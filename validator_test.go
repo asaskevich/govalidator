@@ -321,7 +321,7 @@ func Test_IsDivisibleBy(t *testing.T) {
 }
 
 func Example_IsDivisibleBy() {
-	isDivisible := IsDivisibleBy("1024", "64")
+	println("1024 is divisible by 64: ", IsDivisibleBy("1024", "64"))
 }
 
 func Test_IsByteLength(t *testing.T) {
