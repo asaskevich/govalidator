@@ -337,3 +337,54 @@ func Test_IsByteLength(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func Test_IsJSON(t *testing.T) {
+	if IsJSON("") {
+		t.FailNow()
+	}
+	if IsJSON("145") {
+		t.FailNow()
+	}
+	if IsJSON("asdf") {
+		t.FailNow()
+	}
+	if IsJSON("123:foo") {
+		t.FailNow()
+	}
+	if !IsJSON("{\"Name\":\"Alice\",\"Body\":\"Hello\",\"Time\":1294706395881547000}") {
+		t.FailNow()
+	}
+	if !IsJSON("{}") {
+		t.FailNow()
+	}
+	if !IsJSON("{\"Key\":{\"Key\":{\"Key\":123}}}") {
+		t.FailNow()
+	}
+}
+
+func Test_IsMultibyte(t *testing.T) {
+	if IsMultibyte("abc") {
+		t.FailNow()
+	}
+	if IsMultibyte("123") {
+		t.FailNow()
+	}
+	if IsMultibyte("<>@;.-=") {
+		t.FailNow()
+	}
+	if !IsMultibyte("ひらがな・カタカナ、．漢字") {
+		t.FailNow()
+	}
+	if !IsMultibyte("あいうえお foobar") {
+		t.FailNow()
+	}
+	if !IsMultibyte("test＠example.com") {
+		t.FailNow()
+	}
+	if !IsMultibyte("1234abcDEｘｙｚ") {
+		t.FailNow()
+	}
+	if !IsMultibyte("ｶﾀｶﾅ") {
+		t.FailNow()
+	}
+}
