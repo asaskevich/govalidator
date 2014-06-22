@@ -320,6 +320,10 @@ func Test_IsDivisibleBy(t *testing.T) {
 	}
 }
 
+func Example_IsDivisibleBy() {
+	isDivisible := IsDivisibleBy("1024", "64")
+}
+
 func Test_IsByteLength(t *testing.T) {
 	if IsByteLength("abacaba", 100, -1) {
 		t.FailNow()
