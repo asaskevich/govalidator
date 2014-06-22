@@ -388,3 +388,30 @@ func Test_IsMultibyte(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func Test_IsASCII(t *testing.T) {
+	if IsASCII("ｆｏｏbar") {
+		t.FailNow()
+	}
+	if IsASCII("ｘｙｚ０９８") {
+		t.FailNow()
+	}
+	if IsASCII("１２３456") {
+		t.FailNow()
+	}
+	if IsASCII("ｶﾀｶﾅ") {
+		t.FailNow()
+	}
+	if !IsASCII("foobar") {
+		t.FailNow()
+	}
+	if !IsASCII("0987654321") {
+		t.FailNow()
+	}
+	if !IsASCII("test@example.com") {
+		t.FailNow()
+	}
+	if !IsASCII("1234abcDEF") {
+		t.FailNow()
+	}
+}
