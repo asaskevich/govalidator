@@ -320,7 +320,7 @@ func Test_IsDivisibleBy(t *testing.T) {
 	}
 }
 
-func Example_IsDivisibleBy() {
+func ExampleIsDivisibleBy() {
 	println("1024 is divisible by 64: ", IsDivisibleBy("1024", "64"))
 }
 
