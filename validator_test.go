@@ -127,3 +127,87 @@ func Test_IsInt(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func Test_IsEmail(t *testing.T) {
+	if !IsEmail("foo@bar.com") {
+		t.FailNow()
+	}
+	if !IsEmail("x@x.x") {
+		t.FailNow()
+	}
+	if !IsEmail("foo@bar.com.au") {
+		t.FailNow()
+	}
+	if !IsEmail("foo+bar@bar.com") {
+		t.FailNow()
+	}
+	if IsEmail("invalidemail@") {
+		t.FailNow()
+	}
+	if IsEmail("invalid.com") {
+		t.FailNow()
+	}
+	if IsEmail("@invalid.com") {
+		t.FailNow()
+	}
+}
+
+func Test_IsURL(t *testing.T) {
+	if !IsURL("http://foobar.com") {
+		t.FailNow()
+	}
+	if !IsURL("https://foobar.com") {
+		t.FailNow()
+	}
+	if !IsURL("foobar.com") {
+		t.FailNow()
+	}
+	if !IsURL("http://foobar.org/") {
+		t.FailNow()
+	}
+	if !IsURL("http://foobar.org:8080/") {
+		t.FailNow()
+	}
+	if !IsURL("ftp://foobar.ru/") {
+		t.FailNow()
+	}
+	if !IsURL("http://user:pass@www.foobar.com/") {
+		t.FailNow()
+	}
+	if !IsURL("http://127.0.0.1/") {
+		t.FailNow()
+	}
+	if !IsURL("http://duckduckgo.com/?q=%2F") {
+		t.FailNow()
+	}
+	if !IsURL("http://localhost:3000/") {
+		t.FailNow()
+	}
+	if !IsURL("http://foobar.com/?foo=bar#baz=qux") {
+		t.FailNow()
+	}
+	if !IsURL("http://foobar.com?foo=bar") {
+		t.FailNow()
+	}
+	if !IsURL("http://www.xn--froschgrn-x9a.net/") {
+		t.FailNow()
+	}
+	if IsURL("") {
+		t.FailNow()
+	}
+	if IsURL("xyz://foobar.com") {
+		t.FailNow()
+	}
+	if IsURL("invalid.") {
+		t.FailNow()
+	}
+	if IsURL(".com") {
+		t.FailNow()
+	}
+	if IsURL("rtmp://foobar.com") {
+		t.FailNow()
+	}
+	if IsURL("http://www.foo_bar.com/") {
+		t.FailNow()
+	}
+}

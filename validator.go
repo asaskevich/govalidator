@@ -1,3 +1,4 @@
+// Package govalidator is package of string validators and sanitizers.
 package govalidator
 
 import (
