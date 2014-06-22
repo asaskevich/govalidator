@@ -1,6 +1,6 @@
 govalidator
 ===========
-[![Build Status](https://travis-ci.org/asaskevich/govalidator.svg?branch=master)](https://travis-ci.org/asaskevich/govalidator) [![GoDoc](https://godoc.org/github.com/asaskevich/govalidator?status.png)](https://godoc.org/github.com/asaskevich/govalidator)
+[![Build Status](https://travis-ci.org/asaskevich/govalidator.svg?branch=master)](https://travis-ci.org/asaskevich/govalidator) [![GoDoc](https://godoc.org/github.com/asaskevich/govalidator?status.png)](https://godoc.org/github.com/asaskevich/govalidator) [![Coverage Status](https://img.shields.io/coveralls/asaskevich/govalidator.svg)](https://coveralls.io/r/asaskevich/govalidator?branch=master)
 [![wercker status](https://app.wercker.com/status/1ec990b09ea86c910d5f08b0e02c6043/s "wercker status")](https://app.wercker.com/project/bykey/1ec990b09ea86c910d5f08b0e02c6043)
 
 A package of string validators and sanitizers for Go lang. Based on [validator.js](https://github.com/chriso/validator.js).
@@ -51,6 +51,6 @@ List of functions:
 * func WhiteList(str, chars string) string
 
 Documentation is available here: [godoc.org](https://godoc.org/github.com/asaskevich/govalidator).
-Information about code coverage is available here: [govalidator on gocover.io](http://gocover.io/github.com/asaskevich/govalidator).
+Full information about code coverage is also available here: [govalidator on gocover.io](http://gocover.io/github.com/asaskevich/govalidator).
 
 If you do have a contribution for the package feel free to put up a Pull Request or open Issue.
