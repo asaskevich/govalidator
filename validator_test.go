@@ -415,3 +415,81 @@ func Test_IsASCII(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func Test_IsFullWidth(t *testing.T) {
+	if IsFullWidth("abc") {
+		t.FailNow()
+	}
+	if IsFullWidth("abc123") {
+		t.FailNow()
+	}
+	if IsFullWidth("!\"#$%&()<>/+=-_? ~^|.,@`{}[]") {
+		t.FailNow()
+	}
+	if !IsFullWidth("ひらがな・カタカナ、．漢字") {
+		t.FailNow()
+	}
+	if !IsFullWidth("３ー０　ａ＠ｃｏｍ") {
+		t.FailNow()
+	}
+	if !IsFullWidth("Ｆｶﾀｶﾅﾞﾬ") {
+		t.FailNow()
+	}
+	if !IsFullWidth("Good＝Parts") {
+		t.FailNow()
+	}
+}
+
+func Test_IsHalfWidth(t *testing.T) {
+	if IsHalfWidth("あいうえお") {
+		t.FailNow()
+	}
+	if IsHalfWidth("００１１") {
+		t.FailNow()
+	}
+	if !IsHalfWidth("!\"#$%&()<>/+=-_? ~^|.,@`{}[]") {
+		t.FailNow()
+	}
+	if !IsHalfWidth("l-btn_02--active") {
+		t.FailNow()
+	}
+	if !IsHalfWidth("abc123い") {
+		t.FailNow()
+	}
+	if !IsHalfWidth("ｶﾀｶﾅﾞﾬ￩") {
+		t.FailNow()
+	}
+}
+
+func Test_IsVariableWidth(t *testing.T) {
+	if !IsVariableWidth("ひらがなカタカナ漢字ABCDE") {
+		t.FailNow()
+	}
+	if !IsVariableWidth("３ー０123") {
+		t.FailNow()
+	}
+	if !IsVariableWidth("Ｆｶﾀｶﾅﾞﾬ") {
+		t.FailNow()
+	}
+	if !IsVariableWidth("Good＝Parts") {
+		t.FailNow()
+	}
+	if IsVariableWidth("abc") {
+		t.FailNow()
+	}
+	if IsVariableWidth("abc123") {
+		t.FailNow()
+	}
+	if IsVariableWidth("!\"#$%&()<>/+=-_? ~^|.,@`{}[]") {
+		t.FailNow()
+	}
+	if IsVariableWidth("ひらがな・カタカナ、．漢字") {
+		t.FailNow()
+	}
+	if IsVariableWidth("１２３４５６") {
+		t.FailNow()
+	}
+	if IsVariableWidth("ｶﾀｶﾅﾞﾬ") {
+		t.FailNow()
+	}
+}
