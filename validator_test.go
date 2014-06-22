@@ -493,3 +493,86 @@ func Test_IsVariableWidth(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func Test_IsUUID(t *testing.T) {
+	// Tests without version
+	if IsUUID("", 0) {
+		t.FailNow()
+	}
+	if IsUUID("xxxA987FBC9-4BED-3078-CF07-9141BA07C9F3", 0) {
+		t.FailNow()
+	}
+	if IsUUID("A987FBC9-4BED-3078-CF07-9141BA07C9F3xxx", 0) {
+		t.FailNow()
+	}
+	if IsUUID("A987FBC94BED3078CF079141BA07C9F3", 0) {
+		t.FailNow()
+	}
+	if IsUUID("934859", 0) {
+		t.FailNow()
+	}
+	if IsUUID("987FBC9-4BED-3078-CF07A-9141BA07C9F3", 0) {
+		t.FailNow()
+	}
+	if IsUUID("AAAAAAAA-1111-1111-AAAG-111111111111", 0) {
+		t.FailNow()
+	}
+	if !IsUUID("A987FBC9-4BED-3078-CF07-9141BA07C9F3", 0) {
+		t.FailNow()
+	}
+	// UUID ver. 3
+	if IsUUID("", 3) {
+		t.FailNow()
+	}
+	if IsUUID("412452646", 3) {
+		t.FailNow()
+	}
+	if IsUUID("xxxA987FBC9-4BED-3078-CF07-9141BA07C9F3", 3) {
+		t.FailNow()
+	}
+	if IsUUID("A987FBC9-4BED-4078-8F07-9141BA07C9F3", 3) {
+		t.FailNow()
+	}
+	if !IsUUID("A987FBC9-4BED-3078-CF07-9141BA07C9F3", 3) {
+		t.FailNow()
+	}
+	// UUID ver. 4
+	if IsUUID("", 4) {
+		t.FailNow()
+	}
+	if IsUUID("xxxA987FBC9-4BED-3078-CF07-9141BA07C9F3", 4) {
+		t.FailNow()
+	}
+	if IsUUID("A987FBC9-4BED-5078-AF07-9141BA07C9F3", 4) {
+		t.FailNow()
+	}
+	if IsUUID("934859", 4) {
+		t.FailNow()
+	}
+	if !IsUUID("57B73598-8764-4AD0-A76A-679BB6640EB1", 4) {
+		t.FailNow()
+	}
+	if !IsUUID("625E63F3-58F5-40B7-83A1-A72AD31ACFFB", 4) {
+		t.FailNow()
+	}
+	// UUID ver. 5
+	if IsUUID("xxxA987FBC9-4BED-3078-CF07-9141BA07C9F3", 5) {
+		t.FailNow()
+	}
+	if IsUUID("9c858901-8a57-4791-81fe-4c455b099bc9", 5) {
+		t.FailNow()
+	}
+	if IsUUID("A987FBC9-4BED-3078-CF07-9141BA07C9F3", 5) {
+		t.FailNow()
+	}
+	if IsUUID("", 5) {
+		t.FailNow()
+	}
+	if !IsUUID("987FBC97-4BED-5078-AF07-9141BA07C9F3", 5) {
+		t.FailNow()
+	}
+	if !IsUUID("987FBC97-4BED-5078-9F07-9141BA07C9F3", 5) {
+		t.FailNow()
+	}
+
+}
