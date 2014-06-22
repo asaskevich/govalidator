@@ -6,22 +6,19 @@ import (
 	"strings"
 )
 
-// Check if the string contains the substring.
+// Contains check if the string contains the substring.
 func Contains(str, substr string) bool {
 	return strings.Contains(str, substr)
 }
 
-// Check if string matches the pattern (pattern is regular expression)
+// Matches check if string matches the pattern (pattern is regular expression)
 // In case of error return false
 func Matches(str, pattern string) bool {
-	match, err := regexp.MatchString(pattern, str)
-	if err != nil {
-		return false
-	}
+	match, _ := regexp.MatchString(pattern, str)
 	return match
 }
 
-// Trim characters from the left-side of the input.
+// LeftTrim trim characters from the left-side of the input.
 // If second argument is empty, it's will be remove leading spaces.
 func LeftTrim(str, chars string) string {
 	pattern := ""
@@ -34,7 +31,7 @@ func LeftTrim(str, chars string) string {
 	return string(r.ReplaceAll([]byte(str), []byte("")))
 }
 
-// Trim characters from the right-side of the input.
+// RightTrim trim characters from the right-side of the input.
 // If second argument is empty, it's will be remove spaces.
 func RightTrim(str, chars string) string {
 	pattern := ""
@@ -48,27 +45,27 @@ func RightTrim(str, chars string) string {
 }
 
 
-// Trim characters from both sides of the input.
+// Trim trim characters from both sides of the input.
 // If second argument is empty, it's will be remove spaces.
 func Trim(str, chars string) string {
 	return LeftTrim(RightTrim(str, chars), chars)
 }
 
-// Remove characters that do not appear in the whitelist.
+// WhiteList remove characters that do not appear in the whitelist.
 func WhiteList(str, chars string) string {
 	pattern := "[^" + chars + "]+"
 	r, _ := regexp.Compile(pattern)
 	return string(r.ReplaceAll([]byte(str), []byte("")))
 }
 
-// Remove characters that appear in the blacklist.
+// BlackList remove characters that appear in the blacklist.
 func BlackList(str, chars string) string {
 	pattern := "[" + chars + "]+"
 	r, _ := regexp.Compile(pattern)
 	return string(r.ReplaceAll([]byte(str), []byte("")))
 }
 
-// Remove characters with a numerical value < 32 and 127, mostly control characters.
+// StripLow remove characters with a numerical value < 32 and 127, mostly control characters.
 // If KeepNewLines is true, newline characters are preserved (\n and \r, hex 0xA and 0xD).
 func StripLow(str string, KeepNewLines bool) string {
 	chars := ""
@@ -80,7 +77,7 @@ func StripLow(str string, KeepNewLines bool) string {
 	return BlackList(str, chars)
 }
 
-// Replace regular expression pattern in string
+// ReplacePattern replace regular expression pattern in string
 func ReplacePattern(str, pattern, replace string) string {
 	r, _ := regexp.Compile(pattern)
 	return string(r.ReplaceAll([]byte(str), []byte(replace)))

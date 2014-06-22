@@ -27,7 +27,7 @@ func Test_Matches(t *testing.T) {
 	if !Matches("111222333", "((111|222|333)+)+") {
 		t.FailNow()
 	}
-	if Matches("abacaba", "\\$@$!%(#)") {
+	if Matches("abacaba", "((123+]") {
 		t.FailNow()
 	}
 }
