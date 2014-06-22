@@ -1,4 +1,3 @@
-// A package of string validators and sanitizers.
 package govalidator
 
 // Basic regular expressions for validating strings

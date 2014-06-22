@@ -1,4 +1,4 @@
-// A package of string validators and sanitizers.
+// Package of string validators and sanitizers.
 package govalidator
 
 import (
