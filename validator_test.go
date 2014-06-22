@@ -602,3 +602,51 @@ func Test_IsCreditCard(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func Test_IsISBN(t *testing.T) {
+	// ISBN 10
+	if IsISBN("", 10) {
+		t.FailNow()
+	}
+	if IsISBN("foo", 10) {
+		t.FailNow()
+	}
+	if IsISBN("3423214121", 10) {
+		t.FailNow()
+	}
+	if IsISBN("978-3836221191", 10) {
+		t.FailNow()
+	}
+	if IsISBN("3-423-21412-1", 10) {
+		t.FailNow()
+	}
+	if IsISBN("3 423 21412 1", 10) {
+		t.FailNow()
+	}
+	if !IsISBN("3836221195", 10) {
+		t.FailNow()
+	}
+	if !IsISBN("1-61729-085-8", 10) {
+		t.FailNow()
+	}
+	if !IsISBN("3 423 21412 0", 10) {
+		t.FailNow()
+	}
+	// ISBN 13
+	if IsISBN("", 13) {
+		t.FailNow()
+	}
+	if IsISBN("3-8362-2119-5", 13) {
+		t.FailNow()
+	}
+	if IsISBN("01234567890ab", 13) {
+		t.FailNow()
+	}
+	if IsISBN("978 3 8362 2119 0", 13) {
+		t.FailNow()
+	}
+	if IsISBN("978-3-8362-2119-0", 13) {
+		t.FailNow()
+	}
+
+}

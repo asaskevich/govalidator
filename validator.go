@@ -163,7 +163,7 @@ func IsISBN(str string, version int) bool {
 		for i = 0; i < 12; i++ {
 			checksum += factor[i%2]*int32(sanitized[i])
 		}
-		if int32(sanitized[12])-((10-(checksum%10))%10) == 0 {
+		if int32(sanitized[12])-(checksum%10) == 0 {
 			return true
 		}
 	}
