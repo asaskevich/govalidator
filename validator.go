@@ -67,7 +67,12 @@ func IsFloat(str string) bool {
 
 // IsDivisibleBy check if the string is a number that's divisible by another.
 func IsDivisibleBy(str, num string) bool {
-	return int64(ToFloat(str))%ToInt(num) == 0
+	p := int64(ToFloat(str))
+	q := ToInt(num)
+	if q == 0 {
+		return false
+	}
+	return (p == 0) || (p%q == 0)
 }
 
 // IsNull check if the string is null.

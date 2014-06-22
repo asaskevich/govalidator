@@ -211,3 +211,129 @@ func Test_IsURL(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func Test_IsFloat(t *testing.T) {
+	if IsFloat("") {
+		t.FailNow()
+	}
+	if IsFloat("  ") {
+		t.FailNow()
+	}
+	if IsFloat("-.123") {
+		t.FailNow()
+	}
+	if IsFloat("abacaba") {
+		t.FailNow()
+	}
+	if !IsFloat("123") {
+		t.FailNow()
+	}
+	if !IsFloat("123.") {
+		t.FailNow()
+	}
+	if !IsFloat("123.123") {
+		t.FailNow()
+	}
+	if !IsFloat("-123.123") {
+		t.FailNow()
+	}
+	if !IsFloat("0.123") {
+		t.FailNow()
+	}
+	if !IsFloat("-0.123") {
+		t.FailNow()
+	}
+	if !IsFloat(".0") {
+		t.FailNow()
+	}
+	if !IsFloat("01.123") {
+		t.FailNow()
+	}
+	if !IsFloat("-0.22250738585072011e-307") {
+		t.FailNow()
+	}
+}
+
+func Test_IsHexadecimal(t *testing.T) {
+	if IsHexadecimal("abcdefg") {
+		t.FailNow()
+	}
+	if IsHexadecimal("") {
+		t.FailNow()
+	}
+	if IsHexadecimal("..") {
+		t.FailNow()
+	}
+	if !IsHexadecimal("deadBEEF") {
+		t.FailNow()
+	}
+	if !IsHexadecimal("ff0044") {
+		t.FailNow()
+	}
+}
+
+func Test_IsHexcolor(t *testing.T) {
+	if IsHexcolor("#ff") {
+		t.FailNow()
+	}
+	if IsHexcolor("fff0") {
+		t.FailNow()
+	}
+	if IsHexcolor("#ff12FG") {
+		t.FailNow()
+	}
+	if !IsHexcolor("#ff0034") {
+		t.FailNow()
+	}
+	if !IsHexcolor("CCccCC") {
+		t.FailNow()
+	}
+	if !IsHexcolor("fff") {
+		t.FailNow()
+	}
+	if !IsHexcolor("#f00") {
+		t.FailNow()
+	}
+}
+
+func Test_IsNull(t *testing.T) {
+	if IsNull("abacaba") || !IsNull("") {
+		t.FailNow()
+	}
+}
+
+func Test_IsDivisibleBy(t *testing.T) {
+	if !IsDivisibleBy("4", "2") {
+		t.FailNow()
+	}
+	if !IsDivisibleBy("100", "10") {
+		t.FailNow()
+	}
+	if !IsDivisibleBy("", "1") {
+		t.FailNow()
+	}
+	if IsDivisibleBy("123", "foo") {
+		t.FailNow()
+	}
+	if IsDivisibleBy("123", "0") {
+		t.FailNow()
+	}
+}
+
+func Test_IsByteLength(t *testing.T) {
+	if IsByteLength("abacaba", 100, -1) {
+		t.FailNow()
+	}
+	if IsByteLength("abacaba", 1, 3) {
+		t.FailNow()
+	}
+	if !IsByteLength("abacaba", 1, 7) {
+		t.FailNow()
+	}
+	if !IsByteLength("abacaba", 0, 8) {
+		t.FailNow()
+	}
+	if IsByteLength("\ufff0", 1, 1) {
+		t.FailNow()
+	}
+}
