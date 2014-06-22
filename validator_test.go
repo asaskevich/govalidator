@@ -574,6 +574,9 @@ func Test_IsUUID(t *testing.T) {
 	if !IsUUID("987FBC97-4BED-5078-9F07-9141BA07C9F3", 5) {
 		t.FailNow()
 	}
+	if IsUUID("", -1) {
+		t.FailNow()
+	}
 }
 
 func Test_IsCreditCard(t *testing.T) {
@@ -632,6 +635,9 @@ func Test_IsISBN(t *testing.T) {
 	if !IsISBN("3 423 21412 0", 10) {
 		t.FailNow()
 	}
+	if !IsISBN("3 401 01319 X", 10) {
+		t.FailNow()
+	}
 	// ISBN 13
 	if IsISBN("", 13) {
 		t.FailNow()
@@ -645,8 +651,16 @@ func Test_IsISBN(t *testing.T) {
 	if IsISBN("978 3 8362 2119 0", 13) {
 		t.FailNow()
 	}
-	if IsISBN("978-3-8362-2119-0", 13) {
+	if !IsISBN("9784873113685", 13) {
 		t.FailNow()
 	}
-
+	if !IsISBN("978-4-87311-368-5", 13) {
+		t.FailNow()
+	}
+	if !IsISBN("978 3401013190", 13) {
+		t.FailNow()
+	}
+	if !IsISBN("978-3-8362-2119-1", 13) {
+		t.FailNow()
+	}
 }
