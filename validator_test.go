@@ -574,5 +574,31 @@ func Test_IsUUID(t *testing.T) {
 	if !IsUUID("987FBC97-4BED-5078-9F07-9141BA07C9F3", 5) {
 		t.FailNow()
 	}
+}
 
+func Test_IsCreditCard(t *testing.T) {
+	if IsCreditCard("foo") {
+		t.FailNow()
+	}
+	if IsCreditCard("5398228707871528") {
+		t.FailNow()
+	}
+	if !IsCreditCard("375556917985515") {
+		t.FailNow()
+	}
+	if !IsCreditCard("36050234196908") {
+		t.FailNow()
+	}
+	if !IsCreditCard("4716461583322103") {
+		t.FailNow()
+	}
+	if !IsCreditCard("4716-2210-5188-5662") {
+		t.FailNow()
+	}
+	if !IsCreditCard("4929 7226 5379 7141") {
+		t.FailNow()
+	}
+	if !IsCreditCard("5398228707871527") {
+		t.FailNow()
+	}
 }
