@@ -1,9 +1,6 @@
 package govalidator
 
-import (
-	"testing"
-	"github.com/mattn/go-sqlite3/_example/hook"
-)
+import "testing"
 
 func Test_Contains(t *testing.T) {
 	tests_1 := []string{"abacada", "abacada", "abacada", "abacada"}
