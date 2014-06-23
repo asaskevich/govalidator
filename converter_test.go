@@ -3,74 +3,49 @@ package govalidator
 import "testing"
 
 func Test_ToInt(t *testing.T) {
-	if ToInt("1000") != 1000 {
-		t.FailNow()
-	}
-	if ToInt("-123") != -123 {
-		t.FailNow()
-	}
-	if ToInt("abcdef") != 0 {
-		t.FailNow()
-	}
-	if ToInt("1000000000000000000000000000000000000000000000000000000000") != 0 {
-		t.FailNow()
+	tests := []string{"1000", "-123", "abcdef", "100000000000000000000000000000000000000000000"}
+	expected := []int64{1000, -123, 0, 0}
+	for i := 0; i < len(tests); i ++ {
+		result, _ := ToInt(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
 func Test_ToBoolean(t * testing.T) {
-	if !ToBoolean("true") {
-		t.FailNow()
-	}
-	if !ToBoolean("1") {
-		t.FailNow()
-	}
-	if !ToBoolean("True") {
-		t.FailNow()
-	}
-	if ToBoolean("false") {
-		t.FailNow()
-	}
-	if ToBoolean("0") {
-		t.FailNow()
-	}
-	if ToBoolean("abcdef") {
-		t.FailNow()
+	tests := []string{"true", "1", "True", "false", "0", "abcdef"}
+	expected := []bool{true, true, true, false, false, false}
+	for i := 0; i < len(tests); i ++ {
+		res, _ := ToBoolean(tests[i])
+		if res != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", expected)
+			t.FailNow()
+		}
 	}
 }
 
 func Test_ToString(t *testing.T) {
-	if ToString("string") != "\"string\"" {
-		t.FailNow()
+	tests := []interface{}{"string", 100, -1.23, []int32{1, 2, 3}}
+	expected := []string{"\"string\"", "100", "-1.23", "[1,2,3]"}
+	for i := 0; i < len(tests); i ++ {
+		res, _ := ToString(tests[i])
+		if res != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", expected)
+			t.FailNow()
+		}
 	}
-	if ToString(100) != "100" {
-		t.FailNow()
-	}
-	if ToString(-1.23) != "-1.23" {
-		t.FailNow()
-	}
-	if ToString([]int32{1, 2, 3}) != "[1,2,3]" {
-		t.FailNow()
-	}
-
 }
 
 func Test_ToFloat(t *testing.T) {
-	if ToFloat("") != 0 {
-		t.FailNow()
-	}
-	if ToFloat("123") != 123 {
-		t.FailNow()
-	}
-	if ToFloat("-.01") != -0.01 {
-		t.FailNow()
-	}
-	if ToFloat("10.") != 10.0 {
-		t.FailNow()
-	}
-	if ToFloat("string") != 0 {
-		t.FailNow()
-	}
-	if ToFloat("1.23e3") != 1230 {
-		t.FailNow()
+	tests := []string {"", "123", "-.01", "10.", "string", "1.23e3", ".23e10"}
+	expected := []float64{0, 123, -0.01, 10.0, 0, 1230, 0.23e10}
+	for i := 0; i < len(tests); i ++ {
+		res, _ := ToFloat(tests[i])
+		if res != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", expected)
+			t.FailNow()
+		}
 	}
 }

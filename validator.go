@@ -69,9 +69,10 @@ func IsFloat(str string) bool {
 // If second argument is not valid integer or zero, it's return false.
 // Otherwise, if first argument is not valid integer or zero, it's return true (Invalid string converts to zero).
 func IsDivisibleBy(str, num string) bool {
-	p := int64(ToFloat(str))
-	q := ToInt(num)
-	if q == 0{
+	f, _ := ToFloat(str)
+	p := int64(f)
+	q, _ := ToInt(num)
+	if q == 0 {
 		return false
 	}
 	return (p == 0) || (p%q == 0)
@@ -115,7 +116,7 @@ func IsCreditCard(str string) bool {
 	var shouldDouble bool
 	for i := len(sanitized) - 1; i >= 0; i-- {
 		digit = string(sanitized[i:(i + 1)])
-		tmpNum = ToInt(digit)
+		tmpNum, _ = ToInt(digit)
 		if shouldDouble {
 			tmpNum *= 2
 			if tmpNum >= 10 {
