@@ -3,41 +3,41 @@ package govalidator
 import "testing"
 
 func Test_Contains(t *testing.T) {
-	if !Contains("abacada", "") {
-		t.FailNow()
-	}
-	if Contains("abacada", "ritir") {
-		t.FailNow()
-	}
-	if !Contains("abacada", "a") {
-		t.FailNow()
-	}
-	if !Contains("abacada", "aca") {
-		t.FailNow()
+	tests_1 := []string{"abacada", "abacada", "abacada", "abacada"}
+	tests_2 := []string{"", "ritir", "a", "aca"}
+	expected := []bool{true, false, true, true}
+	for i := 0; i < len(tests_1); i ++ {
+		result := Contains(tests_1[i], tests_2[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
 func Test_Matches(t *testing.T) {
-	if !Matches("123456789", "[0-9]+") {
-		t.FailNow()
-	}
-	if Matches("abacaba", "cab$") {
-		t.FailNow()
-	}
-	if !Matches("111222333", "((111|222|333)+)+") {
-		t.FailNow()
-	}
-	if Matches("abacaba", "((123+]") {
-		t.FailNow()
+	tests_1 := []string{"123456789", "abacada", "111222333", "abacaba"}
+	tests_2 := []string{"[0-9]+", "cab$", "((111|222|333)+)+", "((123+]"}
+	expected := []bool{true, false, true, false}
+	for i := 0; i < len(tests_1); i ++ {
+		result := Matches(tests_1[i], tests_2[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
 func Test_LeftTrim(t *testing.T) {
-	if LeftTrim("  \r\n\tfoo  \r\n\t   ", "") != "foo  \r\n\t   " {
-		t.FailNow()
-	}
-	if LeftTrim("010100201000", "01") != "201000" {
-		t.FailNow()
+	tests_1 := []string{"  \r\n\tfoo  \r\n\t   ", "010100201000"}
+	tests_2 := []string{"", "01"}
+	expected := []string{"foo  \r\n\t   ", "201000"}
+	for i := 0; i < len(tests_1); i ++ {
+		result := LeftTrim(tests_1[i], tests_2[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 

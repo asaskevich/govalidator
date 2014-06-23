@@ -48,10 +48,10 @@ func Matches(str, pattern string) bool
 func ReplacePattern(str, pattern, replace string) string
 func RightTrim(str, chars string) string
 func StripLow(str string, KeepNewLines bool) string
-func ToBoolean(str string) bool
-func ToFloat(str string) float64
-func ToInt(str string) int64
-func ToString(obj interface{}) string
+func ToBoolean(str string) (bool, error)
+func ToFloat(str string) (float64, error)
+func ToInt(str string) (int64, error)
+func ToString(obj interface{}) (string, error)
 func Trim(str, chars string) string
 func WhiteList(str, chars string) string
 ```
