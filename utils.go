@@ -43,7 +43,6 @@ func RightTrim(str, chars string) string {
 	return string(r.ReplaceAll([]byte(str), []byte("")))
 }
 
-
 // Trim trim characters from both sides of the input.
 // If second argument is empty, it's will be remove spaces.
 func Trim(str, chars string) string {

@@ -120,7 +120,7 @@ func IsCreditCard(str string) bool {
 		if shouldDouble {
 			tmpNum *= 2
 			if tmpNum >= 10 {
-				sum += ((tmpNum%10)+1)
+				sum += ((tmpNum % 10) + 1)
 			} else {
 				sum += tmpNum
 			}
@@ -147,12 +147,12 @@ func IsISBN(str string, version int) bool {
 			return false
 		}
 		for i = 0; i < 9; i++ {
-			checksum += (i+1)*int32(sanitized[i] - '0')
+			checksum += (i + 1) * int32(sanitized[i]-'0')
 		}
 		if sanitized[9] == 'X' {
-			checksum += 10*10
+			checksum += 10 * 10
 		} else {
-			checksum += 10*int32(sanitized[9] - '0')
+			checksum += 10 * int32(sanitized[9]-'0')
 		}
 		if checksum%11 == 0 {
 			return true
@@ -164,9 +164,9 @@ func IsISBN(str string, version int) bool {
 		}
 		factor := []int32{1, 3}
 		for i = 0; i < 12; i++ {
-			checksum += factor[i%2]*int32(sanitized[i] - '0')
+			checksum += factor[i%2] * int32(sanitized[i]-'0')
 		}
-		if (int32(sanitized[12] - '0'))-((10-(checksum%10))%10) == 0 {
+		if (int32(sanitized[12]-'0'))-((10-(checksum%10))%10) == 0 {
 			return true
 		}
 	}
