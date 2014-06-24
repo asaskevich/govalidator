@@ -87,104 +87,31 @@ func Test_IsEmail(t *testing.T) {
 }
 
 func Test_IsURL(t *testing.T) {
-	if !IsURL("http://foobar.com") {
-		t.FailNow()
-	}
-	if !IsURL("https://foobar.com") {
-		t.FailNow()
-	}
-	if !IsURL("foobar.com") {
-		t.FailNow()
-	}
-	if !IsURL("http://foobar.org/") {
-		t.FailNow()
-	}
-	if !IsURL("http://foobar.org:8080/") {
-		t.FailNow()
-	}
-	if !IsURL("ftp://foobar.ru/") {
-		t.FailNow()
-	}
-	if !IsURL("http://user:pass@www.foobar.com/") {
-		t.FailNow()
-	}
-	if !IsURL("http://127.0.0.1/") {
-		t.FailNow()
-	}
-	if !IsURL("http://duckduckgo.com/?q=%2F") {
-		t.FailNow()
-	}
-	if !IsURL("http://localhost:3000/") {
-		t.FailNow()
-	}
-	if !IsURL("http://foobar.com/?foo=bar#baz=qux") {
-		t.FailNow()
-	}
-	if !IsURL("http://foobar.com?foo=bar") {
-		t.FailNow()
-	}
-	if !IsURL("http://www.xn--froschgrn-x9a.net/") {
-		t.FailNow()
-	}
-	if IsURL("") {
-		t.FailNow()
-	}
-	if IsURL("xyz://foobar.com") {
-		t.FailNow()
-	}
-	if IsURL("invalid.") {
-		t.FailNow()
-	}
-	if IsURL(".com") {
-		t.FailNow()
-	}
-	if IsURL("rtmp://foobar.com") {
-		t.FailNow()
-	}
-	if IsURL("http://www.foo_bar.com/") {
-		t.FailNow()
+	tests := []string{"http://foobar.com", "https://foobar.com", "foobar.com", "http://foobar.org/", "http://foobar.org:8080/",
+		"ftp://foobar.ru/", "http://user:pass@www.foobar.com/", "http://127.0.0.1/", "http://duckduckgo.com/?q=%2F", "http://localhost:3000/",
+		"http://foobar.com/?foo=bar#baz=qux", "http://foobar.com?foo=bar", "http://www.xn--froschgrn-x9a.net/",
+		"", "xyz://foobar.com", "invalid.", ".com", "rtmp://foobar.com", "http://www.foo_bar.com/"}
+	expected := []bool{true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false,
+		false, false, false}
+	for i := 0; i < len(tests); i++ {
+		result := IsURL(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
 func Test_IsFloat(t *testing.T) {
-	if IsFloat("") {
-		t.FailNow()
-	}
-	if IsFloat("  ") {
-		t.FailNow()
-	}
-	if IsFloat("-.123") {
-		t.FailNow()
-	}
-	if IsFloat("abacaba") {
-		t.FailNow()
-	}
-	if !IsFloat("123") {
-		t.FailNow()
-	}
-	if !IsFloat("123.") {
-		t.FailNow()
-	}
-	if !IsFloat("123.123") {
-		t.FailNow()
-	}
-	if !IsFloat("-123.123") {
-		t.FailNow()
-	}
-	if !IsFloat("0.123") {
-		t.FailNow()
-	}
-	if !IsFloat("-0.123") {
-		t.FailNow()
-	}
-	if !IsFloat(".0") {
-		t.FailNow()
-	}
-	if !IsFloat("01.123") {
-		t.FailNow()
-	}
-	if !IsFloat("-0.22250738585072011e-307") {
-		t.FailNow()
+	tests := []string{"", "  ", "-.123", "abacaba", "123", "123.", "123.123", "-123.123", "0.123", "-0.123", ".0",
+		"01.123", "-0.22250738585072011e-307"}
+	expected := []bool{false, false, false, false, true, true, true, true, true, true, true, true, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsFloat(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
@@ -333,86 +260,59 @@ func Test_IsVariableWidth(t *testing.T) {
 
 func Test_IsUUID(t *testing.T) {
 	// Tests without version
-	if IsUUID("", 0) {
-		t.FailNow()
-	}
-	if IsUUID("xxxA987FBC9-4BED-3078-CF07-9141BA07C9F3", 0) {
-		t.FailNow()
-	}
-	if IsUUID("A987FBC9-4BED-3078-CF07-9141BA07C9F3xxx", 0) {
-		t.FailNow()
-	}
-	if IsUUID("A987FBC94BED3078CF079141BA07C9F3", 0) {
-		t.FailNow()
-	}
-	if IsUUID("934859", 0) {
-		t.FailNow()
-	}
-	if IsUUID("987FBC9-4BED-3078-CF07A-9141BA07C9F3", 0) {
-		t.FailNow()
-	}
-	if IsUUID("AAAAAAAA-1111-1111-AAAG-111111111111", 0) {
-		t.FailNow()
-	}
-	if !IsUUID("A987FBC9-4BED-3078-CF07-9141BA07C9F3", 0) {
-		t.FailNow()
+	tests := []string{"", "xxxA987FBC9-4BED-3078-CF07-9141BA07C9F3", "A987FBC9-4BED-3078-CF07-9141BA07C9F3xxx",
+		"A987FBC94BED3078CF079141BA07C9F3", "934859", "987FBC9-4BED-3078-CF07A-9141BA07C9F3",
+		"AAAAAAAA-1111-1111-AAAG-111111111111", "A987FBC9-4BED-3078-CF07-9141BA07C9F3", }
+	expected := []bool{false, false, false, false, false, false, false, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsUUID(tests[i], 0)
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 	// UUID ver. 3
-	if IsUUID("", 3) {
-		t.FailNow()
-	}
-	if IsUUID("412452646", 3) {
-		t.FailNow()
-	}
-	if IsUUID("xxxA987FBC9-4BED-3078-CF07-9141BA07C9F3", 3) {
-		t.FailNow()
-	}
-	if IsUUID("A987FBC9-4BED-4078-8F07-9141BA07C9F3", 3) {
-		t.FailNow()
-	}
-	if !IsUUID("A987FBC9-4BED-3078-CF07-9141BA07C9F3", 3) {
-		t.FailNow()
+	tests = []string{"", "412452646", "xxxA987FBC9-4BED-3078-CF07-9141BA07C9F3", "A987FBC9-4BED-4078-8F07-9141BA07C9F3",
+		"A987FBC9-4BED-3078-CF07-9141BA07C9F3", }
+	expected = []bool{false, false, false, false, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsUUID(tests[i], 3)
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 	// UUID ver. 4
-	if IsUUID("", 4) {
-		t.FailNow()
-	}
-	if IsUUID("xxxA987FBC9-4BED-3078-CF07-9141BA07C9F3", 4) {
-		t.FailNow()
-	}
-	if IsUUID("A987FBC9-4BED-5078-AF07-9141BA07C9F3", 4) {
-		t.FailNow()
-	}
-	if IsUUID("934859", 4) {
-		t.FailNow()
-	}
-	if !IsUUID("57B73598-8764-4AD0-A76A-679BB6640EB1", 4) {
-		t.FailNow()
-	}
-	if !IsUUID("625E63F3-58F5-40B7-83A1-A72AD31ACFFB", 4) {
-		t.FailNow()
+	tests = []string{"", "xxxA987FBC9-4BED-3078-CF07-9141BA07C9F3", "A987FBC9-4BED-5078-AF07-9141BA07C9F3",
+		"934859", "57B73598-8764-4AD0-A76A-679BB6640EB1", "625E63F3-58F5-40B7-83A1-A72AD31ACFFB", }
+	expected = []bool{false, false, false, false, true, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsUUID(tests[i], 4)
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 	// UUID ver. 5
-	if IsUUID("xxxA987FBC9-4BED-3078-CF07-9141BA07C9F3", 5) {
-		t.FailNow()
+	tests = []string{"xxxA987FBC9-4BED-3078-CF07-9141BA07C9F3", "9c858901-8a57-4791-81fe-4c455b099bc9", "A987FBC9-4BED-3078-CF07-9141BA07C9F3",
+		"", "987FBC97-4BED-5078-AF07-9141BA07C9F3", "987FBC97-4BED-5078-9F07-9141BA07C9F3", }
+	expected = []bool{false, false, false, false, true, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsUUID(tests[i], 5)
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
-	if IsUUID("9c858901-8a57-4791-81fe-4c455b099bc9", 5) {
-		t.FailNow()
-	}
-	if IsUUID("A987FBC9-4BED-3078-CF07-9141BA07C9F3", 5) {
-		t.FailNow()
-	}
-	if IsUUID("", 5) {
-		t.FailNow()
-	}
-	if !IsUUID("987FBC97-4BED-5078-AF07-9141BA07C9F3", 5) {
-		t.FailNow()
-	}
-	if !IsUUID("987FBC97-4BED-5078-9F07-9141BA07C9F3", 5) {
-		t.FailNow()
-	}
-	if IsUUID("", -1) {
-		t.FailNow()
+	// Wrong version
+	tests = []string{""}
+	expected = []bool{false}
+	for i := 0; i < len(tests); i++ {
+		result := IsUUID(tests[i], -1)
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
@@ -431,59 +331,25 @@ func Test_IsCreditCard(t *testing.T) {
 
 func Test_IsISBN(t *testing.T) {
 	// ISBN 10
-	if IsISBN("", 10) {
-		t.FailNow()
-	}
-	if IsISBN("foo", 10) {
-		t.FailNow()
-	}
-	if IsISBN("3423214121", 10) {
-		t.FailNow()
-	}
-	if IsISBN("978-3836221191", 10) {
-		t.FailNow()
-	}
-	if IsISBN("3-423-21412-1", 10) {
-		t.FailNow()
-	}
-	if IsISBN("3 423 21412 1", 10) {
-		t.FailNow()
-	}
-	if !IsISBN("3836221195", 10) {
-		t.FailNow()
-	}
-	if !IsISBN("1-61729-085-8", 10) {
-		t.FailNow()
-	}
-	if !IsISBN("3 423 21412 0", 10) {
-		t.FailNow()
-	}
-	if !IsISBN("3 401 01319 X", 10) {
-		t.FailNow()
+	tests := []string{"", "foo", "3423214121", "978-3836221191", "3-423-21412-1", "3 423 21412 1", "3836221195", "1-61729-085-8",
+		"3 423 21412 0", "3 401 01319 X"}
+	expected := []bool{false, false, false, false, false, false, true, true, true, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsISBN(tests[i], 10)
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 	// ISBN 13
-	if IsISBN("", 13) {
-		t.FailNow()
-	}
-	if IsISBN("3-8362-2119-5", 13) {
-		t.FailNow()
-	}
-	if IsISBN("01234567890ab", 13) {
-		t.FailNow()
-	}
-	if IsISBN("978 3 8362 2119 0", 13) {
-		t.FailNow()
-	}
-	if !IsISBN("9784873113685", 13) {
-		t.FailNow()
-	}
-	if !IsISBN("978-4-87311-368-5", 13) {
-		t.FailNow()
-	}
-	if !IsISBN("978 3401013190", 13) {
-		t.FailNow()
-	}
-	if !IsISBN("978-3-8362-2119-1", 13) {
-		t.FailNow()
+	tests = []string{"", "3-8362-2119-5", "01234567890ab", "978 3 8362 2119 0", "9784873113685", "978-4-87311-368-5",
+		"978 3401013190", "978-3-8362-2119-1"}
+	expected = []bool{false, false, false, false, true, true, true, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsISBN(tests[i], 13)
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
