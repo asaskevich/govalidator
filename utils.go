@@ -6,8 +6,8 @@ import (
 )
 
 // Contains check if the string contains the substring.
-func Contains(str, substr string) bool {
-	return strings.Contains(str, substr)
+func Contains(str, substring string) bool {
+	return strings.Contains(str, substring)
 }
 
 // Matches check if string matches the pattern (pattern is regular expression)
@@ -64,10 +64,10 @@ func BlackList(str, chars string) string {
 }
 
 // StripLow remove characters with a numerical value < 32 and 127, mostly control characters.
-// If KeepNewLines is true, newline characters are preserved (\n and \r, hex 0xA and 0xD).
-func StripLow(str string, KeepNewLines bool) string {
+// If keep_new_lines is true, newline characters are preserved (\n and \r, hex 0xA and 0xD).
+func StripLow(str string, keep_new_lines bool) string {
 	chars := ""
-	if KeepNewLines {
+	if keep_new_lines {
 		chars = "\x00-\x09\x0B\x0C\x0E-\x1F\x7F"
 	} else {
 		chars = "\x00-\x1F\x7F"

@@ -138,7 +138,7 @@ func Test_ReplacePattern(t *testing.T) {
 
 // This small example illustrate how to work with ReplacePattern function.
 func ExampleReplacePattern() {
-	// Replace in "http123123ftp://git534543hub.comio" following:
+	// Replace in "http123123ftp://git534543hub.comio" following (pattern "(ftp|io|[0-9]+)"):
 	// - Sequence "ftp".
 	// - Sequence "io".
 	// - Sequence of digits.

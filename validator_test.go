@@ -3,152 +3,86 @@ package govalidator
 import "testing"
 
 func Test_IsAlpha(t *testing.T) {
-	if IsAlpha("") {
-		t.FailNow()
-	}
-	if IsAlpha("   foo   ") {
-		t.FailNow()
-	}
-	if IsAlpha("abc1") {
-		t.FailNow()
-	}
-	if !IsAlpha("abc") {
-		t.FailNow()
-	}
-	if !IsAlpha("ABC") {
-		t.FailNow()
-	}
-	if !IsAlpha("FoObAr") {
-		t.FailNow()
+	tests := []string{"", "   fooo   ", "abc1", "abc", "ABC", "FoObAr"}
+	expected := []bool{false, false, false, true, true, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsAlpha(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
 func Test_IsAlphanumeric(t *testing.T) {
-	if IsAlphanumeric("foo ") {
-		t.FailNow()
-	}
-	if IsAlphanumeric("abc!!!") {
-		t.FailNow()
-	}
-	if !IsAlphanumeric("abc123") {
-		t.FailNow()
-	}
-	if !IsAlphanumeric("ABC111") {
-		t.FailNow()
+	tests := []string{"foo ", "abc!!!", "abc123", "ABC111"}
+	expected := []bool{false, false, true, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsAlphanumeric(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
 func Test_IsNumeric(t *testing.T) {
-	if !IsNumeric("123") {
-		t.FailNow()
-	}
-	if !IsNumeric("0123") {
-		t.FailNow()
-	}
-	if !IsNumeric("-00123") {
-		t.FailNow()
-	}
-	if !IsNumeric("0") {
-		t.FailNow()
-	}
-	if !IsNumeric("-0") {
-		t.FailNow()
-	}
-	if IsNumeric("123.123") {
-		t.FailNow()
-	}
-	if IsNumeric(" ") {
-		t.FailNow()
-	}
-	if IsNumeric(".") {
-		t.FailNow()
+	tests := []string{"123", "0123", "-00123", "0", "-0", "123.123", " ", "."}
+	expected := []bool{true, true, true, true, true, false, false, false}
+	for i := 0; i < len(tests); i++ {
+		result := IsNumeric(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
 func Test_IsLowerCase(t *testing.T) {
-	if !IsLowerCase("abc123") {
-		t.FailNow()
-	}
-	if !IsLowerCase("abc") {
-		t.FailNow()
-	}
-	if !IsLowerCase("tr竪s 端ber") {
-		t.FailNow()
-	}
-	if IsLowerCase("fooBar") {
-		t.FailNow()
-	}
-	if IsLowerCase("123ABC") {
-		t.FailNow()
+	tests := []string{"abc123", "abc", "tr竪s 端ber", "fooBar", "123ABC"}
+	expected := []bool{true, true, true, false, false}
+	for i := 0; i < len(tests); i++ {
+		result := IsLowerCase(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
 func Test_IsUpperCase(t *testing.T) {
-	if !IsUpperCase("ABC123") {
-		t.FailNow()
-	}
-	if !IsUpperCase("ABC") {
-		t.FailNow()
-	}
-	if !IsUpperCase("S T R") {
-		t.FailNow()
-	}
-	if IsUpperCase("fooBar") {
-		t.FailNow()
-	}
-	if IsUpperCase("abacaba123") {
-		t.FailNow()
+	tests := []string{"ABC123", "ABC", "S T R", "fooBar", "abacaba123"}
+	expected := []bool{true, true, true, false, false}
+	for i := 0; i < len(tests); i++ {
+		result := IsUpperCase(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
 func Test_IsInt(t *testing.T) {
-	if !IsInt("123") {
-		t.FailNow()
-	}
-	if !IsInt("0") {
-		t.FailNow()
-	}
-	if !IsInt("-0") {
-		t.FailNow()
-	}
-	if !IsInt("-0") {
-		t.FailNow()
-	}
-	if IsInt("01") {
-		t.FailNow()
-	}
-	if IsInt("123.123") {
-		t.FailNow()
-	}
-	if IsInt(" ") {
-		t.FailNow()
-	}
-	if IsInt("000") {
-		t.FailNow()
+	tests := []string{"123", "0", "-0", "01", "123.123", " ", "000"}
+	expected := []bool{true, true, true, false, false, false, false}
+	for i := 0; i < len(tests); i++ {
+		result := IsInt(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
 func Test_IsEmail(t *testing.T) {
-	if !IsEmail("foo@bar.com") {
-		t.FailNow()
-	}
-	if !IsEmail("x@x.x") {
-		t.FailNow()
-	}
-	if !IsEmail("foo@bar.com.au") {
-		t.FailNow()
-	}
-	if !IsEmail("foo+bar@bar.com") {
-		t.FailNow()
-	}
-	if IsEmail("invalidemail@") {
-		t.FailNow()
-	}
-	if IsEmail("invalid.com") {
-		t.FailNow()
-	}
-	if IsEmail("@invalid.com") {
-		t.FailNow()
+	tests := []string{"foo@bar.com", "x@x.x" , "foo@bar.com.au", "foo+bar@bar.com", "invalidemail@", "invalid.com", "@invalid.com"}
+	expected := []bool{true, true, true, true, false, false, false}
+	for i := 0; i < len(tests); i++ {
+		result := IsEmail(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
@@ -255,68 +189,51 @@ func Test_IsFloat(t *testing.T) {
 }
 
 func Test_IsHexadecimal(t *testing.T) {
-	if IsHexadecimal("abcdefg") {
-		t.FailNow()
-	}
-	if IsHexadecimal("") {
-		t.FailNow()
-	}
-	if IsHexadecimal("..") {
-		t.FailNow()
-	}
-	if !IsHexadecimal("deadBEEF") {
-		t.FailNow()
-	}
-	if !IsHexadecimal("ff0044") {
-		t.FailNow()
+	tests := []string{"abcdefg", "", "..", "deadBEEF", "ff0044"}
+	expected := []bool{false, false, false, true, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsHexadecimal(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
 func Test_IsHexcolor(t *testing.T) {
-	if IsHexcolor("#ff") {
-		t.FailNow()
-	}
-	if IsHexcolor("fff0") {
-		t.FailNow()
-	}
-	if IsHexcolor("#ff12FG") {
-		t.FailNow()
-	}
-	if !IsHexcolor("#ff0034") {
-		t.FailNow()
-	}
-	if !IsHexcolor("CCccCC") {
-		t.FailNow()
-	}
-	if !IsHexcolor("fff") {
-		t.FailNow()
-	}
-	if !IsHexcolor("#f00") {
-		t.FailNow()
+	tests := []string{"#ff", "fff0", "#ff12FG", "CCccCC", "fff", "#f00"}
+	expected := []bool{false, false, false, true, true, true, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsHexcolor(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
 func Test_IsNull(t *testing.T) {
-	if IsNull("abacaba") || !IsNull("") {
-		t.FailNow()
+	tests := []string{"abacaba", ""}
+	expected := []bool{false, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsNull(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
 func Test_IsDivisibleBy(t *testing.T) {
-	if !IsDivisibleBy("4", "2") {
-		t.FailNow()
-	}
-	if !IsDivisibleBy("100", "10") {
-		t.FailNow()
-	}
-	if !IsDivisibleBy("", "1") {
-		t.FailNow()
-	}
-	if IsDivisibleBy("123", "foo") {
-		t.FailNow()
-	}
-	if IsDivisibleBy("123", "0") {
-		t.FailNow()
+	tests_1 := []string{"4", "100", "", "123", "123"}
+	tests_2 := []string{"2", "10", "1", "foo", "0"}
+	expected := []bool{true, true, true, false, false}
+	for i := 0; i < len(tests_1); i++ {
+		result := IsDivisibleBy(tests_1[i], tests_2[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
@@ -326,176 +243,91 @@ func ExampleIsDivisibleBy() {
 }
 
 func Test_IsByteLength(t *testing.T) {
-	if IsByteLength("abacaba", 100, -1) {
-		t.FailNow()
-	}
-	if IsByteLength("abacaba", 1, 3) {
-		t.FailNow()
-	}
-	if !IsByteLength("abacaba", 1, 7) {
-		t.FailNow()
-	}
-	if !IsByteLength("abacaba", 0, 8) {
-		t.FailNow()
-	}
-	if IsByteLength("\ufff0", 1, 1) {
-		t.FailNow()
+	tests_1 := []string{"abacaba", "abacaba", "abacaba", "abacaba", "\ufff0"}
+	tests_2 := []int{100, 1, 1, 0, 1}
+	tests_3 := []int{-1, 3, 7, 8, 1}
+	expected := []bool{false, false, true, true, false}
+	for i := 0; i < len(tests_1); i++ {
+		result := IsByteLength(tests_1[i], tests_2[i], tests_3[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
 func Test_IsJSON(t *testing.T) {
-	if IsJSON("") {
-		t.FailNow()
-	}
-	if IsJSON("145") {
-		t.FailNow()
-	}
-	if IsJSON("asdf") {
-		t.FailNow()
-	}
-	if IsJSON("123:foo") {
-		t.FailNow()
-	}
-	if !IsJSON("{\"Name\":\"Alice\",\"Body\":\"Hello\",\"Time\":1294706395881547000}") {
-		t.FailNow()
-	}
-	if !IsJSON("{}") {
-		t.FailNow()
-	}
-	if !IsJSON("{\"Key\":{\"Key\":{\"Key\":123}}}") {
-		t.FailNow()
+	tests := []string{"", "145", "asdf", "123:f00", "{\"Name\":\"Alice\",\"Body\":\"Hello\",\"Time\":1294706395881547000}",
+		"{}", "{\"Key\":{\"Key\":{\"Key\":123}}}"}
+	expected := []bool{false, false, false, false, true, true, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsJSON(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
 func Test_IsMultibyte(t *testing.T) {
-	if IsMultibyte("abc") {
-		t.FailNow()
-	}
-	if IsMultibyte("123") {
-		t.FailNow()
-	}
-	if IsMultibyte("<>@;.-=") {
-		t.FailNow()
-	}
-	if !IsMultibyte("ひらがな・カタカナ、．漢字") {
-		t.FailNow()
-	}
-	if !IsMultibyte("あいうえお foobar") {
-		t.FailNow()
-	}
-	if !IsMultibyte("test＠example.com") {
-		t.FailNow()
-	}
-	if !IsMultibyte("1234abcDEｘｙｚ") {
-		t.FailNow()
-	}
-	if !IsMultibyte("ｶﾀｶﾅ") {
-		t.FailNow()
+	tests := []string{"abc", "123", "<>@;.-=", "ひらがな・カタカナ、．漢字", "あいうえお foobar", "test＠example.com",
+		"test＠example.com", "1234abcDEｘｙｚ", "ｶﾀｶﾅ"}
+	expected := []bool{false, false, false, true, true, true, true, true, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsMultibyte(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
 func Test_IsASCII(t *testing.T) {
-	if IsASCII("ｆｏｏbar") {
-		t.FailNow()
-	}
-	if IsASCII("ｘｙｚ０９８") {
-		t.FailNow()
-	}
-	if IsASCII("１２３456") {
-		t.FailNow()
-	}
-	if IsASCII("ｶﾀｶﾅ") {
-		t.FailNow()
-	}
-	if !IsASCII("foobar") {
-		t.FailNow()
-	}
-	if !IsASCII("0987654321") {
-		t.FailNow()
-	}
-	if !IsASCII("test@example.com") {
-		t.FailNow()
-	}
-	if !IsASCII("1234abcDEF") {
-		t.FailNow()
+	tests := []string{"ｆｏｏbar", "ｘｙｚ０９８", "１２３456", "ｶﾀｶﾅ", "foobar", "0987654321", "test@example.com", "1234abcDEF"}
+	expected := []bool{false, false, false, false, true, true, true, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsASCII(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
 func Test_IsFullWidth(t *testing.T) {
-	if IsFullWidth("abc") {
-		t.FailNow()
-	}
-	if IsFullWidth("abc123") {
-		t.FailNow()
-	}
-	if IsFullWidth("!\"#$%&()<>/+=-_? ~^|.,@`{}[]") {
-		t.FailNow()
-	}
-	if !IsFullWidth("ひらがな・カタカナ、．漢字") {
-		t.FailNow()
-	}
-	if !IsFullWidth("３ー０　ａ＠ｃｏｍ") {
-		t.FailNow()
-	}
-	if !IsFullWidth("Ｆｶﾀｶﾅﾞﾬ") {
-		t.FailNow()
-	}
-	if !IsFullWidth("Good＝Parts") {
-		t.FailNow()
+	tests := []string{"abc", "abc123", "!\"#$%&()<>/+=-_? ~^|.,@`{}[]", "ひらがな・カタカナ、．漢字", "３ー０　ａ＠ｃｏｍ", "Ｆｶﾀｶﾅﾞﾬ", "Good＝Parts"}
+	expected := []bool{false, false, false, true, true, true, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsFullWidth(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
 func Test_IsHalfWidth(t *testing.T) {
-	if IsHalfWidth("あいうえお") {
-		t.FailNow()
-	}
-	if IsHalfWidth("００１１") {
-		t.FailNow()
-	}
-	if !IsHalfWidth("!\"#$%&()<>/+=-_? ~^|.,@`{}[]") {
-		t.FailNow()
-	}
-	if !IsHalfWidth("l-btn_02--active") {
-		t.FailNow()
-	}
-	if !IsHalfWidth("abc123い") {
-		t.FailNow()
-	}
-	if !IsHalfWidth("ｶﾀｶﾅﾞﾬ￩") {
-		t.FailNow()
+	tests := []string{"あいうえお", "００１１", "!\"#$%&()<>/+=-_? ~^|.,@`{}[]", "l-btn_02--active", "abc123い", "ｶﾀｶﾅﾞﾬ￩"}
+	expected := []bool{false, false, true, true, true, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsHalfWidth(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
 func Test_IsVariableWidth(t *testing.T) {
-	if !IsVariableWidth("ひらがなカタカナ漢字ABCDE") {
-		t.FailNow()
-	}
-	if !IsVariableWidth("３ー０123") {
-		t.FailNow()
-	}
-	if !IsVariableWidth("Ｆｶﾀｶﾅﾞﾬ") {
-		t.FailNow()
-	}
-	if !IsVariableWidth("Good＝Parts") {
-		t.FailNow()
-	}
-	if IsVariableWidth("abc") {
-		t.FailNow()
-	}
-	if IsVariableWidth("abc123") {
-		t.FailNow()
-	}
-	if IsVariableWidth("!\"#$%&()<>/+=-_? ~^|.,@`{}[]") {
-		t.FailNow()
-	}
-	if IsVariableWidth("ひらがな・カタカナ、．漢字") {
-		t.FailNow()
-	}
-	if IsVariableWidth("１２３４５６") {
-		t.FailNow()
-	}
-	if IsVariableWidth("ｶﾀｶﾅﾞﾬ") {
-		t.FailNow()
+	tests := []string{"ひらがなカタカナ漢字ABCDE", "３ー０123", "Ｆｶﾀｶﾅﾞﾬ", "Good＝Parts" , "abc", "abc123",
+		"!\"#$%&()<>/+=-_? ~^|.,@`{}[]", "ひらがな・カタカナ、．漢字", "１２３４５６", "ｶﾀｶﾅﾞﾬ"}
+	expected := []bool{true, true, true, true, false, false, false, false, false, false}
+	for i := 0; i < len(tests); i++ {
+		result := IsVariableWidth(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
@@ -585,29 +417,15 @@ func Test_IsUUID(t *testing.T) {
 }
 
 func Test_IsCreditCard(t *testing.T) {
-	if IsCreditCard("foo") {
-		t.FailNow()
-	}
-	if IsCreditCard("5398228707871528") {
-		t.FailNow()
-	}
-	if !IsCreditCard("375556917985515") {
-		t.FailNow()
-	}
-	if !IsCreditCard("36050234196908") {
-		t.FailNow()
-	}
-	if !IsCreditCard("4716461583322103") {
-		t.FailNow()
-	}
-	if !IsCreditCard("4716-2210-5188-5662") {
-		t.FailNow()
-	}
-	if !IsCreditCard("4929 7226 5379 7141") {
-		t.FailNow()
-	}
-	if !IsCreditCard("5398228707871527") {
-		t.FailNow()
+	tests := []string{"foo", "5398228707871528", "375556917985515", "36050234196908", "4716461583322103", "4716-2210-5188-5662",
+		"4929 7226 5379 7141", "5398228707871527"}
+	expected := []bool{false, false, true, true, true, true, true, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsCreditCard(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
 	}
 }
 
