@@ -75,8 +75,9 @@ func Test_IsInt(t *testing.T) {
 }
 
 func Test_IsEmail(t *testing.T) {
-	tests := []string{"foo@bar.com", "x@x.x" , "foo@bar.com.au", "foo+bar@bar.com", "invalidemail@", "invalid.com", "@invalid.com"}
-	expected := []bool{true, true, true, true, false, false, false}
+	tests := []string{"foo@bar.com", "x@x.x" , "foo@bar.com.au", "foo+bar@bar.com", "invalidemail@", "invalid.com", "@invalid.com",
+		"test|123@m端ller.com", "hans@m端ller.com", "hans.m端ller@test.com"}
+	expected := []bool{true, true, true, true, false, false, false, true, true, true}
 	for i := 0; i < len(tests); i++ {
 		result := IsEmail(tests[i])
 		if result != expected[i] {
