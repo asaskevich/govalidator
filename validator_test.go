@@ -75,7 +75,7 @@ func Test_IsInt(t *testing.T) {
 }
 
 func Test_IsEmail(t *testing.T) {
-	tests := []string{"foo@bar.com", "x@x.x" , "foo@bar.com.au", "foo+bar@bar.com", "invalidemail@", "invalid.com", "@invalid.com",
+	tests := []string{"foo@bar.com", "x@x.x", "foo@bar.com.au", "foo+bar@bar.com", "invalidemail@", "invalid.com", "@invalid.com",
 		"test|123@m端ller.com", "hans@m端ller.com", "hans.m端ller@test.com"}
 	expected := []bool{true, true, true, true, false, false, false, true, true, true}
 	for i := 0; i < len(tests); i++ {
@@ -247,7 +247,7 @@ func Test_IsHalfWidth(t *testing.T) {
 }
 
 func Test_IsVariableWidth(t *testing.T) {
-	tests := []string{"ひらがなカタカナ漢字ABCDE", "３ー０123", "Ｆｶﾀｶﾅﾞﾬ", "Good＝Parts" , "abc", "abc123",
+	tests := []string{"ひらがなカタカナ漢字ABCDE", "３ー０123", "Ｆｶﾀｶﾅﾞﾬ", "Good＝Parts", "abc", "abc123",
 		"!\"#$%&()<>/+=-_? ~^|.,@`{}[]", "ひらがな・カタカナ、．漢字", "１２３４５６", "ｶﾀｶﾅﾞﾬ"}
 	expected := []bool{true, true, true, true, false, false, false, false, false, false}
 	for i := 0; i < len(tests); i++ {
@@ -263,7 +263,7 @@ func Test_IsUUID(t *testing.T) {
 	// Tests without version
 	tests := []string{"", "xxxA987FBC9-4BED-3078-CF07-9141BA07C9F3", "A987FBC9-4BED-3078-CF07-9141BA07C9F3xxx",
 		"A987FBC94BED3078CF079141BA07C9F3", "934859", "987FBC9-4BED-3078-CF07A-9141BA07C9F3",
-		"AAAAAAAA-1111-1111-AAAG-111111111111", "A987FBC9-4BED-3078-CF07-9141BA07C9F3", }
+		"AAAAAAAA-1111-1111-AAAG-111111111111", "A987FBC9-4BED-3078-CF07-9141BA07C9F3"}
 	expected := []bool{false, false, false, false, false, false, false, true}
 	for i := 0; i < len(tests); i++ {
 		result := IsUUID(tests[i], 0)
@@ -274,7 +274,7 @@ func Test_IsUUID(t *testing.T) {
 	}
 	// UUID ver. 3
 	tests = []string{"", "412452646", "xxxA987FBC9-4BED-3078-CF07-9141BA07C9F3", "A987FBC9-4BED-4078-8F07-9141BA07C9F3",
-		"A987FBC9-4BED-3078-CF07-9141BA07C9F3", }
+		"A987FBC9-4BED-3078-CF07-9141BA07C9F3"}
 	expected = []bool{false, false, false, false, true}
 	for i := 0; i < len(tests); i++ {
 		result := IsUUID(tests[i], 3)
@@ -285,7 +285,7 @@ func Test_IsUUID(t *testing.T) {
 	}
 	// UUID ver. 4
 	tests = []string{"", "xxxA987FBC9-4BED-3078-CF07-9141BA07C9F3", "A987FBC9-4BED-5078-AF07-9141BA07C9F3",
-		"934859", "57B73598-8764-4AD0-A76A-679BB6640EB1", "625E63F3-58F5-40B7-83A1-A72AD31ACFFB", }
+		"934859", "57B73598-8764-4AD0-A76A-679BB6640EB1", "625E63F3-58F5-40B7-83A1-A72AD31ACFFB"}
 	expected = []bool{false, false, false, false, true, true}
 	for i := 0; i < len(tests); i++ {
 		result := IsUUID(tests[i], 4)
@@ -296,7 +296,7 @@ func Test_IsUUID(t *testing.T) {
 	}
 	// UUID ver. 5
 	tests = []string{"xxxA987FBC9-4BED-3078-CF07-9141BA07C9F3", "9c858901-8a57-4791-81fe-4c455b099bc9", "A987FBC9-4BED-3078-CF07-9141BA07C9F3",
-		"", "987FBC97-4BED-5078-AF07-9141BA07C9F3", "987FBC97-4BED-5078-9F07-9141BA07C9F3", }
+		"", "987FBC97-4BED-5078-AF07-9141BA07C9F3", "987FBC97-4BED-5078-9F07-9141BA07C9F3"}
 	expected = []bool{false, false, false, false, true, true}
 	for i := 0; i < len(tests); i++ {
 		result := IsUUID(tests[i], 5)
@@ -348,6 +348,26 @@ func Test_IsISBN(t *testing.T) {
 	expected = []bool{false, false, false, false, true, true, true, true}
 	for i := 0; i < len(tests); i++ {
 		result := IsISBN(tests[i], 13)
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
+	}
+}
+
+func Test_IsBase64(t *testing.T) {
+	tests := []string{"TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4=",
+		"Vml2YW11cyBmZXJtZW50dW0gc2VtcGVyIHBvcnRhLg==", "U3VzcGVuZGlzc2UgbGVjdHVzIGxlbw==",
+		"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuMPNS1Ufof9EW/M98FNw" +
+			"UAKrwflsqVxaxQjBQnHQmiI7Vac40t8x7pIb8gLGV6wL7sBTJiPovJ0V7y7oc0Ye" +
+			"rhKh0Rm4skP2z/jHwwZICgGzBvA0rH8xlhUiTvcwDCJ0kc+fh35hNt8srZQM4619" +
+			"FTgB66Xmp4EtVyhpQV+t02g6NzK72oZI0vnAvqhpkxLeLiMCyrI416wHm5Tkukhx" +
+			"QmcL2a6hNOyu0ixX/x2kSFXApEnVrJ+/IxGyfyw8kf4N2IZpW5nEP847lpfj0SZZ" +
+			"Fwrd1mnfnDbYohX2zRptLy2ZUn06Qo9pkG5ntvFEPo9bfZeULtjYzIl6K8gJ2uGZ" + "HQIDAQAB", "12345", "",
+		"Vml2YW11cyBmZXJtZtesting123"}
+	expected := []bool{true, true, true, true, false, false, false}
+	for i := 0; i < len(tests); i++ {
+		result := IsBase64(tests[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()

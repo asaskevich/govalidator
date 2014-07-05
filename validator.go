@@ -204,3 +204,8 @@ func IsHalfWidth(str string) bool {
 func IsVariableWidth(str string) bool {
 	return Matches(str, HalfWidth) && Matches(str, FullWidth)
 }
+
+// IsBase64 check if a string is base64 encoded.
+func IsBase64(str string) bool {
+	return Matches(str, Base64)
+}

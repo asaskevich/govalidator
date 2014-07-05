@@ -23,6 +23,7 @@ func Contains(str, substr string) bool
 func IsASCII(str string) bool
 func IsAlpha(str string) bool
 func IsAlphanumeric(str string) bool
+func IsBase64(str string) bool
 func IsByteLength(str string, min, max int) bool
 func IsCreditCard(str string) bool
 func IsDivisibleBy(str, num string) bool
