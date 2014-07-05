@@ -33,6 +33,7 @@ func IsFullWidth(str string) bool
 func IsHalfWidth(str string) bool
 func IsHexadecimal(str string) bool
 func IsHexcolor(str string) bool
+func IsIP(str string, version int) bool
 func IsISBN(str string, version int) bool
 func IsInt(str string) bool
 func IsJSON(str string) bool
