@@ -20,6 +20,7 @@ List of functions:
 ```
 func BlackList(str, chars string) string
 func Contains(str, substr string) bool
+func Escape(str string) string
 func IsASCII(str string) bool
 func IsAlpha(str string) bool
 func IsAlphanumeric(str string) bool

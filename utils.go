@@ -80,3 +80,12 @@ func ReplacePattern(str, pattern, replace string) string {
 	r, _ := regexp.Compile(pattern)
 	return string(r.ReplaceAll([]byte(str), []byte(replace)))
 }
+
+// Escape replace <, >, & and " with HTML entities.
+func Escape(str string) string {
+	escaped := strings.Replace(str, "&", "&amp;", -1)
+	escaped = strings.Replace(escaped, `"`, "&quot;", -1)
+	escaped = strings.Replace(escaped, `<`, "&lt;", -1)
+	escaped = strings.Replace(escaped, `>`, "&gt;", -1)
+	return escaped
+}

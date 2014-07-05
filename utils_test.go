@@ -145,3 +145,15 @@ func ExampleReplacePattern() {
 	// with empty string.
 	println(ReplacePattern("http123123ftp://git534543hub.comio", "(ftp|io|[0-9]+)", "") == "http://github.com")
 }
+
+func Test_Escape(t *testing.T) {
+	tests := []string{`<img alt="foo&bar">`}
+	expected := []string{"&lt;img alt=&quot;foo&amp;bar&quot;&gt;"}
+	for i := 0; i < len(tests); i++ {
+		res := Escape(tests[i])
+		if res != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", res)
+			t.FailNow()
+		}
+	}
+}
