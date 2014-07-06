@@ -40,6 +40,7 @@ func IsInt(str string) bool
 func IsJSON(str string) bool
 func IsLowerCase(str string) bool
 func IsMultibyte(str string) bool
+func IsMAC(str string) bool
 func IsNull(str string) bool
 func IsNumeric(str string) bool
 func IsURL(str string) bool

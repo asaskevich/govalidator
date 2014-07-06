@@ -358,12 +358,12 @@ func Test_IsISBN(t *testing.T) {
 func Test_IsBase64(t *testing.T) {
 	tests := []string{"TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4=",
 		"Vml2YW11cyBmZXJtZW50dW0gc2VtcGVyIHBvcnRhLg==", "U3VzcGVuZGlzc2UgbGVjdHVzIGxlbw==",
-		"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuMPNS1Ufof9EW/M98FNw" +
-			"UAKrwflsqVxaxQjBQnHQmiI7Vac40t8x7pIb8gLGV6wL7sBTJiPovJ0V7y7oc0Ye" +
-			"rhKh0Rm4skP2z/jHwwZICgGzBvA0rH8xlhUiTvcwDCJ0kc+fh35hNt8srZQM4619" +
-			"FTgB66Xmp4EtVyhpQV+t02g6NzK72oZI0vnAvqhpkxLeLiMCyrI416wHm5Tkukhx" +
-			"QmcL2a6hNOyu0ixX/x2kSFXApEnVrJ+/IxGyfyw8kf4N2IZpW5nEP847lpfj0SZZ" +
-			"Fwrd1mnfnDbYohX2zRptLy2ZUn06Qo9pkG5ntvFEPo9bfZeULtjYzIl6K8gJ2uGZ" + "HQIDAQAB", "12345", "",
+								"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuMPNS1Ufof9EW/M98FNw" +
+										"UAKrwflsqVxaxQjBQnHQmiI7Vac40t8x7pIb8gLGV6wL7sBTJiPovJ0V7y7oc0Ye" +
+									"rhKh0Rm4skP2z/jHwwZICgGzBvA0rH8xlhUiTvcwDCJ0kc+fh35hNt8srZQM4619" +
+								"FTgB66Xmp4EtVyhpQV+t02g6NzK72oZI0vnAvqhpkxLeLiMCyrI416wHm5Tkukhx" +
+							"QmcL2a6hNOyu0ixX/x2kSFXApEnVrJ+/IxGyfyw8kf4N2IZpW5nEP847lpfj0SZZ" +
+						"Fwrd1mnfnDbYohX2zRptLy2ZUn06Qo9pkG5ntvFEPo9bfZeULtjYzIl6K8gJ2uGZ" + "HQIDAQAB", "12345", "",
 		"Vml2YW11cyBmZXJtZtesting123"}
 	expected := []bool{true, true, true, true, false, false, false}
 	for i := 0; i < len(tests); i++ {
@@ -391,6 +391,18 @@ func Test_IsIP(t *testing.T) {
 	expected = []bool{false, false, false, false, true, true}
 	for i := 0; i < len(tests); i++ {
 		result := IsIP(tests[i], 6)
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
+	}
+}
+
+func Test_IsMAC(t *testing.T) {
+	tests := []string{"3D:F2:C9:A6:B3:4F", "3D-F2-C9-A6-B3:4F", "123", "", "abacaba"}
+	expected := []bool{true, true, false, false, false}
+	for i := 0; i < len(tests); i++ {
+		result := IsMAC(tests[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()

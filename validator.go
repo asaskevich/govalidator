@@ -233,3 +233,12 @@ func IsIP(str string, version int) bool {
 	}
 	return false
 }
+
+// IsMAC check if a string is valid MAC address.
+// Possible MAC formats:
+// 3D:F2:C9:A6:B3:4F
+// 3D-F2-C9-A6-B3:4F
+// 3d-f2-c9-a6-b3:4f
+func IsMAC(str string) bool {
+	return Matches(str, MAC)
+}

@@ -27,8 +27,8 @@ func Test_ToBoolean(t *testing.T) {
 }
 
 func Test_ToString(t *testing.T) {
-	tests := []interface{}{"string", 100, -1.23, []int32{1, 2, 3}}
-	expected := []string{"\"string\"", "100", "-1.23", "[1,2,3]"}
+	tests := []interface{}{"string", 100, -1.23, []int32{1, 2, 3}, struct{ Keys map[int]int }{Keys: map[int]int{1: 2, 3: 4}}}
+	expected := []string{"\"string\"", "100", "-1.23", "[1,2,3]", ""}
 	for i := 0; i < len(tests); i++ {
 		res, _ := ToString(tests[i])
 		if res != expected[i] {
