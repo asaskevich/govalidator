@@ -91,9 +91,11 @@ func Test_IsURL(t *testing.T) {
 	tests := []string{"http://foobar.com", "https://foobar.com", "foobar.com", "http://foobar.org/", "http://foobar.org:8080/",
 		"ftp://foobar.ru/", "http://user:pass@www.foobar.com/", "http://127.0.0.1/", "http://duckduckgo.com/?q=%2F", "http://localhost:3000/",
 		"http://foobar.com/?foo=bar#baz=qux", "http://foobar.com?foo=bar", "http://www.xn--froschgrn-x9a.net/",
-		"", "xyz://foobar.com", "invalid.", ".com", "rtmp://foobar.com", "http://www.foo_bar.com/"}
+		"", "xyz://foobar.com", "invalid.", ".com", "rtmp://foobar.com", "http://www.foo_bar.com/", "http://localhost:3000/",
+		"http://foobar.com#baz=qux", "http://foobar.com/t$-_.+!*\\'(),", "http://www.foobar.com/~foobar", "http://www.-foobar.com/",
+		"http://www.foo---bar.com/"}
 	expected := []bool{true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false,
-		false, false, false}
+		false, false, true, true, true, true, true, false, false}
 	for i := 0; i < len(tests); i++ {
 		result := IsURL(tests[i])
 		if result != expected[i] {
