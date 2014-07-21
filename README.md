@@ -17,8 +17,11 @@ After it the package is ready to use.
 #### List of functions:
 ```go
 func BlackList(str, chars string) string
-func Contains(str, substr string) bool
+func CamelCaseToUnderscore(str string) string
+func Contains(str, substring string) bool
 func Escape(str string) string
+func GetLine(s string, index int) (string, error)
+func GetLines(s string) []string
 func IsASCII(str string) bool
 func IsAlpha(str string) bool
 func IsAlphanumeric(str string) bool
@@ -37,8 +40,8 @@ func IsISBN(str string, version int) bool
 func IsInt(str string) bool
 func IsJSON(str string) bool
 func IsLowerCase(str string) bool
-func IsMultibyte(str string) bool
 func IsMAC(str string) bool
+func IsMultibyte(str string) bool
 func IsNull(str string) bool
 func IsNumeric(str string) bool
 func IsURL(str string) bool
@@ -48,13 +51,15 @@ func IsVariableWidth(str string) bool
 func LeftTrim(str, chars string) string
 func Matches(str, pattern string) bool
 func ReplacePattern(str, pattern, replace string) string
+func Reverse(s string) string
 func RightTrim(str, chars string) string
-func StripLow(str string, KeepNewLines bool) string
+func StripLow(str string, keep_new_lines bool) string
 func ToBoolean(str string) (bool, error)
 func ToFloat(str string) (float64, error)
 func ToInt(str string) (int64, error)
 func ToString(obj interface{}) (string, error)
 func Trim(str, chars string) string
+func UnderscoreToCamelCase(s string) string
 func WhiteList(str, chars string) string
 ```
 #### Notes
