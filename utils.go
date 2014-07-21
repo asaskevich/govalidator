@@ -3,6 +3,7 @@ package govalidator
 import (
 	"regexp"
 	"strings"
+	"unicode"
 )
 
 // Contains check if the string contains the substring.
@@ -24,7 +25,7 @@ func LeftTrim(str, chars string) string {
 	if chars == "" {
 		pattern = "^\\s+"
 	} else {
-		pattern = "^[" + chars + "]+"
+		pattern = "^["+chars+"]+"
 	}
 	r, _ := regexp.Compile(pattern)
 	return string(r.ReplaceAll([]byte(str), []byte("")))
@@ -37,7 +38,7 @@ func RightTrim(str, chars string) string {
 	if chars == "" {
 		pattern = "\\s+$"
 	} else {
-		pattern = "[" + chars + "]+$"
+		pattern = "["+chars+"]+$"
 	}
 	r, _ := regexp.Compile(pattern)
 	return string(r.ReplaceAll([]byte(str), []byte("")))
@@ -88,4 +89,37 @@ func Escape(str string) string {
 	escaped = strings.Replace(escaped, `<`, "&lt;", -1)
 	escaped = strings.Replace(escaped, `>`, "&gt;", -1)
 	return escaped
+}
+
+func addSegment(inrune, segment []rune) []rune {
+	if len(segment) == 0 {
+		return inrune
+	}
+	if len(inrune) != 0 {
+		inrune = append(inrune, '_')
+	}
+	inrune = append(inrune, segment...)
+	return inrune
+}
+
+// UnderscoreToCamelCase converts from underscore separated form to camel case form.
+// Ex.: my_func => MyFunc
+func UnderscoreToCamelCase(s string) string {
+	return strings.Replace(strings.Title(strings.Replace(strings.ToLower(s), "_", " ", -1)), " ", "", -1)
+}
+
+// CamelCaseToUnderscore converts from camel case form to underscore separated form.
+// Ex.: MyFunc => my_func
+func CamelCaseToUnderscore(str string) string {
+	var output []rune
+	var segment []rune
+	for _, r := range str {
+		if !unicode.IsLower(r) {
+			output = addSegment(output, segment)
+			segment = nil
+		}
+		segment = append(segment, unicode.ToLower(r))
+	}
+	output = addSegment(output, segment)
+	return string(output)
 }

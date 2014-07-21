@@ -157,3 +157,27 @@ func Test_Escape(t *testing.T) {
 		}
 	}
 }
+
+func Test_UnderscoreToCamelCase(t *testing.T) {
+	tests := []string{"a_b_c", "my_func", "1ab_cd"}
+	expected := []string{"ABC", "MyFunc", "1abCd"}
+	for i := 0; i < len(tests); i++ {
+		res := UnderscoreToCamelCase(tests[i])
+		if res != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", res)
+			t.FailNow()
+		}
+	}
+}
+
+func Test_CamelCaseToUnderscore(t *testing.T) {
+	tests := []string{"MyFunc", "ABC", "1B"}
+	expected := []string{"my_func","a_b_c", "1_b"}
+	for i := 0; i < len(tests); i++ {
+		res := CamelCaseToUnderscore(tests[i])
+		if res != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", res)
+			t.FailNow()
+		}
+	}
+}
