@@ -172,9 +172,48 @@ func Test_UnderscoreToCamelCase(t *testing.T) {
 
 func Test_CamelCaseToUnderscore(t *testing.T) {
 	tests := []string{"MyFunc", "ABC", "1B"}
-	expected := []string{"my_func","a_b_c", "1_b"}
+	expected := []string{"my_func", "a_b_c", "1_b"}
 	for i := 0; i < len(tests); i++ {
 		res := CamelCaseToUnderscore(tests[i])
+		if res != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", res)
+			t.FailNow()
+		}
+	}
+}
+
+func Test_Reverse(t *testing.T) {
+	tests := []string{"abc", "ｶﾀｶﾅ"}
+	expected := []string{"cba", "ﾅｶﾀｶ"}
+	for i := 0; i < len(tests); i++ {
+		res := Reverse(tests[i])
+		if res != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", res)
+			t.FailNow()
+		}
+	}
+}
+
+func Test_GetLines(t *testing.T) {
+	tests := []string{"abc", "a\nb\nc"}
+	expected := []([]string){{"abc"}, {"a", "b", "c"}}
+	for i := 0; i < len(tests); i++ {
+		res := GetLines(tests[i])
+		for j := 0; j < len(res); j++ {
+			if res[j] != expected[i][j] {
+				t.Log("Case ", i, ": expected ", expected[i], " when result is ", res)
+				t.FailNow()
+			}
+		}
+	}
+}
+
+func Test_GetLine(t *testing.T) {
+	tests_1 := []string{"abc", "a\nb\nc", "abc", "abacaba\n", "abc"}
+	tests_2 := []int{0, 0, -1, 1, 3}
+	expected := []string{"abc", "a", "", "", ""}
+	for i := 0; i < len(tests_1); i++ {
+		res, _ := GetLine(tests_1[i], tests_2[i])
 		if res != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", res)
 			t.FailNow()

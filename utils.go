@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"strings"
 	"unicode"
+	"errors"
 )
 
 // Contains check if the string contains the substring.
@@ -122,4 +123,27 @@ func CamelCaseToUnderscore(str string) string {
 	}
 	output = addSegment(output, segment)
 	return string(output)
+}
+
+// Reverse return reversed string
+func Reverse(s string) string {
+	r := []rune(s)
+	for i, j := 0, len(r) - 1; i < j; i, j = i+1, j-1 {
+		r[i], r[j] = r[j], r[i]
+	}
+	return string(r)
+}
+
+// GetLines split string by "\n" and return array of lines
+func GetLines(s string) []string {
+	return strings.Split(s, "\n")
+}
+
+// GetLine return specified line of multiline string
+func GetLine(s string, index int) (string, error) {
+	lines := GetLines(s)
+	if (index < 0 || index >= len(lines)) {
+		return "", errors.New("Index out of bounds.")
+	}
+	return lines[index], nil
 }
