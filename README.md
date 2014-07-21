@@ -5,8 +5,7 @@ govalidator
 
 A package of string validators and sanitizers for Go lang. Based on [validator.js](https://github.com/chriso/validator.js).
 
-Installation
-===========
+#### Installation
 Make sure that Go is installed on your computer.
 Type the following command in your terminal:
 
@@ -15,9 +14,8 @@ Type the following command in your terminal:
 After it the package is ready to use.
 
 
-List of functions:
-===========
-```
+#### List of functions:
+```go
 func BlackList(str, chars string) string
 func Contains(str, substr string) bool
 func Escape(str string) string
@@ -59,8 +57,9 @@ func ToString(obj interface{}) (string, error)
 func Trim(str, chars string) string
 func WhiteList(str, chars string) string
 ```
-
+#### Notes
 Documentation is available here: [godoc.org](https://godoc.org/github.com/asaskevich/govalidator).
 Full information about code coverage is also available here: [govalidator on gocover.io](http://gocover.io/github.com/asaskevich/govalidator).
 
+#### Support
 If you do have a contribution for the package feel free to put up a Pull Request or open Issue.
