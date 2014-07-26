@@ -99,7 +99,7 @@ func Test_IsURL(t *testing.T) {
 	for i := 0; i < len(tests); i++ {
 		result := IsURL(tests[i])
 		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result, tests[i])
 			t.FailNow()
 		}
 	}
