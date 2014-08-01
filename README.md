@@ -1,6 +1,6 @@
 govalidator
 ===========
-[![Build Status](https://drone.io/github.com/asaskevich/govalidator/status.png)](https://drone.io/github.com/asaskevich/govalidator/latest) [![GoDoc](https://godoc.org/github.com/asaskevich/govalidator?status.png)](https://godoc.org/github.com/asaskevich/govalidator) [![Coverage Status](https://img.shields.io/coveralls/asaskevich/govalidator.svg)](https://coveralls.io/r/asaskevich/govalidator?branch=master)
+[![Build Status](https://drone.io/github.com/asaskevich/govalidator/status.png)](https://drone.io/github.com/asaskevich/govalidator/latest) [![GoDoc](https://godoc.org/github.com/asaskevich/govalidator?status.png)](https://godoc.org/github.com/asaskevich/govalidator) [![Coverage Status](https://img.shields.io/coveralls/asaskevich/govalidator.svg)](https://coveralls.io/r/asaskevich/govalidator?branch=master) [![status](https://sourcegraph.com/api/repos/github.com/asaskevich/govalidator/.badges/status.png)](https://sourcegraph.com/github.com/asaskevich/govalidator) [![views](https://sourcegraph.com/api/repos/github.com/asaskevich/govalidator/.counters/views.png)](https://sourcegraph.com/github.com/asaskevich/govalidator)
 [![wercker status](https://app.wercker.com/status/1ec990b09ea86c910d5f08b0e02c6043/s "wercker status")](https://app.wercker.com/project/bykey/1ec990b09ea86c910d5f08b0e02c6043)
 
 A package of string validators and sanitizers for Go lang. Based on [validator.js](https://github.com/chriso/validator.js).
@@ -50,9 +50,11 @@ func IsUpperCase(str string) bool
 func IsVariableWidth(str string) bool
 func LeftTrim(str, chars string) string
 func Matches(str, pattern string) bool
+func RemoveTags(s string) string
 func ReplacePattern(str, pattern, replace string) string
 func Reverse(s string) string
 func RightTrim(str, chars string) string
+func SafeFileName(str string) string
 func StripLow(str string, keep_new_lines bool) string
 func ToBoolean(str string) (bool, error)
 func ToFloat(str string) (float64, error)
