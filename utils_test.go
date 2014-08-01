@@ -220,3 +220,27 @@ func Test_GetLine(t *testing.T) {
 		}
 	}
 }
+
+func Test_RemoveTags(t *testing.T) {
+	tests := []string{"abc", "<!-- Test -->", "<div><div><p><a>Text</a></p></div></div>", `<a href="#">Link</a>`}
+	expected := []string{"abc", "", "Text", "Link"}
+	for i := 0; i < len(tests); i++ {
+		res := RemoveTags(tests[i])
+		if res != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", res)
+			t.FailNow()
+		}
+	}
+}
+
+func Test_SafeFileName(t *testing.T) {
+	tests := []string{"abc", "123456789     '_-?ASDF@£$%£%^é.html", "ReadMe.md", "file:///c:/test.go", "../../../Hello World!.txt"}
+	expected := []string{"abc", "123456789-asdf.html", "readme.md", "test.go", "hello-world.txt"}
+	for i := 0; i < len(tests); i++ {
+		res := SafeFileName(tests[i])
+		if res != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", res)
+			t.FailNow()
+		}
+	}
+}
