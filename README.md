@@ -55,15 +55,48 @@ func ReplacePattern(str, pattern, replace string) string
 func Reverse(s string) string
 func RightTrim(str, chars string) string
 func SafeFileName(str string) string
-func StripLow(str string, keep_new_lines bool) string
+func StripLow(str string, keepNewLines bool) string
 func ToBoolean(str string) (bool, error)
 func ToFloat(str string) (float64, error)
 func ToInt(str string) (int64, error)
 func ToString(obj interface{}) (string, error)
 func Trim(str, chars string) string
 func UnderscoreToCamelCase(s string) string
+func ValidateStruct(s interface{}) bool
 func WhiteList(str, chars string) string
 ```
+
+#### Examples
+###### IsURL
+```go
+println(govalidator.IsURL(`http://user@pass:domain.com/path/page`))
+```
+###### ToString
+```go
+type User struct {
+	FirstName string
+	LastName string
+}
+
+str,_ := govalidator.ToString(&User{"John", "Juan"})
+println(str)
+```
+###### ValidateStruct
+```go
+type Post struct {
+    Title    string `^[a-zA-Z0-9]{10,50}$`
+    Message  string
+    AuthorIP string `^(\d?\d?\d)\.(\d?\d?\d)\.(\d?\d?\d)\.(\d?\d?\d)$"`
+}
+post := &Post{"My Post about Examples", "Some text", "123.234.54.3"}
+println(ValidateStruct(post) == true)
+```
+###### WhiteList
+```go
+// Remove all characters from string ignoring characters between "a" and "z"
+println(WhiteList("a3a43a5a4a3a2a23a4a5a4a3a4", "a-z") == "aaaaaaaaaaaa")
+```
+
 #### Notes
 Documentation is available here: [godoc.org](https://godoc.org/github.com/asaskevich/govalidator).
 Full information about code coverage is also available here: [govalidator on gocover.io](http://gocover.io/github.com/asaskevich/govalidator).
