@@ -2,7 +2,7 @@ package govalidator
 
 import "testing"
 
-func Test_ToInt(t *testing.T) {
+func TestToInt(t *testing.T) {
 	tests := []string{"1000", "-123", "abcdef", "100000000000000000000000000000000000000000000"}
 	expected := []int64{1000, -123, 0, 0}
 	for i := 0; i < len(tests); i++ {
@@ -14,7 +14,7 @@ func Test_ToInt(t *testing.T) {
 	}
 }
 
-func Test_ToBoolean(t *testing.T) {
+func TestToBoolean(t *testing.T) {
 	tests := []string{"true", "1", "True", "false", "0", "abcdef"}
 	expected := []bool{true, true, true, false, false, false}
 	for i := 0; i < len(tests); i++ {
@@ -26,7 +26,7 @@ func Test_ToBoolean(t *testing.T) {
 	}
 }
 
-func Test_ToString(t *testing.T) {
+func TestToString(t *testing.T) {
 	tests := []interface{}{"string", 100, -1.23, []int32{1, 2, 3}, struct{ Keys map[int]int }{Keys: map[int]int{1: 2, 3: 4}}}
 	expected := []string{"\"string\"", "100", "-1.23", "[1,2,3]", ""}
 	for i := 0; i < len(tests); i++ {
@@ -38,7 +38,7 @@ func Test_ToString(t *testing.T) {
 	}
 }
 
-func Test_ToFloat(t *testing.T) {
+func TestToFloat(t *testing.T) {
 	tests := []string{"", "123", "-.01", "10.", "string", "1.23e3", ".23e10"}
 	expected := []float64{0, 123, -0.01, 10.0, 0, 1230, 0.23e10}
 	for i := 0; i < len(tests); i++ {

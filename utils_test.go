@@ -2,7 +2,7 @@ package govalidator
 
 import "testing"
 
-func Test_Contains(t *testing.T) {
+func TestContains(t *testing.T) {
 	tests_1 := []string{"abacada", "abacada", "abacada", "abacada"}
 	tests_2 := []string{"", "ritir", "a", "aca"}
 	expected := []bool{true, false, true, true}
@@ -15,7 +15,7 @@ func Test_Contains(t *testing.T) {
 	}
 }
 
-func Test_Matches(t *testing.T) {
+func TestMatches(t *testing.T) {
 	tests_1 := []string{"123456789", "abacada", "111222333", "abacaba"}
 	tests_2 := []string{"[0-9]+", "cab$", "((111|222|333)+)+", "((123+]"}
 	expected := []bool{true, false, true, false}
@@ -28,7 +28,7 @@ func Test_Matches(t *testing.T) {
 	}
 }
 
-func Test_LeftTrim(t *testing.T) {
+func TestLeftTrim(t *testing.T) {
 	tests_1 := []string{"  \r\n\tfoo  \r\n\t   ", "010100201000"}
 	tests_2 := []string{"", "01"}
 	expected := []string{"foo  \r\n\t   ", "201000"}
@@ -41,7 +41,7 @@ func Test_LeftTrim(t *testing.T) {
 	}
 }
 
-func Test_RightTrim(t *testing.T) {
+func TestRightTrim(t *testing.T) {
 	tests_1 := []string{"  \r\n\tfoo  \r\n\t   ", "010100201000"}
 	tests_2 := []string{"", "01"}
 	expected := []string{"  \r\n\tfoo", "0101002"}
@@ -54,7 +54,7 @@ func Test_RightTrim(t *testing.T) {
 	}
 }
 
-func Test_Trim(t *testing.T) {
+func TestTrim(t *testing.T) {
 	tests_1 := []string{"  \r\n\tfoo  \r\n\t   ", "010100201000", "1234567890987654321"}
 	tests_2 := []string{"", "01", "1-8"}
 	expected := []string{"foo", "2", "909"}
@@ -76,7 +76,7 @@ func ExampleTrim() {
 	println(Trim("1234567890987654321", "1-8") == "909")
 }
 
-func Test_WhiteList(t *testing.T) {
+func TestWhiteList(t *testing.T) {
 	tests_1 := []string{"abcdef", "aaaaaaaaaabbbbbbbbbb", "a1b2c3", "   ", "a3a43a5a4a3a2a23a4a5a4a3a4"}
 	tests_2 := []string{"abc", "abc", "abc", "abc", "a-z"}
 	expected := []string{"abc", "aaaaaaaaaabbbbbbbbbb", "abc", "", "aaaaaaaaaaaa"}
@@ -95,7 +95,7 @@ func ExampleWhiteList() {
 	println(WhiteList("a3a43a5a4a3a2a23a4a5a4a3a4", "a-z") == "aaaaaaaaaaaa")
 }
 
-func Test_BlackList(t *testing.T) {
+func TestBlackList(t *testing.T) {
 	tests_1 := []string{"abcdef", "aaaaaaaaaabbbbbbbbbb", "a1b2c3", "   "}
 	tests_2 := []string{"abc", "abc", "abc", "abc"}
 	expected := []string{"def", "", "123", "   "}
@@ -108,7 +108,7 @@ func Test_BlackList(t *testing.T) {
 	}
 }
 
-func Test_StripLow(t *testing.T) {
+func TestStripLow(t *testing.T) {
 	tests_1 := []string{"foo\x00", "\x7Ffoo\x02", "\x01\x09", "foo\x0A\x0D", "perch\u00e9", "\u20ac",
 		"\u2206\x0A", "foo\x0A\x0D", "\x03foo\x0A\x0D"}
 	tests_2 := []bool{false, false, false, false, false, false, false, true, true}
@@ -122,7 +122,7 @@ func Test_StripLow(t *testing.T) {
 	}
 }
 
-func Test_ReplacePattern(t *testing.T) {
+func TestReplacePattern(t *testing.T) {
 	tests_1 := []string{"ab123ba", "abacaba", "httpftp://github.comio", "aaaaaaaaaa", "http123123ftp://git534543hub.comio"}
 	tests_2 := []string{"[0-9]+", "[0-9]+", "(ftp|io)", "a", "(ftp|io|[0-9]+)"}
 	tests_3 := []string{"aca", "aca", "", "", ""}
@@ -146,7 +146,7 @@ func ExampleReplacePattern() {
 	println(ReplacePattern("http123123ftp://git534543hub.comio", "(ftp|io|[0-9]+)", "") == "http://github.com")
 }
 
-func Test_Escape(t *testing.T) {
+func TestEscape(t *testing.T) {
 	tests := []string{`<img alt="foo&bar">`}
 	expected := []string{"&lt;img alt=&quot;foo&amp;bar&quot;&gt;"}
 	for i := 0; i < len(tests); i++ {
@@ -158,7 +158,7 @@ func Test_Escape(t *testing.T) {
 	}
 }
 
-func Test_UnderscoreToCamelCase(t *testing.T) {
+func TestUnderscoreToCamelCase(t *testing.T) {
 	tests := []string{"a_b_c", "my_func", "1ab_cd"}
 	expected := []string{"ABC", "MyFunc", "1abCd"}
 	for i := 0; i < len(tests); i++ {
@@ -170,7 +170,7 @@ func Test_UnderscoreToCamelCase(t *testing.T) {
 	}
 }
 
-func Test_CamelCaseToUnderscore(t *testing.T) {
+func TestCamelCaseToUnderscore(t *testing.T) {
 	tests := []string{"MyFunc", "ABC", "1B"}
 	expected := []string{"my_func", "a_b_c", "1_b"}
 	for i := 0; i < len(tests); i++ {
@@ -182,7 +182,7 @@ func Test_CamelCaseToUnderscore(t *testing.T) {
 	}
 }
 
-func Test_Reverse(t *testing.T) {
+func TestReverse(t *testing.T) {
 	tests := []string{"abc", "ｶﾀｶﾅ"}
 	expected := []string{"cba", "ﾅｶﾀｶ"}
 	for i := 0; i < len(tests); i++ {
@@ -194,7 +194,7 @@ func Test_Reverse(t *testing.T) {
 	}
 }
 
-func Test_GetLines(t *testing.T) {
+func TestGetLines(t *testing.T) {
 	tests := []string{"abc", "a\nb\nc"}
 	expected := []([]string){{"abc"}, {"a", "b", "c"}}
 	for i := 0; i < len(tests); i++ {
@@ -208,7 +208,7 @@ func Test_GetLines(t *testing.T) {
 	}
 }
 
-func Test_GetLine(t *testing.T) {
+func TestGetLine(t *testing.T) {
 	tests_1 := []string{"abc", "a\nb\nc", "abc", "abacaba\n", "abc"}
 	tests_2 := []int{0, 0, -1, 1, 3}
 	expected := []string{"abc", "a", "", "", ""}
@@ -221,7 +221,7 @@ func Test_GetLine(t *testing.T) {
 	}
 }
 
-func Test_RemoveTags(t *testing.T) {
+func TestRemoveTags(t *testing.T) {
 	tests := []string{"abc", "<!-- Test -->", "<div><div><p><a>Text</a></p></div></div>", `<a href="#">Link</a>`}
 	expected := []string{"abc", "", "Text", "Link"}
 	for i := 0; i < len(tests); i++ {
@@ -233,7 +233,7 @@ func Test_RemoveTags(t *testing.T) {
 	}
 }
 
-func Test_SafeFileName(t *testing.T) {
+func TestSafeFileName(t *testing.T) {
 	tests := []string{"abc", "123456789     '_-?ASDF@£$%£%^é.html", "ReadMe.md", "file:///c:/test.go", "../../../Hello World!.txt"}
 	expected := []string{"abc", "123456789-asdf.html", "readme.md", "test.go", "hello-world.txt"}
 	for i := 0; i < len(tests); i++ {

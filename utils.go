@@ -1,11 +1,11 @@
 package govalidator
 
 import (
+	"errors"
+	"path"
 	"regexp"
 	"strings"
 	"unicode"
-	"errors"
-	"path"
 )
 
 // Contains check if the string contains the substring.
@@ -27,7 +27,7 @@ func LeftTrim(str, chars string) string {
 	if chars == "" {
 		pattern = "^\\s+"
 	} else {
-		pattern = "^["+chars+"]+"
+		pattern = "^[" + chars + "]+"
 	}
 	r, _ := regexp.Compile(pattern)
 	return string(r.ReplaceAll([]byte(str), []byte("")))
@@ -40,7 +40,7 @@ func RightTrim(str, chars string) string {
 	if chars == "" {
 		pattern = "\\s+$"
 	} else {
-		pattern = "["+chars+"]+$"
+		pattern = "[" + chars + "]+$"
 	}
 	r, _ := regexp.Compile(pattern)
 	return string(r.ReplaceAll([]byte(str), []byte("")))
@@ -68,9 +68,9 @@ func BlackList(str, chars string) string {
 
 // StripLow remove characters with a numerical value < 32 and 127, mostly control characters.
 // If keep_new_lines is true, newline characters are preserved (\n and \r, hex 0xA and 0xD).
-func StripLow(str string, keep_new_lines bool) string {
+func StripLow(str string, keepNewLines bool) string {
 	chars := ""
-	if keep_new_lines {
+	if keepNewLines {
 		chars = "\x00-\x09\x0B\x0C\x0E-\x1F\x7F"
 	} else {
 		chars = "\x00-\x1F\x7F"
@@ -88,10 +88,10 @@ func ReplacePattern(str, pattern, replace string) string {
 func Escape(str string) string {
 	escaped := str
 	escaping := map[string]string{}
-	escaping["&"] = "&amp;"
+	escaping[`&`] = "&amp;"
 	escaping[`"`] = "&quot;"
-	escaping["<"] = "&lt;"
-	escaping[">"] = "&gt;"
+	escaping[`<`] = "&lt;"
+	escaping[`>`] = "&gt;"
 	// If you want to add more escaping characters,
 	// use escaping[old_char] = escaped_form
 	for key, value := range escaping {
@@ -136,7 +136,7 @@ func CamelCaseToUnderscore(str string) string {
 // Reverse return reversed string
 func Reverse(s string) string {
 	r := []rune(s)
-	for i, j := 0, len(r) - 1; i < j; i, j = i+1, j-1 {
+	for i, j := 0, len(r)-1; i < j; i, j = i+1, j-1 {
 		r[i], r[j] = r[j], r[i]
 	}
 	return string(r)
@@ -150,7 +150,7 @@ func GetLines(s string) []string {
 // GetLine return specified line of multiline string
 func GetLine(s string, index int) (string, error) {
 	lines := GetLines(s)
-	if (index < 0 || index >= len(lines)) {
+	if index < 0 || index >= len(lines) {
 		return "", errors.New("Index out of bounds.")
 	}
 	return lines[index], nil
@@ -174,9 +174,8 @@ func SafeFileName(str string) string {
 	if err == nil {
 		name = legal.ReplaceAllString(name, "")
 	}
-	for ; strings.Contains(name, "--"); {
+	for strings.Contains(name, "--") {
 		name = strings.Replace(name, "--", "-", -1)
 	}
 	return name
 }
-

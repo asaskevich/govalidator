@@ -4,6 +4,8 @@ package govalidator
 
 import (
 	"encoding/json"
+	"fmt"
+	"reflect"
 	"regexp"
 	"strings"
 )
@@ -121,7 +123,7 @@ func IsCreditCard(str string) bool {
 		if shouldDouble {
 			tmpNum *= 2
 			if tmpNum >= 10 {
-				sum += ((tmpNum%10)+1)
+				sum += ((tmpNum % 10) + 1)
 			} else {
 				sum += tmpNum
 			}
@@ -149,31 +151,31 @@ func IsISBN(str string, version int) bool {
 			return false
 		}
 		for i = 0; i < 9; i++ {
-			checksum += (i+1)*int32(sanitized[i] - '0')
+			checksum += (i + 1) * int32(sanitized[i]-'0')
 		}
 		if sanitized[9] == 'X' {
-			checksum += 10*10
+			checksum += 10 * 10
 		} else {
-			checksum += 10*int32(sanitized[9] - '0')
+			checksum += 10 * int32(sanitized[9]-'0')
 		}
 		if checksum%11 == 0 {
 			return true
 		}
+		return false
 	} else if version == 13 {
 		if !Matches(string(sanitized), ISBN13) {
 			return false
 		}
 		factor := []int32{1, 3}
 		for i = 0; i < 12; i++ {
-			checksum += factor[i%2]*int32(sanitized[i] - '0')
+			checksum += factor[i%2] * int32(sanitized[i]-'0')
 		}
-		if (int32(sanitized[12] - '0'))-((10-(checksum%10))%10) == 0 {
+		if (int32(sanitized[12]-'0'))-((10-(checksum%10))%10) == 0 {
 			return true
 		}
-	} else {
-		return IsISBN(str, 10) || IsISBN(str, 13)
+		return false
 	}
-	return false
+	return IsISBN(str, 10) || IsISBN(str, 13)
 }
 
 // IsJSON check if the string is valid JSON (note: uses json.Unmarshal).
@@ -222,8 +224,8 @@ func IsIP(str string, version int) bool {
 		parts := strings.Split(str, ".")
 		isIPv4 := true
 		for i := 0; i < len(parts); i++ {
-			part_i, _ := ToInt(parts[i])
-			isIPv4 = isIPv4 && ((part_i >= 0) && (part_i <= 255))
+			partI, _ := ToInt(parts[i])
+			isIPv4 = isIPv4 && ((partI >= 0) && (partI <= 255))
 		}
 		return isIPv4
 	} else if version == 6 {
@@ -239,4 +241,30 @@ func IsIP(str string, version int) bool {
 // 3d-f2-c9-a6-b3:4f
 func IsMAC(str string) bool {
 	return Matches(str, MAC)
+}
+
+// ValidateStruct use tags for fields as regexp for validating string fields.
+// See an example for further information.
+func ValidateStruct(s interface{}) bool {
+	if s == nil {
+		return true
+	}
+	result := true
+	if reflect.ValueOf(s).Kind() == reflect.Interface || reflect.ValueOf(s).Kind() == reflect.Ptr {
+		val := reflect.ValueOf(s).Elem()
+
+		for i := 0; i < val.NumField(); i++ {
+			valueField := val.Field(i)
+			typeField := val.Type().Field(i)
+			tag := typeField.Tag
+			tagStr := fmt.Sprint(tag)
+			if len(tagStr) > 0 && valueField.Kind() == reflect.String {
+				field := fmt.Sprint(valueField)
+				result = result && Matches(field, tagStr)
+			} else if valueField.Kind() == reflect.Struct || valueField.Kind() == reflect.Ptr {
+				result = result && ValidateStruct(valueField.Interface())
+			}
+		}
+	}
+	return result
 }
