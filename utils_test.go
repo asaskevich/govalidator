@@ -3,11 +3,11 @@ package govalidator
 import "testing"
 
 func TestContains(t *testing.T) {
-	tests_1 := []string{"abacada", "abacada", "abacada", "abacada"}
-	tests_2 := []string{"", "ritir", "a", "aca"}
+	tests1 := []string{"abacada", "abacada", "abacada", "abacada"}
+	tests2 := []string{"", "ritir", "a", "aca"}
 	expected := []bool{true, false, true, true}
-	for i := 0; i < len(tests_1); i++ {
-		result := Contains(tests_1[i], tests_2[i])
+	for i := 0; i < len(tests1); i++ {
+		result := Contains(tests1[i], tests2[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -16,11 +16,11 @@ func TestContains(t *testing.T) {
 }
 
 func TestMatches(t *testing.T) {
-	tests_1 := []string{"123456789", "abacada", "111222333", "abacaba"}
-	tests_2 := []string{"[0-9]+", "cab$", "((111|222|333)+)+", "((123+]"}
+	tests1 := []string{"123456789", "abacada", "111222333", "abacaba"}
+	tests2 := []string{"[0-9]+", "cab$", "((111|222|333)+)+", "((123+]"}
 	expected := []bool{true, false, true, false}
-	for i := 0; i < len(tests_1); i++ {
-		result := Matches(tests_1[i], tests_2[i])
+	for i := 0; i < len(tests1); i++ {
+		result := Matches(tests1[i], tests2[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -29,11 +29,11 @@ func TestMatches(t *testing.T) {
 }
 
 func TestLeftTrim(t *testing.T) {
-	tests_1 := []string{"  \r\n\tfoo  \r\n\t   ", "010100201000"}
-	tests_2 := []string{"", "01"}
+	tests1 := []string{"  \r\n\tfoo  \r\n\t   ", "010100201000"}
+	tests2 := []string{"", "01"}
 	expected := []string{"foo  \r\n\t   ", "201000"}
-	for i := 0; i < len(tests_1); i++ {
-		result := LeftTrim(tests_1[i], tests_2[i])
+	for i := 0; i < len(tests1); i++ {
+		result := LeftTrim(tests1[i], tests2[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -42,11 +42,11 @@ func TestLeftTrim(t *testing.T) {
 }
 
 func TestRightTrim(t *testing.T) {
-	tests_1 := []string{"  \r\n\tfoo  \r\n\t   ", "010100201000"}
-	tests_2 := []string{"", "01"}
+	tests1 := []string{"  \r\n\tfoo  \r\n\t   ", "010100201000"}
+	tests2 := []string{"", "01"}
 	expected := []string{"  \r\n\tfoo", "0101002"}
-	for i := 0; i < len(tests_1); i++ {
-		result := RightTrim(tests_1[i], tests_2[i])
+	for i := 0; i < len(tests1); i++ {
+		result := RightTrim(tests1[i], tests2[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -55,11 +55,11 @@ func TestRightTrim(t *testing.T) {
 }
 
 func TestTrim(t *testing.T) {
-	tests_1 := []string{"  \r\n\tfoo  \r\n\t   ", "010100201000", "1234567890987654321"}
-	tests_2 := []string{"", "01", "1-8"}
+	tests1 := []string{"  \r\n\tfoo  \r\n\t   ", "010100201000", "1234567890987654321"}
+	tests2 := []string{"", "01", "1-8"}
 	expected := []string{"foo", "2", "909"}
-	for i := 0; i < len(tests_1); i++ {
-		result := Trim(tests_1[i], tests_2[i])
+	for i := 0; i < len(tests1); i++ {
+		result := Trim(tests1[i], tests2[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -77,11 +77,11 @@ func ExampleTrim() {
 }
 
 func TestWhiteList(t *testing.T) {
-	tests_1 := []string{"abcdef", "aaaaaaaaaabbbbbbbbbb", "a1b2c3", "   ", "a3a43a5a4a3a2a23a4a5a4a3a4"}
-	tests_2 := []string{"abc", "abc", "abc", "abc", "a-z"}
+	tests1 := []string{"abcdef", "aaaaaaaaaabbbbbbbbbb", "a1b2c3", "   ", "a3a43a5a4a3a2a23a4a5a4a3a4"}
+	tests2 := []string{"abc", "abc", "abc", "abc", "a-z"}
 	expected := []string{"abc", "aaaaaaaaaabbbbbbbbbb", "abc", "", "aaaaaaaaaaaa"}
-	for i := 0; i < len(tests_1); i++ {
-		result := WhiteList(tests_1[i], tests_2[i])
+	for i := 0; i < len(tests1); i++ {
+		result := WhiteList(tests1[i], tests2[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -96,11 +96,11 @@ func ExampleWhiteList() {
 }
 
 func TestBlackList(t *testing.T) {
-	tests_1 := []string{"abcdef", "aaaaaaaaaabbbbbbbbbb", "a1b2c3", "   "}
-	tests_2 := []string{"abc", "abc", "abc", "abc"}
+	tests1 := []string{"abcdef", "aaaaaaaaaabbbbbbbbbb", "a1b2c3", "   "}
+	tests2 := []string{"abc", "abc", "abc", "abc"}
 	expected := []string{"def", "", "123", "   "}
-	for i := 0; i < len(tests_1); i++ {
-		result := BlackList(tests_1[i], tests_2[i])
+	for i := 0; i < len(tests1); i++ {
+		result := BlackList(tests1[i], tests2[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -109,12 +109,12 @@ func TestBlackList(t *testing.T) {
 }
 
 func TestStripLow(t *testing.T) {
-	tests_1 := []string{"foo\x00", "\x7Ffoo\x02", "\x01\x09", "foo\x0A\x0D", "perch\u00e9", "\u20ac",
+	tests1 := []string{"foo\x00", "\x7Ffoo\x02", "\x01\x09", "foo\x0A\x0D", "perch\u00e9", "\u20ac",
 		"\u2206\x0A", "foo\x0A\x0D", "\x03foo\x0A\x0D"}
-	tests_2 := []bool{false, false, false, false, false, false, false, true, true}
+	tests2 := []bool{false, false, false, false, false, false, false, true, true}
 	expected := []string{"foo", "foo", "", "foo", "perch\u00e9", "\u20ac", "\u2206", "foo\x0A\x0D", "foo\x0A\x0D"}
-	for i := 0; i < len(tests_1); i++ {
-		result := StripLow(tests_1[i], tests_2[i])
+	for i := 0; i < len(tests1); i++ {
+		result := StripLow(tests1[i], tests2[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -123,12 +123,12 @@ func TestStripLow(t *testing.T) {
 }
 
 func TestReplacePattern(t *testing.T) {
-	tests_1 := []string{"ab123ba", "abacaba", "httpftp://github.comio", "aaaaaaaaaa", "http123123ftp://git534543hub.comio"}
-	tests_2 := []string{"[0-9]+", "[0-9]+", "(ftp|io)", "a", "(ftp|io|[0-9]+)"}
-	tests_3 := []string{"aca", "aca", "", "", ""}
+	tests1 := []string{"ab123ba", "abacaba", "httpftp://github.comio", "aaaaaaaaaa", "http123123ftp://git534543hub.comio"}
+	tests2 := []string{"[0-9]+", "[0-9]+", "(ftp|io)", "a", "(ftp|io|[0-9]+)"}
+	tests3 := []string{"aca", "aca", "", "", ""}
 	expected := []string{"abacaba", "abacaba", "http://github.com", "", "http://github.com"}
-	for i := 0; i < len(tests_1); i++ {
-		result := ReplacePattern(tests_1[i], tests_2[i], tests_3[i])
+	for i := 0; i < len(tests1); i++ {
+		result := ReplacePattern(tests1[i], tests2[i], tests3[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -209,11 +209,11 @@ func TestGetLines(t *testing.T) {
 }
 
 func TestGetLine(t *testing.T) {
-	tests_1 := []string{"abc", "a\nb\nc", "abc", "abacaba\n", "abc"}
-	tests_2 := []int{0, 0, -1, 1, 3}
+	tests1 := []string{"abc", "a\nb\nc", "abc", "abacaba\n", "abc"}
+	tests2 := []int{0, 0, -1, 1, 3}
 	expected := []string{"abc", "a", "", "", ""}
-	for i := 0; i < len(tests_1); i++ {
-		res, _ := GetLine(tests_1[i], tests_2[i])
+	for i := 0; i < len(tests1); i++ {
+		res, _ := GetLine(tests1[i], tests2[i])
 		if res != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", res)
 			t.FailNow()

@@ -155,11 +155,11 @@ func TestIsNull(t *testing.T) {
 }
 
 func TestIsDivisibleBy(t *testing.T) {
-	tests_1 := []string{"4", "100", "", "123", "123"}
-	tests_2 := []string{"2", "10", "1", "foo", "0"}
+	tests1 := []string{"4", "100", "", "123", "123"}
+	tests2 := []string{"2", "10", "1", "foo", "0"}
 	expected := []bool{true, true, true, false, false}
-	for i := 0; i < len(tests_1); i++ {
-		result := IsDivisibleBy(tests_1[i], tests_2[i])
+	for i := 0; i < len(tests1); i++ {
+		result := IsDivisibleBy(tests1[i], tests2[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -173,12 +173,12 @@ func ExampleIsDivisibleBy() {
 }
 
 func TestIsByteLength(t *testing.T) {
-	tests_1 := []string{"abacaba", "abacaba", "abacaba", "abacaba", "\ufff0"}
-	tests_2 := []int{100, 1, 1, 0, 1}
-	tests_3 := []int{-1, 3, 7, 8, 1}
+	tests1 := []string{"abacaba", "abacaba", "abacaba", "abacaba", "\ufff0"}
+	tests2 := []int{100, 1, 1, 0, 1}
+	tests3 := []int{-1, 3, 7, 8, 1}
 	expected := []bool{false, false, true, true, false}
-	for i := 0; i < len(tests_1); i++ {
-		result := IsByteLength(tests_1[i], tests_2[i], tests_3[i])
+	for i := 0; i < len(tests1); i++ {
+		result := IsByteLength(tests1[i], tests2[i], tests3[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -466,6 +466,12 @@ func TestValidateStruct(t *testing.T) {
 		t.Log("Case ", 2, ": expected ", false, " when result is ", result)
 		t.FailNow()
 	}
+	result = ValidateStruct(nil)
+	if result != true {
+		t.Log("Case ", 3, ": expected ", true, " when result is ", result)
+		t.FailNow()
+	}
+
 }
 
 func ExampleValidateStruct() {
