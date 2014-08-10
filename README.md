@@ -89,12 +89,12 @@ type Post struct {
     AuthorIP string `^(\d?\d?\d)\.(\d?\d?\d)\.(\d?\d?\d)\.(\d?\d?\d)$"`
 }
 post := &Post{"My Post about Examples", "Some text", "123.234.54.3"}
-println(ValidateStruct(post) == true)
+println(govalidator.ValidateStruct(post) == true)
 ```
 ###### WhiteList
 ```go
 // Remove all characters from string ignoring characters between "a" and "z"
-println(WhiteList("a3a43a5a4a3a2a23a4a5a4a3a4", "a-z") == "aaaaaaaaaaaa")
+println(govalidator.WhiteList("a3a43a5a4a3a2a23a4a5a4a3a4", "a-z") == "aaaaaaaaaaaa")
 ```
 
 #### Notes
