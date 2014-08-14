@@ -256,7 +256,7 @@ func ValidateStruct(s interface{}) bool {
 		for i := 0; i < val.NumField(); i++ {
 			valueField := val.Field(i)
 			typeField := val.Type().Field(i)
-			tag := typeField.Tag
+			tag := typeField.Tag.Get("regex")
 			tagStr := fmt.Sprint(tag)
 			if len(tagStr) > 0 && valueField.Kind() == reflect.String {
 				field := fmt.Sprint(valueField)

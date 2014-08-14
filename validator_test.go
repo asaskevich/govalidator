@@ -435,12 +435,12 @@ func TestIsMAC(t *testing.T) {
 
 type Address struct {
 	Street string
-	Zip    string `^[0-9]{6,6}$`
+	Zip    string `regex:"^[0-9]{6,6}$"`
 }
 
 type User struct {
-	Name     string `^[a-zA-Z]+$`
-	Password string `^[a-z0-9]{8,10}$`
+	Name     string `regex:"^[a-zA-Z]+$"`
+	Password string `regex:"^[a-z0-9]{8,10}$"`
 	Age      int
 	Home     *Address
 }
@@ -476,9 +476,9 @@ func TestValidateStruct(t *testing.T) {
 
 func ExampleValidateStruct() {
 	type Post struct {
-		Title    string `^[a-zA-Z0-9]{10,50}$`
+		Title    string `regex:"^[a-zA-Z0-9]{10,50}$"`
 		Message  string
-		AuthorIP string `^(\d?\d?\d)\.(\d?\d?\d)\.(\d?\d?\d)\.(\d?\d?\d)$"`
+		AuthorIP string `regex:"^(\d?\d?\d)\.(\d?\d?\d)\.(\d?\d?\d)\.(\d?\d?\d)$"`
 	}
 	post := &Post{"My Post about Examples", "Some text", "123.234.54.3"}
 	println(ValidateStruct(post) == true)
