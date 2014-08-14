@@ -84,9 +84,9 @@ println(str)
 ###### ValidateStruct
 ```go
 type Post struct {
-    Title    string `^[a-zA-Z0-9]{10,50}$`
+    Title    string `regex:"^[a-zA-Z0-9]{10,50}$"`
     Message  string
-    AuthorIP string `^(\d?\d?\d)\.(\d?\d?\d)\.(\d?\d?\d)\.(\d?\d?\d)$"`
+    AuthorIP string `regex:"^(\d?\d?\d)\.(\d?\d?\d)\.(\d?\d?\d)\.(\d?\d?\d)$"`
 }
 post := &Post{"My Post about Examples", "Some text", "123.234.54.3"}
 println(govalidator.ValidateStruct(post) == true)
