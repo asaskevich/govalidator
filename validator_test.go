@@ -142,6 +142,18 @@ func TestIsHexcolor(t *testing.T) {
 	}
 }
 
+func TestIsRGBcolor(t *testing.T) {
+	tests := []string{"rgb(0,31,255)", "rgb(1,349,275)", "rgb(01,31,255)", "rgb(0.6,31,255)", "rgba(0,31,255)", "rgb(0,  31, 255)"}
+	expected := []bool{true, false, false, false, false, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsRGBcolor(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
+	}
+}
+
 func TestIsNull(t *testing.T) {
 	tests := []string{"abacaba", ""}
 	expected := []bool{false, true}
@@ -433,42 +445,74 @@ func TestIsMAC(t *testing.T) {
 	}
 }
 
+func TestIsLatitude(t *testing.T) {
+	tests := []string{"-90.000", "+90", "47.1231231", "+99.9", "108"}
+	expected := []bool{true, true, true, false, false}
+	for i := 0; i < len(tests); i++ {
+		result := IsLatitude(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
+	}
+}
+
+func TestIsLongitude(t *testing.T) {
+	tests := []string{"-180.000", "180.1", "+73.234", "+382.3811", "23.11111111"}
+	expected := []bool{true, false, true, false, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsLongitude(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
+	}
+}
+
 type Address struct {
-	Street string
-	Zip    string `regex:"^[0-9]{6,6}$"`
+	Street string `valid:"-"`
+	Zip    string `json:"zip" valid:"numeric,required"`
 }
 
 type User struct {
-	Name     string `regex:"^[a-zA-Z]+$"`
-	Password string `regex:"^[a-z0-9]{8,10}$"`
-	Age      int
+	Name     string `valid:"required"`
+	Email    string `valid:"required,email"`
+	Password string `valid:"required"`
+	Age      int    `valid:"required,numeric"`
 	Home     *Address
+	Work     []Address
 }
 
 func TestValidateStruct(t *testing.T) {
+
+	ExampleValidateStruct()
 	// Valid structure
-	user := &User{"John", "12345678", 20, &Address{"Street", "123456"}}
-	result := ValidateStruct(user)
+	user := &User{"John", "john@yahoo.com", "123G#678", 20, &Address{"Street", "123456"}, []Address{Address{"Street", "123456"}, Address{"Street", "123456"}}}
+	result, err := ValidateStruct(user)
 	if result != true {
 		t.Log("Case ", 0, ": expected ", true, " when result is ", result)
+		t.Error(err)
 		t.FailNow()
 	}
 	// Not valid
-	user = &User{"John", "12345678", 20, &Address{"Street", "123456789"}}
-	result = ValidateStruct(user)
+	user = &User{"John", "john!yahoo.com", "12345678", 20, &Address{"Street", "ABC456D89"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}}
+	result, err = ValidateStruct(user)
 	if result == true {
 		t.Log("Case ", 1, ": expected ", false, " when result is ", result)
+		t.Error(err)
 		t.FailNow()
 	}
-	user = &User{"John", "12345", 20, &Address{"Street", "123456789"}}
-	result = ValidateStruct(user)
+	user = &User{"John", "", "12345", 0, &Address{"Street", "123456789"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}}
+	result, err = ValidateStruct(user)
 	if result == true {
 		t.Log("Case ", 2, ": expected ", false, " when result is ", result)
+		t.Error(err)
 		t.FailNow()
 	}
-	result = ValidateStruct(nil)
+	result, err = ValidateStruct(nil)
 	if result != true {
 		t.Log("Case ", 3, ": expected ", true, " when result is ", result)
+		t.Error(err)
 		t.FailNow()
 	}
 
@@ -476,10 +520,24 @@ func TestValidateStruct(t *testing.T) {
 
 func ExampleValidateStruct() {
 	type Post struct {
-		Title    string `regex:"^[a-zA-Z0-9]{10,50}$"`
-		Message  string
-		AuthorIP string `regex:"^(\d?\d?\d)\.(\d?\d?\d)\.(\d?\d?\d)\.(\d?\d?\d)$"`
+		Title    string `valid:"alphanum,required"`
+		Message  string `valid:"duck,ascii"`
+		AuthorIP string `valid:"ipv4"`
 	}
-	post := &Post{"My Post about Examples", "Some text", "123.234.54.3"}
-	println(ValidateStruct(post) == true)
+	post := &Post{"My1PostaboutExamples", "duck", "123.234.54.3"}
+
+	//add your own struct validation tags
+	TagMap["duck"] = validator(func(str string) bool {
+		if str == "duck" {
+			return true
+		} else {
+			return false
+		}
+	})
+
+	result, err := ValidateStruct(post)
+	if err != nil {
+		println("error: " + err.Error())
+	}
+	println(result)
 }
