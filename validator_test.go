@@ -280,7 +280,7 @@ func TestIsUUID(t *testing.T) {
 		"AAAAAAAA-1111-1111-AAAG-111111111111", "A987FBC9-4BED-3078-CF07-9141BA07C9F3"}
 	expected := []bool{false, false, false, false, false, false, false, true}
 	for i := 0; i < len(tests); i++ {
-		result := IsUUID(tests[i], 0)
+		result := IsUUID(tests[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -291,7 +291,7 @@ func TestIsUUID(t *testing.T) {
 		"A987FBC9-4BED-3078-CF07-9141BA07C9F3"}
 	expected = []bool{false, false, false, false, true}
 	for i := 0; i < len(tests); i++ {
-		result := IsUUID(tests[i], 3)
+		result := IsUUIDv3(tests[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -302,7 +302,7 @@ func TestIsUUID(t *testing.T) {
 		"934859", "57B73598-8764-4AD0-A76A-679BB6640EB1", "625E63F3-58F5-40B7-83A1-A72AD31ACFFB"}
 	expected = []bool{false, false, false, false, true, true}
 	for i := 0; i < len(tests); i++ {
-		result := IsUUID(tests[i], 4)
+		result := IsUUIDv4(tests[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -313,22 +313,13 @@ func TestIsUUID(t *testing.T) {
 		"", "987FBC97-4BED-5078-AF07-9141BA07C9F3", "987FBC97-4BED-5078-9F07-9141BA07C9F3"}
 	expected = []bool{false, false, false, false, true, true}
 	for i := 0; i < len(tests); i++ {
-		result := IsUUID(tests[i], 5)
+		result := IsUUIDv5(tests[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
 		}
 	}
-	// Wrong version
-	tests = []string{""}
-	expected = []bool{false}
-	for i := 0; i < len(tests); i++ {
-		result := IsUUID(tests[i], -1)
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
-		}
-	}
+
 }
 
 func TestIsCreditCard(t *testing.T) {

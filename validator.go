@@ -28,6 +28,7 @@ var TagMap = map[string]Validator{
 	"int":           IsInt,
 	"float":         IsFloat,
 	"null":          IsNull,
+	"uuid":          IsUUID,
 	"uuidv3":        IsUUIDv3,
 	"uuidv4":        IsUUIDv4,
 	"uuidv5":        IsUUIDv5,
@@ -147,18 +148,8 @@ func IsUUIDv5(str string) bool {
 }
 
 // IsUUID check if the string is a UUID (version 3, 4 or 5).
-func IsUUID(str string, version int) bool {
-	switch version {
-	case 0:
-		return Matches(str, UUID)
-	case 3:
-		return Matches(str, UUID3)
-	case 4:
-		return Matches(str, UUID4)
-	case 5:
-		return Matches(str, UUID5)
-	}
-	return false
+func IsUUID(str string) bool {
+	return Matches(str, UUID)
 }
 
 // IsCreditCard check if the string is a credit card.
