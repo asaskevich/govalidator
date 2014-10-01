@@ -546,7 +546,7 @@ func ExampleValidateStruct() {
 	post := &Post{"My1PostaboutExamples", "duck", "123.234.54.3"}
 
 	//add your own struct validation tags
-	TagMap["duck"] = validator(func(str string) bool {
+	TagMap["duck"] = Validator(func(str string) bool {
 		if str == "duck" {
 			return true
 		} else {

@@ -12,9 +12,9 @@ import (
 	"unicode"
 )
 
-type validator func(str string) bool
+type Validator func(str string) bool
 
-var TagMap = map[string]validator{
+var TagMap = map[string]Validator{
 	"email":         IsEmail,
 	"url":           IsURL,
 	"alpha":         IsAlpha,
