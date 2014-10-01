@@ -41,6 +41,7 @@ var TagMap = map[string]validator{
 	"halfwidth":     IsHalfWidth,
 	"variablewidth": IsVariableWidth,
 	"base64":        IsBase64,
+	"datauri":       IsDataURI,
 	"ipv4":          IsIPv4,
 	"ipv6":          IsIPv6,
 	"mac":           IsMAC,
@@ -274,6 +275,15 @@ func IsVariableWidth(str string) bool {
 // IsBase64 check if a string is base64 encoded.
 func IsBase64(str string) bool {
 	return Matches(str, Base64)
+}
+
+// IsDataURI checks if a string is base64 encoded data URI such as an image
+func IsDataURI(str string) bool {
+	dataURI := strings.Split(str, ",")
+	if !Matches(dataURI[0], DataURI) {
+		return false
+	}
+	return IsBase64(dataURI[1])
 }
 
 func IsIPv4(str string) bool {

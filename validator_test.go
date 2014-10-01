@@ -380,6 +380,26 @@ func TestIsISBN(t *testing.T) {
 	}
 }
 
+func TestIsDataURI(t *testing.T) {
+	tests := []string{"data:image/png;base64,TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4=",
+		"data:text/plain;base64,Vml2YW11cyBmZXJtZW50dW0gc2VtcGVyIHBvcnRhLg==", "image/gif;base64,U3VzcGVuZGlzc2UgbGVjdHVzIGxlbw==",
+		"data:image/gif;base64,MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuMPNS1Ufof9EW/M98FNw" +
+			"UAKrwflsqVxaxQjBQnHQmiI7Vac40t8x7pIb8gLGV6wL7sBTJiPovJ0V7y7oc0Ye" +
+			"rhKh0Rm4skP2z/jHwwZICgGzBvA0rH8xlhUiTvcwDCJ0kc+fh35hNt8srZQM4619" +
+			"FTgB66Xmp4EtVyhpQV+t02g6NzK72oZI0vnAvqhpkxLeLiMCyrI416wHm5Tkukhx" +
+			"QmcL2a6hNOyu0ixX/x2kSFXApEnVrJ+/IxGyfyw8kf4N2IZpW5nEP847lpfj0SZZ" +
+			"Fwrd1mnfnDbYohX2zRptLy2ZUn06Qo9pkG5ntvFEPo9bfZeULtjYzIl6K8gJ2uGZ" + "HQIDAQAB", "data:image/png;base64,12345", "",
+		"data:text,:;base85,U3VzcGVuZGlzc2UgbGVjdHVzIGxlbw=="}
+	expected := []bool{true, true, false, true, false, false, false}
+	for i := 0; i < len(tests); i++ {
+		result := IsDataURI(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
+	}
+}
+
 func TestIsBase64(t *testing.T) {
 	tests := []string{"TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4=",
 		"Vml2YW11cyBmZXJtZW50dW0gc2VtcGVyIHBvcnRhLg==", "U3VzcGVuZGlzc2UgbGVjdHVzIGxlbw==",
@@ -485,7 +505,6 @@ type User struct {
 
 func TestValidateStruct(t *testing.T) {
 
-	ExampleValidateStruct()
 	// Valid structure
 	user := &User{"John", "john@yahoo.com", "123G#678", 20, &Address{"Street", "123456"}, []Address{Address{"Street", "123456"}, Address{"Street", "123456"}}}
 	result, err := ValidateStruct(user)
