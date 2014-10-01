@@ -142,6 +142,18 @@ func TestIsHexcolor(t *testing.T) {
 	}
 }
 
+func TestIsRGBcolor(t *testing.T) {
+	tests := []string{"rgb(0,31,255)", "rgb(1,349,275)", "rgb(01,31,255)", "rgb(0.6,31,255)", "rgba(0,31,255)", "rgb(0,  31, 255)"}
+	expected := []bool{true, false, false, false, false, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsRGBcolor(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
+	}
+}
+
 func TestIsNull(t *testing.T) {
 	tests := []string{"abacaba", ""}
 	expected := []bool{false, true}
@@ -268,7 +280,7 @@ func TestIsUUID(t *testing.T) {
 		"AAAAAAAA-1111-1111-AAAG-111111111111", "A987FBC9-4BED-3078-CF07-9141BA07C9F3"}
 	expected := []bool{false, false, false, false, false, false, false, true}
 	for i := 0; i < len(tests); i++ {
-		result := IsUUID(tests[i], 0)
+		result := IsUUID(tests[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -279,7 +291,7 @@ func TestIsUUID(t *testing.T) {
 		"A987FBC9-4BED-3078-CF07-9141BA07C9F3"}
 	expected = []bool{false, false, false, false, true}
 	for i := 0; i < len(tests); i++ {
-		result := IsUUID(tests[i], 3)
+		result := IsUUIDv3(tests[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -290,7 +302,7 @@ func TestIsUUID(t *testing.T) {
 		"934859", "57B73598-8764-4AD0-A76A-679BB6640EB1", "625E63F3-58F5-40B7-83A1-A72AD31ACFFB"}
 	expected = []bool{false, false, false, false, true, true}
 	for i := 0; i < len(tests); i++ {
-		result := IsUUID(tests[i], 4)
+		result := IsUUIDv4(tests[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -301,22 +313,13 @@ func TestIsUUID(t *testing.T) {
 		"", "987FBC97-4BED-5078-AF07-9141BA07C9F3", "987FBC97-4BED-5078-9F07-9141BA07C9F3"}
 	expected = []bool{false, false, false, false, true, true}
 	for i := 0; i < len(tests); i++ {
-		result := IsUUID(tests[i], 5)
+		result := IsUUIDv5(tests[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
 		}
 	}
-	// Wrong version
-	tests = []string{""}
-	expected = []bool{false}
-	for i := 0; i < len(tests); i++ {
-		result := IsUUID(tests[i], -1)
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
-		}
-	}
+
 }
 
 func TestIsCreditCard(t *testing.T) {
@@ -361,6 +364,26 @@ func TestIsISBN(t *testing.T) {
 	expected = []bool{true, true, true, true, true, true, true, true, false, false}
 	for i := 0; i < len(tests); i++ {
 		result := IsISBN(tests[i], -1)
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
+	}
+}
+
+func TestIsDataURI(t *testing.T) {
+	tests := []string{"data:image/png;base64,TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4=",
+		"data:text/plain;base64,Vml2YW11cyBmZXJtZW50dW0gc2VtcGVyIHBvcnRhLg==", "image/gif;base64,U3VzcGVuZGlzc2UgbGVjdHVzIGxlbw==",
+		"data:image/gif;base64,MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuMPNS1Ufof9EW/M98FNw" +
+			"UAKrwflsqVxaxQjBQnHQmiI7Vac40t8x7pIb8gLGV6wL7sBTJiPovJ0V7y7oc0Ye" +
+			"rhKh0Rm4skP2z/jHwwZICgGzBvA0rH8xlhUiTvcwDCJ0kc+fh35hNt8srZQM4619" +
+			"FTgB66Xmp4EtVyhpQV+t02g6NzK72oZI0vnAvqhpkxLeLiMCyrI416wHm5Tkukhx" +
+			"QmcL2a6hNOyu0ixX/x2kSFXApEnVrJ+/IxGyfyw8kf4N2IZpW5nEP847lpfj0SZZ" +
+			"Fwrd1mnfnDbYohX2zRptLy2ZUn06Qo9pkG5ntvFEPo9bfZeULtjYzIl6K8gJ2uGZ" + "HQIDAQAB", "data:image/png;base64,12345", "",
+		"data:text,:;base85,U3VzcGVuZGlzc2UgbGVjdHVzIGxlbw=="}
+	expected := []bool{true, true, false, true, false, false, false}
+	for i := 0; i < len(tests); i++ {
+		result := IsDataURI(tests[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -433,42 +456,73 @@ func TestIsMAC(t *testing.T) {
 	}
 }
 
+func TestIsLatitude(t *testing.T) {
+	tests := []string{"-90.000", "+90", "47.1231231", "+99.9", "108"}
+	expected := []bool{true, true, true, false, false}
+	for i := 0; i < len(tests); i++ {
+		result := IsLatitude(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
+	}
+}
+
+func TestIsLongitude(t *testing.T) {
+	tests := []string{"-180.000", "180.1", "+73.234", "+382.3811", "23.11111111"}
+	expected := []bool{true, false, true, false, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsLongitude(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
+	}
+}
+
 type Address struct {
-	Street string
-	Zip    string `regex:"^[0-9]{6,6}$"`
+	Street string `valid:"-"`
+	Zip    string `json:"zip" valid:"numeric,required"`
 }
 
 type User struct {
-	Name     string `regex:"^[a-zA-Z]+$"`
-	Password string `regex:"^[a-z0-9]{8,10}$"`
-	Age      int
+	Name     string `valid:"required"`
+	Email    string `valid:"required,email"`
+	Password string `valid:"required"`
+	Age      int    `valid:"required,numeric"`
 	Home     *Address
+	Work     []Address
 }
 
 func TestValidateStruct(t *testing.T) {
+
 	// Valid structure
-	user := &User{"John", "12345678", 20, &Address{"Street", "123456"}}
-	result := ValidateStruct(user)
+	user := &User{"John", "john@yahoo.com", "123G#678", 20, &Address{"Street", "123456"}, []Address{Address{"Street", "123456"}, Address{"Street", "123456"}}}
+	result, err := ValidateStruct(user)
 	if result != true {
 		t.Log("Case ", 0, ": expected ", true, " when result is ", result)
+		t.Error(err)
 		t.FailNow()
 	}
 	// Not valid
-	user = &User{"John", "12345678", 20, &Address{"Street", "123456789"}}
-	result = ValidateStruct(user)
+	user = &User{"John", "john!yahoo.com", "12345678", 20, &Address{"Street", "ABC456D89"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}}
+	result, err = ValidateStruct(user)
 	if result == true {
 		t.Log("Case ", 1, ": expected ", false, " when result is ", result)
+		t.Error(err)
 		t.FailNow()
 	}
-	user = &User{"John", "12345", 20, &Address{"Street", "123456789"}}
-	result = ValidateStruct(user)
+	user = &User{"John", "", "12345", 0, &Address{"Street", "123456789"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}}
+	result, err = ValidateStruct(user)
 	if result == true {
 		t.Log("Case ", 2, ": expected ", false, " when result is ", result)
+		t.Error(err)
 		t.FailNow()
 	}
-	result = ValidateStruct(nil)
+	result, err = ValidateStruct(nil)
 	if result != true {
 		t.Log("Case ", 3, ": expected ", true, " when result is ", result)
+		t.Error(err)
 		t.FailNow()
 	}
 
@@ -476,10 +530,24 @@ func TestValidateStruct(t *testing.T) {
 
 func ExampleValidateStruct() {
 	type Post struct {
-		Title    string `regex:"^[a-zA-Z0-9]{10,50}$"`
-		Message  string
-		AuthorIP string `regex:"^(\d?\d?\d)\.(\d?\d?\d)\.(\d?\d?\d)\.(\d?\d?\d)$"`
+		Title    string `valid:"alphanum,required"`
+		Message  string `valid:"duck,ascii"`
+		AuthorIP string `valid:"ipv4"`
 	}
-	post := &Post{"My Post about Examples", "Some text", "123.234.54.3"}
-	println(ValidateStruct(post) == true)
+	post := &Post{"My1PostaboutExamples", "duck", "123.234.54.3"}
+
+	//add your own struct validation tags
+	TagMap["duck"] = Validator(func(str string) bool {
+		if str == "duck" {
+			return true
+		} else {
+			return false
+		}
+	})
+
+	result, err := ValidateStruct(post)
+	if err != nil {
+		println("error: " + err.Error())
+	}
+	println(result)
 }
