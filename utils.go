@@ -151,7 +151,7 @@ func GetLines(s string) []string {
 func GetLine(s string, index int) (string, error) {
 	lines := GetLines(s)
 	if index < 0 || index >= len(lines) {
-		return "", errors.New("index out of bounds.")
+		return "", errors.New("GetLine: line index out of bounds")
 	}
 	return lines[index], nil
 }

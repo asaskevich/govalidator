@@ -341,7 +341,7 @@ func TestIsISBN(t *testing.T) {
 		"3 423 21412 0", "3 401 01319 X"}
 	expected := []bool{false, false, false, false, false, false, true, true, true, true}
 	for i := 0; i < len(tests); i++ {
-		result := IsISBN(tests[i], 10)
+		result := IsISBN10(tests[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -352,7 +352,7 @@ func TestIsISBN(t *testing.T) {
 		"978 3401013190", "978-3-8362-2119-1"}
 	expected = []bool{false, false, false, false, true, true, true, true}
 	for i := 0; i < len(tests); i++ {
-		result := IsISBN(tests[i], 13)
+		result := IsISBN13(tests[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -416,7 +416,7 @@ func TestIsIP(t *testing.T) {
 	tests := []string{"127.0.0.1", "0.0.0.0", "255.255.255.255", "1.2.3.4", "::1", "2001:db8:0000:1:1:1:1:1"}
 	expected := []bool{true, true, true, true, false, false}
 	for i := 0; i < len(tests); i++ {
-		result := IsIP(tests[i], 4)
+		result := IsIPv4(tests[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -426,7 +426,7 @@ func TestIsIP(t *testing.T) {
 	tests = []string{"127.0.0.1", "0.0.0.0", "255.255.255.255", "1.2.3.4", "::1", "2001:db8:0000:1:1:1:1:1"}
 	expected = []bool{false, false, false, false, true, true}
 	for i := 0; i < len(tests); i++ {
-		result := IsIP(tests[i], 6)
+		result := IsIPv6(tests[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -489,13 +489,17 @@ type User struct {
 	Name     string `valid:"required"`
 	Email    string `valid:"required,email"`
 	Password string `valid:"required"`
-	Age      int    `valid:"required,numeric"`
+	Age      int    `valid:"required,numeric,"`
 	Home     *Address
 	Work     []Address
 }
 
-func TestValidateStruct(t *testing.T) {
+type PrivateStruct struct {
+	privateField string `valid:"required,alpha,@!!"`
+	NonZero      int
+}
 
+func TestValidateStruct(t *testing.T) {
 	// Valid structure
 	user := &User{"John", "john@yahoo.com", "123G#678", 20, &Address{"Street", "123456"}, []Address{Address{"Street", "123456"}, Address{"Street", "123456"}}}
 	result, err := ValidateStruct(user)
@@ -525,7 +529,25 @@ func TestValidateStruct(t *testing.T) {
 		t.Error(err)
 		t.FailNow()
 	}
-
+	user = &User{"John", "john@yahoo.com", "123G#678", 0, &Address{"Street", "123456"}, []Address{}}
+	result, err = ValidateStruct(user)
+	if result != true {
+		t.Log("Case ", 4, ": expected ", true, " when result is ", result)
+		t.Error(err)
+		t.FailNow()
+	}
+	result, err = ValidateStruct("im not a struct")
+	if result == true {
+		t.Log("Case ", 5, ": expected ", false, " when result is ", result)
+		t.Error(err)
+		t.FailNow()
+	}
+	result, err = ValidateStruct(PrivateStruct{"private_str", 0})
+	if result != true {
+		t.Log("Case ", 6, ": expected ", true, " when result is ", result)
+		t.Error(err)
+		t.FailNow()
+	}
 }
 
 func ExampleValidateStruct() {
@@ -538,11 +560,7 @@ func ExampleValidateStruct() {
 
 	//add your own struct validation tags
 	TagMap["duck"] = Validator(func(str string) bool {
-		if str == "duck" {
-			return true
-		} else {
-			return false
-		}
+		return str == "duck"
 	})
 
 	result, err := ValidateStruct(post)

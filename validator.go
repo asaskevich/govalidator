@@ -12,44 +12,6 @@ import (
 	"unicode"
 )
 
-type Validator func(str string) bool
-
-var TagMap = map[string]Validator{
-	"email":         IsEmail,
-	"url":           IsURL,
-	"alpha":         IsAlpha,
-	"alphanum":      IsAlphanumeric,
-	"numeric":       IsNumeric,
-	"hexadecimal":   IsHexadecimal,
-	"hexcolor":      IsHexcolor,
-	"rgbcolor":      IsRGBcolor,
-	"lowercase":     IsLowerCase,
-	"uppercase":     IsUpperCase,
-	"int":           IsInt,
-	"float":         IsFloat,
-	"null":          IsNull,
-	"uuid":          IsUUID,
-	"uuidv3":        IsUUIDv3,
-	"uuidv4":        IsUUIDv4,
-	"uuidv5":        IsUUIDv5,
-	"creditcard":    IsCreditCard,
-	"isbn10":        IsISBN10,
-	"isbn13":        IsISBN13,
-	"json":          IsJSON,
-	"multibyte":     IsMultibyte,
-	"ascii":         IsASCII,
-	"fullwidth":     IsFullWidth,
-	"halfwidth":     IsHalfWidth,
-	"variablewidth": IsVariableWidth,
-	"base64":        IsBase64,
-	"datauri":       IsDataURI,
-	"ipv4":          IsIPv4,
-	"ipv6":          IsIPv6,
-	"mac":           IsMAC,
-	"latitude":      IsLatitude,
-	"longitude":     IsLongitude,
-}
-
 // IsEmail check if the string is an email.
 func IsEmail(str string) bool {
 	return Matches(str, Email)
@@ -88,6 +50,7 @@ func IsHexcolor(str string) bool {
 	return Matches(str, Hexcolor)
 }
 
+// IsRGBcolor check if the string is a valid RGB color in form rgb(RRR, GGG, BBB).
 func IsRGBcolor(str string) bool {
 	return Matches(str, RGBcolor)
 }
@@ -135,14 +98,17 @@ func IsByteLength(str string, min, max int) bool {
 	return len(str) >= min && len(str) <= max
 }
 
+// IsUUIDv3 check if the string is a UUID version 3.
 func IsUUIDv3(str string) bool {
 	return Matches(str, UUID3)
 }
 
+// IsUUIDv4 check if the string is a UUID version 4.
 func IsUUIDv4(str string) bool {
 	return Matches(str, UUID4)
 }
 
+// IsUUIDv5 check if the string is a UUID version 5.
 func IsUUIDv5(str string) bool {
 	return Matches(str, UUID5)
 }
@@ -185,10 +151,12 @@ func IsCreditCard(str string) bool {
 	return false
 }
 
+// IsISBN10 check if the string is an ISBN version 10.
 func IsISBN10(str string) bool {
 	return IsISBN(str, 10)
 }
 
+// IsISBN13 check if the string is an ISBN version 13.
 func IsISBN13(str string) bool {
 	return IsISBN(str, 13)
 }
@@ -277,10 +245,12 @@ func IsDataURI(str string) bool {
 	return IsBase64(dataURI[1])
 }
 
+// IsIPv4 check if the string is an IP version 4.
 func IsIPv4(str string) bool {
 	return IsIP(str, 4)
 }
 
+// IsIPv6 check if the string is an IP version 6.
 func IsIPv6(str string) bool {
 	return IsIP(str, 6)
 }
@@ -314,19 +284,15 @@ func IsMAC(str string) bool {
 	return Matches(str, MAC)
 }
 
+// IsLatitude check if a string is valid latitude.
 func IsLatitude(str string) bool {
 	return Matches(str, Latitude)
 }
 
+// IsLongitude check if a string is valid longitude.
 func IsLongitude(str string) bool {
 	return Matches(str, Longitude)
 }
-
-//--------------------------------------------------
-
-const tagName = "valid"
-
-type tagOptions []string
 
 // ValidateStruct use tags for fields
 func ValidateStruct(s interface{}) (bool, error) {
@@ -335,44 +301,34 @@ func ValidateStruct(s interface{}) (bool, error) {
 	}
 	result := true
 	var err error
-
 	val := reflect.ValueOf(s)
 	if val.Kind() == reflect.Interface || val.Kind() == reflect.Ptr {
 		val = val.Elem()
 	}
-
 	// we only accept structs
 	if val.Kind() != reflect.Struct {
-		return false, fmt.Errorf("ValidateStruct only accepts structs; got %T", val)
+		return false, fmt.Errorf("function only accepts structs; got %T", val)
 	}
-
 	for i := 0; i < val.NumField(); i++ {
-
 		valueField := val.Field(i)
 		typeField := val.Type().Field(i)
-
 		if typeField.PkgPath != "" {
 			continue // Private field
 		}
-
 		resultField, err := typeCheck(valueField, typeField)
 		if err != nil {
 			return false, err
 		}
 		result = result && resultField
-
 	}
-
 	return result, err
 }
 
 // parseTag splits a struct field's tag into its
 // comma-separated options.
 func parseTag(tag string) tagOptions {
-
 	split := strings.SplitN(tag, ",", -1)
 	return tagOptions(split)
-
 }
 
 func isValidTag(s string) bool {
@@ -398,7 +354,6 @@ func isValidTag(s string) bool {
 // contains a particular substr flag. substr must be surrounded by a
 // string boundary or commas.
 func (opts tagOptions) contains(optionName string) bool {
-
 	for i := range opts {
 		tagOpt := opts[i]
 		if tagOpt == optionName {
@@ -406,85 +361,61 @@ func (opts tagOptions) contains(optionName string) bool {
 		}
 	}
 	return false
-
 }
 
 func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 	if !v.IsValid() {
 		return false, nil
 	}
-
 	switch v.Kind() {
-	case
-		reflect.Bool,
+	case reflect.Bool,
 		reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
 		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
 		reflect.Float32, reflect.Float64,
 		reflect.String:
-
 		tag := t.Tag.Get(tagName)
-
 		// Check if the field should be ignored
 		if tag == "-" || tag == "" {
 			return true, nil
 		}
-
 		options := parseTag(tag)
-
 		if options.contains("required") {
-
 			result := func(field interface{}) bool {
 				//test is underlying type is not: nil, 0, ""
 				return field != nil || field != reflect.Zero(reflect.TypeOf(v)).Interface()
 			}(v)
 			if result == false {
-				err := fmt.Errorf("non zero value required for type %s.", t.Name)
+				err := fmt.Errorf("non zero value required for type %s", t.Name)
 				return result, err
 			}
-
 		} else if isEmptyValue(v) { //not required and empty is valid
 			return true, nil
 		}
-
 		//for each tag option check the map of validator functions
 		for i := range options {
-
 			tagOpt := options[i]
-
 			if ok := isValidTag(tagOpt); !ok {
 				continue
 			}
-
 			if validatefunc, ok := TagMap[tagOpt]; ok {
-
 				if v.Kind() == reflect.String { //TODO:other options/types to string
-
 					field := fmt.Sprint(v) //make value into string, then validate with regex
-
 					if result := validatefunc(field); !result {
-
-						err := fmt.Errorf("value: %s=%s does not validate as %s.", t.Name, field, tagOpt)
+						err := fmt.Errorf("value: %s=%s does not validate as %s", t.Name, field, tagOpt)
 						return result, err
 					}
 				}
-
 			}
 		}
 		return true, nil
-
-	case reflect.Struct:
-
-		return ValidateStruct(v.Interface())
-
 	case reflect.Map:
-
 		if v.Type().Key().Kind() != reflect.String {
 			return false, &UnsupportedTypeError{v.Type()}
 		}
-		if v.IsNil() { //an empty map is not validated, always true
+		//an empty map is not validated, always true
+		if v.IsNil() {
 			return true, nil
 		}
-
 		var sv stringValues = v.MapKeys()
 		sort.Sort(sv)
 		result := true
@@ -494,16 +425,13 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 				return false, err
 			}
 			result = result && resultItem
-
 		}
 		return result, nil
-
 	case reflect.Slice:
-
-		if v.IsNil() { //an empty slice is not validated, always true
+		//an empty slice is not validated, always true
+		if v.IsNil() {
 			return true, nil
 		}
-
 		result := true
 		for i := 0; i < v.Len(); i++ {
 			resultItem, err := ValidateStruct(v.Index(i).Interface())
@@ -511,13 +439,9 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 				return false, err
 			}
 			result = result && resultItem
-
 		}
-
 		return result, nil
-
 	case reflect.Array:
-
 		result := true
 		for i := 0; i < v.Len(); i++ {
 			resultItem, err := ValidateStruct(v.Index(i).Interface())
@@ -525,19 +449,17 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 				return false, err
 			}
 			result = result && resultItem
-
 		}
 		return result, nil
 
 	case reflect.Interface, reflect.Ptr:
-
 		// If the value is an interface or pointer then encode its element
 		if v.IsNil() {
 			return true, nil
 		}
-
 		return ValidateStruct(v.Interface())
-
+	case reflect.Struct:
+		return ValidateStruct(v.Interface())
 	default:
 		return false, &UnsupportedTypeError{v.Type()}
 	}
@@ -562,17 +484,9 @@ func isEmptyValue(v reflect.Value) bool {
 	return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
 }
 
-type UnsupportedTypeError struct {
-	Type reflect.Type
-}
-
 func (e *UnsupportedTypeError) Error() string {
 	return "validator: unsupported type: " + e.Type.String()
 }
-
-// stringValues is a slice of reflect.Value holding *reflect.StringValue.
-// It implements the methods to sort by string.
-type stringValues []reflect.Value
 
 func (sv stringValues) Len() int           { return len(sv) }
 func (sv stringValues) Swap(i, j int)      { sv[i], sv[j] = sv[j], sv[i] }
