@@ -416,7 +416,8 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 		if v.IsNil() {
 			return true, nil
 		}
-		var sv stringValues = v.MapKeys()
+		var sv stringValues
+		sv = v.MapKeys()
 		sort.Sort(sv)
 		result := true
 		for _, k := range sv {
@@ -484,6 +485,7 @@ func isEmptyValue(v reflect.Value) bool {
 	return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
 }
 
+// Error returns string equivalent for reflect.Type
 func (e *UnsupportedTypeError) Error() string {
 	return "validator: unsupported type: " + e.Type.String()
 }

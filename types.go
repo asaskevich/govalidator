@@ -2,11 +2,11 @@ package govalidator
 
 import "reflect"
 
-// Wrapper for validator functions, that returns bool and accepts string.
+// Validator is a wrapper for validator functions, that returns bool and accepts string.
 type Validator func(str string) bool
 type tagOptions []string
 
-// Wrapper for reflect.Type
+// UnsupportedTypeError is a wrapper for reflect.Type
 type UnsupportedTypeError struct {
 	Type reflect.Type
 }

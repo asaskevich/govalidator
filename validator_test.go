@@ -489,14 +489,17 @@ type User struct {
 	Name     string `valid:"required"`
 	Email    string `valid:"required,email"`
 	Password string `valid:"required"`
-	Age      int    `valid:"required,numeric,"`
+	Age      int    `valid:"required,numeric,@#\u0000"`
 	Home     *Address
 	Work     []Address
 }
 
 type PrivateStruct struct {
-	privateField string `valid:"required,alpha,@!!"`
+	privateField string `valid:"required,alpha,d_k"`
 	NonZero      int
+	Work         [2]Address
+	Home         Address
+	Map          map[string]Address
 }
 
 func TestValidateStruct(t *testing.T) {
@@ -542,7 +545,12 @@ func TestValidateStruct(t *testing.T) {
 		t.Error(err)
 		t.FailNow()
 	}
-	result, err = ValidateStruct(PrivateStruct{"private_str", 0})
+
+	TagMap["d_k"] = Validator(func(str string) bool {
+		return str == "d_k"
+	})
+	result, err = ValidateStruct(PrivateStruct{"d_k", 0, [2]Address{Address{"Street", "123456"},
+		Address{"Street", "123456"}}, Address{"Street", "123456"}, map[string]Address{"address": Address{"Street", "123456"}}})
 	if result != true {
 		t.Log("Case ", 6, ": expected ", true, " when result is ", result)
 		t.Error(err)
@@ -556,9 +564,9 @@ func ExampleValidateStruct() {
 		Message  string `valid:"duck,ascii"`
 		AuthorIP string `valid:"ipv4"`
 	}
-	post := &Post{"My1PostaboutExamples", "duck", "123.234.54.3"}
+	post := &Post{"My Example Post", "duck", "123.234.54.3"}
 
-	//add your own struct validation tags
+	//Add your own struct validation tags
 	TagMap["duck"] = Validator(func(str string) bool {
 		return str == "duck"
 	})
