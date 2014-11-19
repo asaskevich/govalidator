@@ -30,14 +30,64 @@ func IsAlpha(str string) bool {
 	return Matches(str, Alpha)
 }
 
+//IsUnicodeLetter check if the string contains only unicode letter characters.
+//Similar to IsAlpha but for all languages.
+func IsUnicodeLetter(str string) bool {
+
+	for _, c := range str {
+		if !unicode.IsLetter(c) {
+			return false
+		}
+	}
+	return true
+
+}
+
 // IsAlphanumeric check if the string contains only letters and numbers.
 func IsAlphanumeric(str string) bool {
 	return Matches(str, Alphanumeric)
 }
 
+// IsUnicodeLetterNumeric check if the string contains only unicode letters and numbers.
+func IsUnicodeLetterNumeric(str string) bool {
+
+	for _, c := range str {
+		if !unicode.IsLetter(c) && !unicode.IsNumber(c) { //letters && numbers are ok
+			return false
+		}
+	}
+	return true
+
+}
+
 // IsNumeric check if the string contains only numbers.
 func IsNumeric(str string) bool {
 	return Matches(str, Numeric)
+}
+
+// IsUnicodeNumeric check if the string contains only unicode numbers of any kind.
+// Numbers can be 0-9 but also Fractions ¾,Roman Ⅸ and Hangzhou 〩.
+func IsUnicodeNumeric(str string) bool {
+
+	for _, c := range str {
+		if unicode.IsNumber(c) == false && c != '-' { //numbers && minus sign are ok
+			return false
+		}
+	}
+	return true
+
+}
+
+// IsUnicodeDigit check if the string contains only unicode radix-10 decimal digits.
+func IsUnicodeDigit(str string) bool {
+
+	for _, c := range str {
+		if !unicode.IsDigit(c) && c != '-' { //digits && minus sign are ok
+			return false
+		}
+	}
+	return true
+
 }
 
 // IsHexadecimal check if the string is a hexadecimal number.
