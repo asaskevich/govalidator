@@ -10,7 +10,7 @@ Make sure that Go is installed on your computer.
 Type the following command in your terminal:
 
 	go get github.com/asaskevich/govalidator
-	
+
 After it the package is ready to use.
 
 #### Import package in your project
@@ -103,14 +103,14 @@ type User struct {
 	LastName string
 }
 
-str,_ := govalidator.ToString(&User{"John", "Juan"})
+str, _ := govalidator.ToString(&User{"John", "Juan"})
 println(str)
 ```
 ###### ValidateStruct [#2](https://github.com/asaskevich/govalidator/pull/2)
 If you want to validate structs, you can use tag `valid` for any field in your structure. All validators used with this field in one tag are separated by comma. If you want to skip validation, place `-` in your tag. If you need a validator that is not on the list below, you can add it like this:
 ```go
 govalidator.TagMap["duck"] = govalidator.Validator(func(str string) bool {
-    return str == "duck"
+	return str == "duck"
 })
 ```
 Here is a list of available validators for struct fields (validator - used function):
@@ -152,21 +152,25 @@ Here is a list of available validators for struct fields (validator - used funct
 And here is small example of usage:
 ```go
 type Post struct {
-    Title    string `valid:"alphanum,required"`
-    Message  string `valid:"duck,ascii"`
-    AuthorIP string `valid:"ipv4"`
-    Date     string `valid:"-"`	
+	Title    string `valid:"alphanum,required"`
+	Message  string `valid:"duck,ascii"`
+	AuthorIP string `valid:"ipv4"`
+	Date     string `valid:"-"`
 }
-post := &Post{"My Example Post", "duck", "123.234.54.3"}
+post := &Post{
+	Title:   "My Example Post",
+	Message: "duck",
+	AuthorIP: "123.234.54.3",
+}
 
-//Add your own struct validation tags
+// Add your own struct validation tags
 govalidator.TagMap["duck"] = govalidator.Validator(func(str string) bool {
-    return str == "duck"
+	return str == "duck"
 })
 
 result, err := govalidator.ValidateStruct(post)
 if err != nil {
-    println("error: " + err.Error())
+	println("error: " + err.Error())
 }
 println(result)
 ```
