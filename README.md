@@ -157,7 +157,11 @@ type Post struct {
     AuthorIP string `valid:"ipv4"`
     Date     string `valid:"-"`	
 }
-post := &Post{"My Example Post", "duck", "123.234.54.3"}
+post := &Post{
+    Title:   "My Example Post",
+    Message: "duck",
+    AuthorIP: "123.234.54.3",
+}
 
 //Add your own struct validation tags
 govalidator.TagMap["duck"] = govalidator.Validator(func(str string) bool {
