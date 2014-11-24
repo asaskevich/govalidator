@@ -1,5 +1,7 @@
 package govalidator
 
+import "regexp"
+
 // Basic regular expressions for validating strings
 const (
 	Email        string = "^(((([a-z]|\\d|[!#\\$%&'\\*\\+\\-\\/=\\?\\^_`{\\|}~]|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])+(\\.([a-z]|\\d|[!#\\$%&'\\*\\+\\-\\/=\\?\\^_`{\\|}~]|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])+)*)|((\\x22)((((\\x20|\\x09)*(\\x0d\\x0a))?(\\x20|\\x09)+)?(([\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x7f]|\\x21|[\\x23-\\x5b]|[\\x5d-\\x7e]|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])|(\\([\\x01-\\x09\\x0b\\x0c\\x0d-\\x7f]|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}]))))*(((\\x20|\\x09)*(\\x0d\\x0a))?(\\x20|\\x09)+)?(\\x22)))@((([a-z]|\\d|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])|(([a-z]|\\d|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])([a-z]|\\d|-|\\.|_|~|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])*([a-z]|\\d|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])))\\.)+(([a-z]|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])|(([a-z]|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])([a-z]|\\d|-|\\.|_|~|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])*([a-z]|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])))\\.?$"
@@ -31,4 +33,35 @@ const (
 	Longitude    string = "^[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$"
 	URL          string = `^((ftp|http|https):\/\/)?(\S+(:\S*)?@)?((([1-9]\d?|1\d\d|2[01]\d|22[0-3])(\.(1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.([0-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|((www\.)?)?(([a-z\x{00a1}-\x{ffff}0-9]+-?-?_?)*[a-z\x{00a1}-\x{ffff}0-9]+)(?:\.([a-z\x{00a1}-\x{ffff}]{2,}))?)|localhost)(:(\d{1,5}))?((\/|\?|#)[^\s]*)?$`
 	tagName      string = "valid"
+)
+
+var (
+	rxEmail        = regexp.MustCompile(Email)
+	rxCreditCard   = regexp.MustCompile(CreditCard)
+	rxISBN10       = regexp.MustCompile(ISBN10)
+	rxISBN13       = regexp.MustCompile(ISBN13)
+	rxIPv4         = regexp.MustCompile(IPv4)
+	rxIPv6         = regexp.MustCompile(IPv6)
+	rxUUID3        = regexp.MustCompile(UUID3)
+	rxUUID4        = regexp.MustCompile(UUID4)
+	rxUUID5        = regexp.MustCompile(UUID5)
+	rxUUID         = regexp.MustCompile(UUID)
+	rxAlpha        = regexp.MustCompile(Alpha)
+	rxAlphanumeric = regexp.MustCompile(Alphanumeric)
+	rxNumeric      = regexp.MustCompile(Numeric)
+	rxInt          = regexp.MustCompile(Int)
+	rxFloat        = regexp.MustCompile(Float)
+	rxHexadecimal  = regexp.MustCompile(Hexadecimal)
+	rxHexcolor     = regexp.MustCompile(Hexcolor)
+	rxRGBcolor     = regexp.MustCompile(RGBcolor)
+	rxASCII        = regexp.MustCompile(ASCII)
+	rxMultibyte    = regexp.MustCompile(Multibyte)
+	rxFullWidth    = regexp.MustCompile(FullWidth)
+	rxHalfWidth    = regexp.MustCompile(HalfWidth)
+	rxBase64       = regexp.MustCompile(Base64)
+	rxDataURI      = regexp.MustCompile(DataURI)
+	rxMAC          = regexp.MustCompile(MAC)
+	rxLatitude     = regexp.MustCompile(Latitude)
+	rxLongitude    = regexp.MustCompile(Longitude)
+	rxURL          = regexp.MustCompile(URL)
 )
