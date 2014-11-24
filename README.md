@@ -107,7 +107,7 @@ str,_ := govalidator.ToString(&User{"John", "Juan"})
 println(str)
 ```
 ###### ValidateStruct [#2](https://github.com/asaskevich/govalidator/pull/2)
-If you want to validate structs, you can use tag `valid` for any field in your structure. All validators used with this field in one tag are separated by comma. If you want to ignore tag, place `-` in your tag. If you think, that package has no necessary validators, you can add it:
+If you want to validate structs, you can use tag `valid` for any field in your structure. All validators used with this field in one tag are separated by comma. If you want to skip validation, place `-` in your tag. If you need a validator that is not on the list below, you can add it like this:
 ```go
 govalidator.TagMap["duck"] = govalidator.Validator(func(str string) bool {
     return str == "duck"
