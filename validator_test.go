@@ -200,8 +200,8 @@ func TestIsByteLength(t *testing.T) {
 
 func TestIsJSON(t *testing.T) {
 	tests := []string{"", "145", "asdf", "123:f00", "{\"Name\":\"Alice\",\"Body\":\"Hello\",\"Time\":1294706395881547000}",
-		"{}", "{\"Key\":{\"Key\":{\"Key\":123}}}"}
-	expected := []bool{false, false, false, false, true, true, true}
+		"{}", "{\"Key\":{\"Key\":{\"Key\":123}}}", "[]", "null"}
+	expected := []bool{false, true, false, false, true, true, true, true, true}
 	for i := 0; i < len(tests); i++ {
 		result := IsJSON(tests[i])
 		if result != expected[i] {
