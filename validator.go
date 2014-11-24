@@ -202,7 +202,7 @@ func IsISBN(str string, version int) bool {
 
 // IsJSON check if the string is valid JSON (note: uses json.Unmarshal).
 func IsJSON(str string) bool {
-	var js map[string]interface{}
+	var js json.RawMessage
 	return json.Unmarshal([]byte(str), &js) == nil
 }
 
