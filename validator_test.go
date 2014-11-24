@@ -436,7 +436,7 @@ func TestIsIP(t *testing.T) {
 	tests = []string{"127.0.0.1", "0.0.0.0", "255.255.255.255", "1.2.3.4", "::1", "2001:db8:0000:1:1:1:1:1", "300.0.0.0"}
 	expected = []bool{true, true, true, true, true, true, false}
 	for i := 0; i < len(tests); i++ {
-		result := IsIP(tests[i], -1)
+		result := IsIP(tests[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()

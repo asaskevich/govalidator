@@ -245,19 +245,23 @@ func IsDataURI(str string) bool {
 	return IsBase64(dataURI[1])
 }
 
+// IsIP checks if a string is either IP version 4 or 6.
+func IsIP(str string) bool {
+	return (isIP(str, 4) || isIP(str, 6))
+}
+
 // IsIPv4 check if the string is an IP version 4.
 func IsIPv4(str string) bool {
-	return IsIP(str, 4)
+	return isIP(str, 4)
 }
 
 // IsIPv6 check if the string is an IP version 6.
 func IsIPv6(str string) bool {
-	return IsIP(str, 6)
+	return isIP(str, 6)
 }
 
-// IsIP check if the string is an IP (version 4 or 6).
-// If version value is not equal to 6 or 4, it will be check both variants.
-func IsIP(str string, version int) bool {
+// isIP check if the string is an IP (version 4 or 6).
+func isIP(str string, version int) bool {
 	if version == 4 {
 		if !rxIPv4.MatchString(str) {
 			return false
@@ -272,7 +276,7 @@ func IsIP(str string, version int) bool {
 	} else if version == 6 {
 		return rxIPv6.MatchString(str)
 	}
-	return (IsIP(str, 4) || IsIP(str, 6))
+	return false
 }
 
 // IsMAC check if a string is valid MAC address.
