@@ -446,7 +446,7 @@ func TestIsIP(t *testing.T) {
 
 func TestIsMAC(t *testing.T) {
 	tests := []string{"3D:F2:C9:A6:B3:4F", "3D-F2-C9-A6-B3:4F", "123", "", "abacaba"}
-	expected := []bool{true, true, false, false, false}
+	expected := []bool{true, false, false, false, false}
 	for i := 0; i < len(tests); i++ {
 		result := IsMAC(tests[i])
 		if result != expected[i] {

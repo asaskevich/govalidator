@@ -5,6 +5,7 @@ package govalidator
 import (
 	"encoding/json"
 	"fmt"
+	"net"
 	"reflect"
 	"regexp"
 	"sort"
@@ -271,11 +272,15 @@ func IsIPv6(str string) bool {
 
 // IsMAC check if a string is valid MAC address.
 // Possible MAC formats:
-// 3D:F2:C9:A6:B3:4F
-// 3D-F2-C9-A6-B3:4F
-// 3d-f2-c9-a6-b3:4f
+// 01:23:45:67:89:ab
+// 01:23:45:67:89:ab:cd:ef
+// 01-23-45-67-89-ab
+// 01-23-45-67-89-ab-cd-ef
+// 0123.4567.89ab
+// 0123.4567.89ab.cdef
 func IsMAC(str string) bool {
-	return rxMAC.MatchString(str)
+	_, err := net.ParseMAC(str)
+	return err == nil
 }
 
 // IsLatitude check if a string is valid latitude.
