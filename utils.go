@@ -86,18 +86,11 @@ func ReplacePattern(str, pattern, replace string) string {
 
 // Escape replace <, >, & and " with HTML entities.
 func Escape(str string) string {
-	escaped := str
-	escaping := map[string]string{}
-	escaping[`&`] = "&amp;"
-	escaping[`"`] = "&quot;"
-	escaping[`<`] = "&lt;"
-	escaping[`>`] = "&gt;"
-	// If you want to add more escaping characters,
-	// use escaping[old_char] = escaped_form
-	for key, value := range escaping {
-		escaped = strings.Replace(escaped, key, value, -1)
-	}
-	return escaped
+	str = strings.Replace(str, `&`, "&amp;", -1)
+	str = strings.Replace(str, `"`, "&quot;", -1)
+	str = strings.Replace(str, `<`, "&lt;", -1)
+	str = strings.Replace(str, `>`, "&gt;", -1)
+	return str
 }
 
 func addSegment(inrune, segment []rune) []rune {
