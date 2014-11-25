@@ -5,6 +5,7 @@ package govalidator
 import (
 	"encoding/json"
 	"fmt"
+	"net"
 	"reflect"
 	"regexp"
 	"sort"
@@ -247,26 +248,19 @@ func IsDataURI(str string) bool {
 
 // IsIP checks if a string is either IP version 4 or 6.
 func IsIP(str string) bool {
-	return IsIPv4(str) || IsIPv6(str)
+	return net.ParseIP(str) != nil
 }
 
 // IsIPv4 check if the string is an IP version 4.
 func IsIPv4(str string) bool {
-	if !rxIPv4.MatchString(str) {
-		return false
-	}
-	parts := strings.Split(str, ".")
-	isIPv4 := true
-	for i := 0; i < len(parts); i++ {
-		partI, _ := ToInt(parts[i])
-		isIPv4 = isIPv4 && ((partI >= 0) && (partI <= 255))
-	}
-	return isIPv4
+	ip := net.ParseIP(str)
+	return ip != nil && ip.To4() != nil
 }
 
 // IsIPv6 check if the string is an IP version 6.
 func IsIPv6(str string) bool {
-	return rxIPv6.MatchString(str)
+	ip := net.ParseIP(str)
+	return ip != nil && ip.To4() == nil
 }
 
 // IsMAC check if a string is valid MAC address.

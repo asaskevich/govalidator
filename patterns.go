@@ -8,8 +8,6 @@ const (
 	CreditCard   string = "^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\\d{3})\\d{11})$"
 	ISBN10       string = "^(?:[0-9]{9}X|[0-9]{10})$"
 	ISBN13       string = "^(?:[0-9]{13})$"
-	IPv4         string = "^(\\d?\\d?\\d)\\.(\\d?\\d?\\d)\\.(\\d?\\d?\\d)\\.(\\d?\\d?\\d)$"
-	IPv6         string = "^::|^::1|^([a-fA-F0-9]{1,4}::?){1,7}([a-fA-F0-9]{1,4})$"
 	UUID3        string = "^[0-9A-F]{8}-[0-9A-F]{4}-3[0-9A-F]{3}-[0-9A-F]{4}-[0-9A-F]{12}$"
 	UUID4        string = "^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$"
 	UUID5        string = "^[0-9A-F]{8}-[0-9A-F]{4}-5[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$"
@@ -40,8 +38,6 @@ var (
 	rxCreditCard   = regexp.MustCompile(CreditCard)
 	rxISBN10       = regexp.MustCompile(ISBN10)
 	rxISBN13       = regexp.MustCompile(ISBN13)
-	rxIPv4         = regexp.MustCompile(IPv4)
-	rxIPv6         = regexp.MustCompile(IPv6)
 	rxUUID3        = regexp.MustCompile(UUID3)
 	rxUUID4        = regexp.MustCompile(UUID4)
 	rxUUID5        = regexp.MustCompile(UUID5)
