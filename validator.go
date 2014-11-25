@@ -247,7 +247,7 @@ func IsDataURI(str string) bool {
 
 // IsIP checks if a string is either IP version 4 or 6.
 func IsIP(str string) bool {
-	return (IsIPv4(str) || IsIPv6(str))
+	return IsIPv4(str) || IsIPv6(str)
 }
 
 // IsIPv4 check if the string is an IP version 4.
