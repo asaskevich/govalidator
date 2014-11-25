@@ -14,7 +14,7 @@ import (
 
 // IsEmail check if the string is an email.
 func IsEmail(str string) bool {
-	return Matches(str, Email)
+	return rxEmail.MatchString(str)
 }
 
 // IsURL check if the string is an URL.
@@ -22,37 +22,37 @@ func IsURL(str string) bool {
 	if str == "" || len(str) >= 2083 {
 		return false
 	}
-	return Matches(str, URL)
+	return rxURL.MatchString(str)
 }
 
 // IsAlpha check if the string contains only letters (a-zA-Z).
 func IsAlpha(str string) bool {
-	return Matches(str, Alpha)
+	return rxAlpha.MatchString(str)
 }
 
 // IsAlphanumeric check if the string contains only letters and numbers.
 func IsAlphanumeric(str string) bool {
-	return Matches(str, Alphanumeric)
+	return rxAlphanumeric.MatchString(str)
 }
 
 // IsNumeric check if the string contains only numbers.
 func IsNumeric(str string) bool {
-	return Matches(str, Numeric)
+	return rxNumeric.MatchString(str)
 }
 
 // IsHexadecimal check if the string is a hexadecimal number.
 func IsHexadecimal(str string) bool {
-	return Matches(str, Hexadecimal)
+	return rxHexadecimal.MatchString(str)
 }
 
 // IsHexcolor check if the string is a hexadecimal color.
 func IsHexcolor(str string) bool {
-	return Matches(str, Hexcolor)
+	return rxHexcolor.MatchString(str)
 }
 
 // IsRGBcolor check if the string is a valid RGB color in form rgb(RRR, GGG, BBB).
 func IsRGBcolor(str string) bool {
-	return Matches(str, RGBcolor)
+	return rxRGBcolor.MatchString(str)
 }
 
 // IsLowerCase check if the string is lowercase.
@@ -67,12 +67,12 @@ func IsUpperCase(str string) bool {
 
 // IsInt check if the string is an integer.
 func IsInt(str string) bool {
-	return Matches(str, Int)
+	return rxInt.MatchString(str)
 }
 
 // IsFloat check if the string is a float.
 func IsFloat(str string) bool {
-	return str != "" && Matches(str, Float)
+	return str != "" && rxFloat.MatchString(str)
 }
 
 // IsDivisibleBy check if the string is a number that's divisible by another.
@@ -100,29 +100,29 @@ func IsByteLength(str string, min, max int) bool {
 
 // IsUUIDv3 check if the string is a UUID version 3.
 func IsUUIDv3(str string) bool {
-	return Matches(str, UUID3)
+	return rxUUID3.MatchString(str)
 }
 
 // IsUUIDv4 check if the string is a UUID version 4.
 func IsUUIDv4(str string) bool {
-	return Matches(str, UUID4)
+	return rxUUID4.MatchString(str)
 }
 
 // IsUUIDv5 check if the string is a UUID version 5.
 func IsUUIDv5(str string) bool {
-	return Matches(str, UUID5)
+	return rxUUID5.MatchString(str)
 }
 
 // IsUUID check if the string is a UUID (version 3, 4 or 5).
 func IsUUID(str string) bool {
-	return Matches(str, UUID)
+	return rxUUID.MatchString(str)
 }
 
 // IsCreditCard check if the string is a credit card.
 func IsCreditCard(str string) bool {
 	r, _ := regexp.Compile("[^0-9]+")
 	sanitized := r.ReplaceAll([]byte(str), []byte(""))
-	if !Matches(string(sanitized), CreditCard) {
+	if !rxCreditCard.MatchString(string(sanitized)) {
 		return false
 	}
 	var sum int64
@@ -169,7 +169,7 @@ func IsISBN(str string, version int) bool {
 	var checksum int32
 	var i int32
 	if version == 10 {
-		if !Matches(string(sanitized), ISBN10) {
+		if !rxISBN10.MatchString(string(sanitized)) {
 			return false
 		}
 		for i = 0; i < 9; i++ {
@@ -185,7 +185,7 @@ func IsISBN(str string, version int) bool {
 		}
 		return false
 	} else if version == 13 {
-		if !Matches(string(sanitized), ISBN13) {
+		if !rxISBN13.MatchString(string(sanitized)) {
 			return false
 		}
 		factor := []int32{1, 3}
@@ -208,38 +208,38 @@ func IsJSON(str string) bool {
 
 // IsMultibyte check if the string contains one or more multibyte chars.
 func IsMultibyte(str string) bool {
-	return Matches(str, Multibyte)
+	return rxMultibyte.MatchString(str)
 }
 
 // IsASCII check if the string contains ASCII chars only.
 func IsASCII(str string) bool {
-	return Matches(str, ASCII)
+	return rxASCII.MatchString(str)
 }
 
 // IsFullWidth check if the string contains any full-width chars.
 func IsFullWidth(str string) bool {
-	return Matches(str, FullWidth)
+	return rxFullWidth.MatchString(str)
 }
 
 // IsHalfWidth check if the string contains any half-width chars.
 func IsHalfWidth(str string) bool {
-	return Matches(str, HalfWidth)
+	return rxHalfWidth.MatchString(str)
 }
 
 // IsVariableWidth check if the string contains a mixture of full and half-width chars.
 func IsVariableWidth(str string) bool {
-	return Matches(str, HalfWidth) && Matches(str, FullWidth)
+	return rxHalfWidth.MatchString(str) && rxFullWidth.MatchString(str)
 }
 
 // IsBase64 check if a string is base64 encoded.
 func IsBase64(str string) bool {
-	return Matches(str, Base64)
+	return rxBase64.MatchString(str)
 }
 
 // IsDataURI checks if a string is base64 encoded data URI such as an image
 func IsDataURI(str string) bool {
 	dataURI := strings.Split(str, ",")
-	if !Matches(dataURI[0], DataURI) {
+	if !rxDataURI.MatchString(dataURI[0]) {
 		return false
 	}
 	return IsBase64(dataURI[1])
@@ -259,7 +259,7 @@ func IsIPv6(str string) bool {
 // If version value is not equal to 6 or 4, it will be check both variants.
 func IsIP(str string, version int) bool {
 	if version == 4 {
-		if !Matches(str, IPv4) {
+		if !rxIPv4.MatchString(str) {
 			return false
 		}
 		parts := strings.Split(str, ".")
@@ -270,7 +270,7 @@ func IsIP(str string, version int) bool {
 		}
 		return isIPv4
 	} else if version == 6 {
-		return Matches(str, IPv6)
+		return rxIPv6.MatchString(str)
 	}
 	return (IsIP(str, 4) || IsIP(str, 6))
 }
@@ -281,17 +281,17 @@ func IsIP(str string, version int) bool {
 // 3D-F2-C9-A6-B3:4F
 // 3d-f2-c9-a6-b3:4f
 func IsMAC(str string) bool {
-	return Matches(str, MAC)
+	return rxMAC.MatchString(str)
 }
 
 // IsLatitude check if a string is valid latitude.
 func IsLatitude(str string) bool {
-	return Matches(str, Latitude)
+	return rxLatitude.MatchString(str)
 }
 
 // IsLongitude check if a string is valid longitude.
 func IsLongitude(str string) bool {
-	return Matches(str, Longitude)
+	return rxLongitude.MatchString(str)
 }
 
 // ValidateStruct use tags for fields
