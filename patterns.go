@@ -28,7 +28,6 @@ const (
 	HalfWidth    string = "[\u0020-\u007E\uFF61-\uFF9F\uFFA0-\uFFDC\uFFE8-\uFFEE0-9a-zA-Z]"
 	Base64       string = "^(?:[A-Za-z0-9+\\/]{4})*(?:[A-Za-z0-9+\\/]{2}==|[A-Za-z0-9+\\/]{3}=|[A-Za-z0-9+\\/]{4})$"
 	DataURI      string = "^data:.+\\/(.+);base64$"
-	MAC          string = "^([a-fA-F0-9]{2}[:-]){5}[a-fA-F0-9]{2}$"
 	Latitude     string = "^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)$"
 	Longitude    string = "^[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$"
 	URL          string = `^((ftp|http|https):\/\/)?(\S+(:\S*)?@)?((([1-9]\d?|1\d\d|2[01]\d|22[0-3])(\.(1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.([0-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|((www\.)?)?(([a-z\x{00a1}-\x{ffff}0-9]+-?-?_?)*[a-z\x{00a1}-\x{ffff}0-9]+)(?:\.([a-z\x{00a1}-\x{ffff}]{2,}))?)|localhost)(:(\d{1,5}))?((\/|\?|#)[^\s]*)?$`
@@ -60,7 +59,6 @@ var (
 	rxHalfWidth    = regexp.MustCompile(HalfWidth)
 	rxBase64       = regexp.MustCompile(Base64)
 	rxDataURI      = regexp.MustCompile(DataURI)
-	rxMAC          = regexp.MustCompile(MAC)
 	rxLatitude     = regexp.MustCompile(Latitude)
 	rxLongitude    = regexp.MustCompile(Longitude)
 	rxURL          = regexp.MustCompile(URL)
