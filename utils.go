@@ -2,6 +2,7 @@ package govalidator
 
 import (
 	"errors"
+	"html"
 	"path"
 	"regexp"
 	"strings"
@@ -85,13 +86,7 @@ func ReplacePattern(str, pattern, replace string) string {
 }
 
 // Escape replace <, >, & and " with HTML entities.
-func Escape(str string) string {
-	str = strings.Replace(str, `&`, "&amp;", -1)
-	str = strings.Replace(str, `"`, "&quot;", -1)
-	str = strings.Replace(str, `<`, "&lt;", -1)
-	str = strings.Replace(str, `>`, "&gt;", -1)
-	return str
-}
+var Escape = html.EscapeString
 
 func addSegment(inrune, segment []rune) []rune {
 	if len(segment) == 0 {
