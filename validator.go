@@ -245,34 +245,28 @@ func IsDataURI(str string) bool {
 	return IsBase64(dataURI[1])
 }
 
+// IsIP checks if a string is either IP version 4 or 6.
+func IsIP(str string) bool {
+	return IsIPv4(str) || IsIPv6(str)
+}
+
 // IsIPv4 check if the string is an IP version 4.
 func IsIPv4(str string) bool {
-	return IsIP(str, 4)
+	if !rxIPv4.MatchString(str) {
+		return false
+	}
+	parts := strings.Split(str, ".")
+	isIPv4 := true
+	for i := 0; i < len(parts); i++ {
+		partI, _ := ToInt(parts[i])
+		isIPv4 = isIPv4 && ((partI >= 0) && (partI <= 255))
+	}
+	return isIPv4
 }
 
 // IsIPv6 check if the string is an IP version 6.
 func IsIPv6(str string) bool {
-	return IsIP(str, 6)
-}
-
-// IsIP check if the string is an IP (version 4 or 6).
-// If version value is not equal to 6 or 4, it will be check both variants.
-func IsIP(str string, version int) bool {
-	if version == 4 {
-		if !rxIPv4.MatchString(str) {
-			return false
-		}
-		parts := strings.Split(str, ".")
-		isIPv4 := true
-		for i := 0; i < len(parts); i++ {
-			partI, _ := ToInt(parts[i])
-			isIPv4 = isIPv4 && ((partI >= 0) && (partI <= 255))
-		}
-		return isIPv4
-	} else if version == 6 {
-		return rxIPv6.MatchString(str)
-	}
-	return (IsIP(str, 4) || IsIP(str, 6))
+	return rxIPv6.MatchString(str)
 }
 
 // IsMAC check if a string is valid MAC address.

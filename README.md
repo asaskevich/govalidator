@@ -143,6 +143,7 @@ Here is a list of available validators for struct fields (validator - used funct
 "variablewidth": IsVariableWidth,
 "base64":        IsBase64,
 "datauri":       IsDataURI,
+"ip":            IsIP,
 "ipv4":          IsIPv4,
 "ipv6":          IsIPv6,
 "mac":           IsMAC,
