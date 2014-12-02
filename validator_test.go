@@ -14,6 +14,18 @@ func TestIsAlpha(t *testing.T) {
 	}
 }
 
+func TestIsUnicodeLetter(t *testing.T) {
+	tests := []string{`\n`, "Ⅸ", "   fooo   ", "abc〩", "abc", "소주", "FoObAr"}
+	expected := []bool{false, false, false, false, true, true, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsUnicodeLetter(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
+	}
+}
+
 func TestIsAlphanumeric(t *testing.T) {
 	tests := []string{"foo ", "abc!!!", "abc123", "ABC111"}
 	expected := []bool{false, false, true, true}
@@ -26,11 +38,47 @@ func TestIsAlphanumeric(t *testing.T) {
 	}
 }
 
+func TestIsUnicodeLetterNumeric(t *testing.T) {
+	tests := []string{"foo ", "abc!!!", "달기&Co.", "소주", "〩Hours"}
+	expected := []bool{false, false, false, true, true}
+	for i := 0; i < len(tests); i++ {
+		result := IsUnicodeLetterNumeric(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
+	}
+}
+
 func TestIsNumeric(t *testing.T) {
 	tests := []string{"123", "0123", "-00123", "0", "-0", "123.123", " ", "."}
 	expected := []bool{true, true, true, true, true, false, false, false}
 	for i := 0; i < len(tests); i++ {
 		result := IsNumeric(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
+	}
+}
+
+func TestIsUnicodeNumeric(t *testing.T) {
+	tests := []string{"12𐅪3", "-1¾", "Ⅸ", "〥〩", "모자", "ix", " ", "."}
+	expected := []bool{true, true, true, true, false, false, false, false}
+	for i := 0; i < len(tests); i++ {
+		result := IsUnicodeNumeric(tests[i])
+		if result != expected[i] {
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
+			t.FailNow()
+		}
+	}
+}
+
+func TestIsUnicodeDigit(t *testing.T) {
+	tests := []string{"12𐅪3", "1483920", "۳۵۶۰", "-29", "〥〩", "모자", "ix", " ", "."}
+	expected := []bool{false, true, true, true, false, false, false, false, false}
+	for i := 0; i < len(tests); i++ {
+		result := IsUnicodeDigit(tests[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
