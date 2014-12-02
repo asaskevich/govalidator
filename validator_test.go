@@ -248,8 +248,8 @@ func TestIsByteLength(t *testing.T) {
 
 func TestIsJSON(t *testing.T) {
 	tests := []string{"", "145", "asdf", "123:f00", "{\"Name\":\"Alice\",\"Body\":\"Hello\",\"Time\":1294706395881547000}",
-		"{}", "{\"Key\":{\"Key\":{\"Key\":123}}}"}
-	expected := []bool{false, false, false, false, true, true, true}
+		"{}", "{\"Key\":{\"Key\":{\"Key\":123}}}", "[]", "null"}
+	expected := []bool{false, true, false, false, true, true, true, true, true}
 	for i := 0; i < len(tests); i++ {
 		result := IsJSON(tests[i])
 		if result != expected[i] {
@@ -484,7 +484,7 @@ func TestIsIP(t *testing.T) {
 	tests = []string{"127.0.0.1", "0.0.0.0", "255.255.255.255", "1.2.3.4", "::1", "2001:db8:0000:1:1:1:1:1", "300.0.0.0"}
 	expected = []bool{true, true, true, true, true, true, false}
 	for i := 0; i < len(tests); i++ {
-		result := IsIP(tests[i], -1)
+		result := IsIP(tests[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()
@@ -494,7 +494,7 @@ func TestIsIP(t *testing.T) {
 
 func TestIsMAC(t *testing.T) {
 	tests := []string{"3D:F2:C9:A6:B3:4F", "3D-F2-C9-A6-B3:4F", "123", "", "abacaba"}
-	expected := []bool{true, true, false, false, false}
+	expected := []bool{true, false, false, false, false}
 	for i := 0; i < len(tests); i++ {
 		result := IsMAC(tests[i])
 		if result != expected[i] {

@@ -148,7 +148,7 @@ func ExampleReplacePattern() {
 
 func TestEscape(t *testing.T) {
 	tests := []string{`<img alt="foo&bar">`}
-	expected := []string{"&lt;img alt=&quot;foo&amp;bar&quot;&gt;"}
+	expected := []string{"&lt;img alt=&#34;foo&amp;bar&#34;&gt;"}
 	for i := 0; i < len(tests); i++ {
 		res := Escape(tests[i])
 		if res != expected[i] {
