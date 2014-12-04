@@ -3,226 +3,426 @@ package govalidator
 import "testing"
 
 func TestIsAlpha(t *testing.T) {
-	tests := []string{"", "   fooo   ", "abc1", "abc", "ABC", "FoObAr"}
-	expected := []bool{false, false, false, true, true, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsAlpha(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"", false},
+		{"   fooo   ", false},
+		{"abc1", false},
+		{"abc", true},
+		{"ABC", true},
+		{"FoObAr", true},
+	}
+	for _, test := range tests {
+		actual := IsAlpha(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsAlpha(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsUnicodeLetter(t *testing.T) {
-	tests := []string{`\n`, "Ⅸ", "   fooo   ", "abc〩", "abc", "소주", "FoObAr"}
-	expected := []bool{false, false, false, false, true, true, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsUnicodeLetter(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{`\n`, false},
+		{"Ⅸ", false},
+		{"   fooo   ", false},
+		{"abc〩", false},
+		{"abc", true},
+		{"소주", true},
+		{"FoObAr", true},
+	}
+	for _, test := range tests {
+		actual := IsUnicodeLetter(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsUnicodeLetter(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsAlphanumeric(t *testing.T) {
-	tests := []string{"foo ", "abc!!!", "abc123", "ABC111"}
-	expected := []bool{false, false, true, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsAlphanumeric(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"foo ", false},
+		{"abc!!!", false},
+		{"abc123", true},
+		{"ABC111", true},
+	}
+	for _, test := range tests {
+		actual := IsAlphanumeric(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsAlphanumeric(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsUnicodeLetterNumeric(t *testing.T) {
-	tests := []string{"foo ", "abc!!!", "달기&Co.", "소주", "〩Hours"}
-	expected := []bool{false, false, false, true, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsUnicodeLetterNumeric(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"foo ", false},
+		{"abc!!!", false},
+		{"달기&Co.", false},
+		{"소주", true},
+		{"〩Hours", true},
+	}
+	for _, test := range tests {
+		actual := IsUnicodeLetterNumeric(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsUnicodeLetterNumeric(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsNumeric(t *testing.T) {
-	tests := []string{"123", "0123", "-00123", "0", "-0", "123.123", " ", "."}
-	expected := []bool{true, true, true, true, true, false, false, false}
-	for i := 0; i < len(tests); i++ {
-		result := IsNumeric(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"123", true},
+		{"0123", true},
+		{"-00123", true},
+		{"0", true},
+		{"-0", true},
+		{"123.123", false},
+		{" ", false},
+		{".", false},
+	}
+	for _, test := range tests {
+		actual := IsNumeric(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsNumeric(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsUnicodeNumeric(t *testing.T) {
-	tests := []string{"12𐅪3", "-1¾", "Ⅸ", "〥〩", "모자", "ix", " ", "."}
-	expected := []bool{true, true, true, true, false, false, false, false}
-	for i := 0; i < len(tests); i++ {
-		result := IsUnicodeNumeric(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"12𐅪3", true},
+		{"-1¾", true},
+		{"Ⅸ", true},
+		{"〥〩", true},
+		{"모자", false},
+		{"ix", false},
+		{" ", false},
+		{".", false},
+	}
+	for _, test := range tests {
+		actual := IsUnicodeNumeric(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsUnicodeNumeric(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsUnicodeDigit(t *testing.T) {
-	tests := []string{"12𐅪3", "1483920", "۳۵۶۰", "-29", "〥〩", "모자", "ix", " ", "."}
-	expected := []bool{false, true, true, true, false, false, false, false, false}
-	for i := 0; i < len(tests); i++ {
-		result := IsUnicodeDigit(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"12𐅪3", false},
+		{"1483920", true},
+		{"۳۵۶۰", true},
+		{"-29", true},
+		{"〥〩", false},
+		{"모자", false},
+		{"ix", false},
+		{" ", false},
+		{".", false},
+	}
+	for _, test := range tests {
+		actual := IsUnicodeDigit(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsUnicodeDigit(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsLowerCase(t *testing.T) {
-	tests := []string{"abc123", "abc", "tr竪s 端ber", "fooBar", "123ABC"}
-	expected := []bool{true, true, true, false, false}
-	for i := 0; i < len(tests); i++ {
-		result := IsLowerCase(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"abc123", true},
+		{"abc", true},
+		{"tr竪s 端ber", true},
+		{"fooBar", false},
+		{"123ABC", false},
+	}
+	for _, test := range tests {
+		actual := IsLowerCase(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsLowerCase(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsUpperCase(t *testing.T) {
-	tests := []string{"ABC123", "ABC", "S T R", "fooBar", "abacaba123"}
-	expected := []bool{true, true, true, false, false}
-	for i := 0; i < len(tests); i++ {
-		result := IsUpperCase(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"ABC123", true},
+		{"ABC", true},
+		{"S T R", true},
+		{"fooBar", false},
+		{"abacaba123", false},
+	}
+	for _, test := range tests {
+		actual := IsUpperCase(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsUpperCase(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsInt(t *testing.T) {
-	tests := []string{"123", "0", "-0", "01", "123.123", " ", "000"}
-	expected := []bool{true, true, true, false, false, false, false}
-	for i := 0; i < len(tests); i++ {
-		result := IsInt(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"123", true},
+		{"0", true},
+		{"-0", true},
+		{"01", false},
+		{"123.123", false},
+		{" ", false},
+		{"000", false},
+	}
+	for _, test := range tests {
+		actual := IsInt(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsInt(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsEmail(t *testing.T) {
-	tests := []string{"foo@bar.com", "x@x.x", "foo@bar.com.au", "foo+bar@bar.com", "invalidemail@", "invalid.com", "@invalid.com",
-		"test|123@m端ller.com", "hans@m端ller.com", "hans.m端ller@test.com"}
-	expected := []bool{true, true, true, true, false, false, false, true, true, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsEmail(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"foo@bar.com", true},
+		{"x@x.x", true},
+		{"foo@bar.com.au", true},
+		{"foo+bar@bar.com", true},
+		{"invalidemail@", false},
+		{"invalid.com", false},
+		{"@invalid.com", false},
+		{"test|123@m端ller.com", true},
+		{"hans@m端ller.com", true},
+		{"hans.m端ller@test.com", true},
+	}
+	for _, test := range tests {
+		actual := IsEmail(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsEmail(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsURL(t *testing.T) {
-	tests := []string{"http://foobar.com", "https://foobar.com", "foobar.com", "http://foobar.org/", "http://foobar.org:8080/",
-		"ftp://foobar.ru/", "http://user:pass@www.foobar.com/", "http://127.0.0.1/", "http://duckduckgo.com/?q=%2F", "http://localhost:3000/",
-		"http://foobar.com/?foo=bar#baz=qux", "http://foobar.com?foo=bar", "http://www.xn--froschgrn-x9a.net/",
-		"", "xyz://foobar.com", "invalid.", ".com", "rtmp://foobar.com", "http://www.foo_bar.com/", "http://localhost:3000/",
-		"http://foobar.com#baz=qux", "http://foobar.com/t$-_.+!*\\'(),", "http://www.foobar.com/~foobar", "http://www.-foobar.com/",
-		"http://www.foo---bar.com/"}
-	expected := []bool{true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false,
-		false, false, true, true, true, true, true, false, false}
-	for i := 0; i < len(tests); i++ {
-		result := IsURL(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result, tests[i])
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"http://foobar.com", true},
+		{"https://foobar.com", true},
+		{"foobar.com", true},
+		{"http://foobar.org/", true},
+		{"http://foobar.org:8080/", true},
+		{"ftp://foobar.ru/", true},
+		{"http://user:pass@www.foobar.com/", true},
+		{"http://127.0.0.1/", true},
+		{"http://duckduckgo.com/?q=%2F", true},
+		{"http://localhost:3000/", true},
+		{"http://foobar.com/?foo=bar#baz=qux", true},
+		{"http://foobar.com?foo=bar", true},
+		{"http://www.xn--froschgrn-x9a.net/", true},
+		{"", false},
+		{"xyz://foobar.com", false},
+		{"invalid.", false},
+		{".com", false},
+		{"rtmp://foobar.com", false},
+		{"http://www.foo_bar.com/", true},
+		{"http://localhost:3000/", true},
+		{"http://foobar.com#baz=qux", true},
+		{"http://foobar.com/t$-_.+!*\\'(),", true},
+		{"http://www.foobar.com/~foobar", true},
+		{"http://www.-foobar.com/", false},
+		{"http://www.foo---bar.com/", false},
+	}
+	for _, test := range tests {
+		actual := IsURL(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsURL(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsFloat(t *testing.T) {
-	tests := []string{"", "  ", "-.123", "abacaba", "123", "123.", "123.123", "-123.123", "0.123", "-0.123", ".0",
-		"01.123", "-0.22250738585072011e-307"}
-	expected := []bool{false, false, false, false, true, true, true, true, true, true, true, true, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsFloat(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"", false},
+		{"  ", false},
+		{"-.123", false},
+		{"abacaba", false},
+		{"123", true},
+		{"123.", true},
+		{"123.123", true},
+		{"-123.123", true},
+		{"0.123", true},
+		{"-0.123", true},
+		{".0", true},
+		{"01.123", true},
+		{"-0.22250738585072011e-307", true},
+	}
+	for _, test := range tests {
+		actual := IsFloat(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsFloat(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsHexadecimal(t *testing.T) {
-	tests := []string{"abcdefg", "", "..", "deadBEEF", "ff0044"}
-	expected := []bool{false, false, false, true, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsHexadecimal(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"abcdefg", false},
+		{"", false},
+		{"..", false},
+		{"deadBEEF", true},
+		{"ff0044", true},
+	}
+	for _, test := range tests {
+		actual := IsHexadecimal(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsHexadecimal(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsHexcolor(t *testing.T) {
-	tests := []string{"#ff", "fff0", "#ff12FG", "CCccCC", "fff", "#f00"}
-	expected := []bool{false, false, false, true, true, true, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsHexcolor(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"#ff", false},
+		{"fff0", false},
+		{"#ff12FG", false},
+		{"CCccCC", true},
+		{"fff", true},
+		{"#f00", true},
+	}
+	for _, test := range tests {
+		actual := IsHexcolor(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsHexcolor(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsRGBcolor(t *testing.T) {
-	tests := []string{"rgb(0,31,255)", "rgb(1,349,275)", "rgb(01,31,255)", "rgb(0.6,31,255)", "rgba(0,31,255)", "rgb(0,  31, 255)"}
-	expected := []bool{true, false, false, false, false, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsRGBcolor(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"rgb(0,31,255)", true},
+		{"rgb(1,349,275)", false},
+		{"rgb(01,31,255)", false},
+		{"rgb(0.6,31,255)", false},
+		{"rgba(0,31,255)", false},
+		{"rgb(0,  31, 255)", true},
+	}
+	for _, test := range tests {
+		actual := IsRGBcolor(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsRGBcolor(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsNull(t *testing.T) {
-	tests := []string{"abacaba", ""}
-	expected := []bool{false, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsNull(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"abacaba", false},
+		{"", true},
+	}
+	for _, test := range tests {
+		actual := IsNull(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsNull(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsDivisibleBy(t *testing.T) {
-	tests1 := []string{"4", "100", "", "123", "123"}
-	tests2 := []string{"2", "10", "1", "foo", "0"}
-	expected := []bool{true, true, true, false, false}
-	for i := 0; i < len(tests1); i++ {
-		result := IsDivisibleBy(tests1[i], tests2[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param1		string
+		param2		string
+		expected	bool
+	}{
+		{"4", "2", true},
+		{"100", "10", true},
+		{"", "1", true},
+		{"123", "foo", false},
+		{"123", "0", false},
+	}
+	for _, test := range tests {
+		actual := IsDivisibleBy(test.param1, test.param2)
+		if actual != test.expected {
+			t.Errorf("Expected IsDivisibleBy(%q, %q) to be %v, got %v", test.param1, test.param2, test.expected, actual)
 		}
 	}
 }
@@ -233,90 +433,169 @@ func ExampleIsDivisibleBy() {
 }
 
 func TestIsByteLength(t *testing.T) {
-	tests1 := []string{"abacaba", "abacaba", "abacaba", "abacaba", "\ufff0"}
-	tests2 := []int{100, 1, 1, 0, 1}
-	tests3 := []int{-1, 3, 7, 8, 1}
-	expected := []bool{false, false, true, true, false}
-	for i := 0; i < len(tests1); i++ {
-		result := IsByteLength(tests1[i], tests2[i], tests3[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param1		string
+		param2		int
+		param3		int
+		expected	bool
+	}{
+		{"abacaba", 100, -1, false},
+		{"abacaba", 1, 3, false},
+		{"abacaba", 1, 7, true},
+		{"abacaba", 0, 8, true},
+		{"\ufff0", 1, 1, false},
+	}
+	for _, test := range tests {
+		actual := IsByteLength(test.param1, test.param2, test.param3)
+		if actual != test.expected {
+			t.Errorf("Expected IsByteLength(%q, %q, %q) to be %v, got %v", test.param1, test.param2, test.param3, test.expected, actual)
 		}
 	}
 }
 
 func TestIsJSON(t *testing.T) {
-	tests := []string{"", "145", "asdf", "123:f00", "{\"Name\":\"Alice\",\"Body\":\"Hello\",\"Time\":1294706395881547000}",
-		"{}", "{\"Key\":{\"Key\":{\"Key\":123}}}", "[]", "null"}
-	expected := []bool{false, true, false, false, true, true, true, true, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsJSON(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"", false},
+		{"145", true},
+		{"asdf", false},
+		{"123:f00", false},
+		{"{\"Name\":\"Alice\",\"Body\":\"Hello\",\"Time\":1294706395881547000}", true},
+		{"{}", true},
+		{"{\"Key\":{\"Key\":{\"Key\":123}}}", true},
+		{"[]", true},
+		{"null", true},
+	}
+	for _, test := range tests {
+		actual := IsJSON(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsJSON(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsMultibyte(t *testing.T) {
-	tests := []string{"abc", "123", "<>@;.-=", "ひらがな・カタカナ、．漢字", "あいうえお foobar", "test＠example.com",
-		"test＠example.com", "1234abcDEｘｙｚ", "ｶﾀｶﾅ"}
-	expected := []bool{false, false, false, true, true, true, true, true, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsMultibyte(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"abc", false},
+		{"123", false},
+		{"<>@;.-=", false},
+		{"ひらがな・カタカナ、．漢字", true},
+		{"あいうえお foobar", true},
+		{"test＠example.com", true},
+		{"test＠example.com", true},
+		{"1234abcDEｘｙｚ", true},
+		{"ｶﾀｶﾅ", true},
+	}
+	for _, test := range tests {
+		actual := IsMultibyte(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsMultibyte(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsASCII(t *testing.T) {
-	tests := []string{"ｆｏｏbar", "ｘｙｚ０９８", "１２３456", "ｶﾀｶﾅ", "foobar", "0987654321", "test@example.com", "1234abcDEF"}
-	expected := []bool{false, false, false, false, true, true, true, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsASCII(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"ｆｏｏbar", false},
+		{"ｘｙｚ０９８", false},
+		{"１２３456", false},
+		{"ｶﾀｶﾅ", false},
+		{"foobar", true},
+		{"0987654321", true},
+		{"test@example.com", true},
+		{"1234abcDEF", true},
+	}
+	for _, test := range tests {
+		actual := IsASCII(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsASCII(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsFullWidth(t *testing.T) {
-	tests := []string{"abc", "abc123", "!\"#$%&()<>/+=-_? ~^|.,@`{}[]", "ひらがな・カタカナ、．漢字", "３ー０　ａ＠ｃｏｍ", "Ｆｶﾀｶﾅﾞﾬ", "Good＝Parts"}
-	expected := []bool{false, false, false, true, true, true, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsFullWidth(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"abc", false},
+		{"abc123", false},
+		{"!\"#$%&()<>/+=-_? ~^|.,@`{}[]", false},
+		{"ひらがな・カタカナ、．漢字", true},
+		{"３ー０　ａ＠ｃｏｍ", true},
+		{"Ｆｶﾀｶﾅﾞﾬ", true},
+		{"Good＝Parts", true},
+	}
+	for _, test := range tests {
+		actual := IsFullWidth(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsFullWidth(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsHalfWidth(t *testing.T) {
-	tests := []string{"あいうえお", "００１１", "!\"#$%&()<>/+=-_? ~^|.,@`{}[]", "l-btn_02--active", "abc123い", "ｶﾀｶﾅﾞﾬ￩"}
-	expected := []bool{false, false, true, true, true, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsHalfWidth(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"あいうえお", false},
+		{"００１１", false},
+		{"!\"#$%&()<>/+=-_? ~^|.,@`{}[]", true},
+		{"l-btn_02--active", true},
+		{"abc123い", true},
+		{"ｶﾀｶﾅﾞﾬ￩", true},
+	}
+	for _, test := range tests {
+		actual := IsHalfWidth(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsHalfWidth(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsVariableWidth(t *testing.T) {
-	tests := []string{"ひらがなカタカナ漢字ABCDE", "３ー０123", "Ｆｶﾀｶﾅﾞﾬ", "Good＝Parts", "abc", "abc123",
-		"!\"#$%&()<>/+=-_? ~^|.,@`{}[]", "ひらがな・カタカナ、．漢字", "１２３４５６", "ｶﾀｶﾅﾞﾬ"}
-	expected := []bool{true, true, true, true, false, false, false, false, false, false}
-	for i := 0; i < len(tests); i++ {
-		result := IsVariableWidth(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"ひらがなカタカナ漢字ABCDE", true},
+		{"３ー０123", true},
+		{"Ｆｶﾀｶﾅﾞﾬ", true},
+		{"Good＝Parts", true},
+		{"abc", false},
+		{"abc123", false},
+		{"!\"#$%&()<>/+=-_? ~^|.,@`{}[]", false},
+		{"ひらがな・カタカナ、．漢字", false},
+		{"１２３４５６", false},
+		{"ｶﾀｶﾅﾞﾬ", false},
+	}
+	for _, test := range tests {
+		actual := IsVariableWidth(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsVariableWidth(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
@@ -371,14 +650,25 @@ func TestIsUUID(t *testing.T) {
 }
 
 func TestIsCreditCard(t *testing.T) {
-	tests := []string{"foo", "5398228707871528", "375556917985515", "36050234196908", "4716461583322103", "4716-2210-5188-5662",
-		"4929 7226 5379 7141", "5398228707871527"}
-	expected := []bool{false, false, true, true, true, true, true, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsCreditCard(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"foo", false},
+		{"5398228707871528", false},
+		{"375556917985515", true},
+		{"36050234196908", true},
+		{"4716461583322103", true},
+		{"4716-2210-5188-5662", true},
+		{"4929 7226 5379 7141", true},
+		{"5398228707871527", true},
+	}
+	for _, test := range tests {
+		actual := IsCreditCard(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsCreditCard(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
@@ -420,41 +710,57 @@ func TestIsISBN(t *testing.T) {
 }
 
 func TestIsDataURI(t *testing.T) {
-	tests := []string{"data:image/png;base64,TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4=",
-		"data:text/plain;base64,Vml2YW11cyBmZXJtZW50dW0gc2VtcGVyIHBvcnRhLg==", "image/gif;base64,U3VzcGVuZGlzc2UgbGVjdHVzIGxlbw==",
-		"data:image/gif;base64,MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuMPNS1Ufof9EW/M98FNw" +
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"data:image/png;base64,TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4=", true},
+		{"data:text/plain;base64,Vml2YW11cyBmZXJtZW50dW0gc2VtcGVyIHBvcnRhLg==", true},
+		{"image/gif;base64,U3VzcGVuZGlzc2UgbGVjdHVzIGxlbw==", false},
+		{"data:image/gif;base64,MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuMPNS1Ufof9EW/M98FNw" +
 			"UAKrwflsqVxaxQjBQnHQmiI7Vac40t8x7pIb8gLGV6wL7sBTJiPovJ0V7y7oc0Ye" +
 			"rhKh0Rm4skP2z/jHwwZICgGzBvA0rH8xlhUiTvcwDCJ0kc+fh35hNt8srZQM4619" +
 			"FTgB66Xmp4EtVyhpQV+t02g6NzK72oZI0vnAvqhpkxLeLiMCyrI416wHm5Tkukhx" +
 			"QmcL2a6hNOyu0ixX/x2kSFXApEnVrJ+/IxGyfyw8kf4N2IZpW5nEP847lpfj0SZZ" +
-			"Fwrd1mnfnDbYohX2zRptLy2ZUn06Qo9pkG5ntvFEPo9bfZeULtjYzIl6K8gJ2uGZ" + "HQIDAQAB", "data:image/png;base64,12345", "",
-		"data:text,:;base85,U3VzcGVuZGlzc2UgbGVjdHVzIGxlbw=="}
-	expected := []bool{true, true, false, true, false, false, false}
-	for i := 0; i < len(tests); i++ {
-		result := IsDataURI(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+			"Fwrd1mnfnDbYohX2zRptLy2ZUn06Qo9pkG5ntvFEPo9bfZeULtjYzIl6K8gJ2uGZ" + "HQIDAQAB", true},
+		{"data:image/png;base64,12345", false},
+		{"", false},
+		{"data:text,:;base85,U3VzcGVuZGlzc2UgbGVjdHVzIGxlbw==", false},
+	}
+	for _, test := range tests {
+		actual := IsDataURI(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsDataURI(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsBase64(t *testing.T) {
-	tests := []string{"TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4=",
-		"Vml2YW11cyBmZXJtZW50dW0gc2VtcGVyIHBvcnRhLg==", "U3VzcGVuZGlzc2UgbGVjdHVzIGxlbw==",
-		"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuMPNS1Ufof9EW/M98FNw" +
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4=", true},
+		{"Vml2YW11cyBmZXJtZW50dW0gc2VtcGVyIHBvcnRhLg==", true},
+		{"U3VzcGVuZGlzc2UgbGVjdHVzIGxlbw==", true},
+		{"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuMPNS1Ufof9EW/M98FNw" +
 			"UAKrwflsqVxaxQjBQnHQmiI7Vac40t8x7pIb8gLGV6wL7sBTJiPovJ0V7y7oc0Ye" +
 			"rhKh0Rm4skP2z/jHwwZICgGzBvA0rH8xlhUiTvcwDCJ0kc+fh35hNt8srZQM4619" +
 			"FTgB66Xmp4EtVyhpQV+t02g6NzK72oZI0vnAvqhpkxLeLiMCyrI416wHm5Tkukhx" +
 			"QmcL2a6hNOyu0ixX/x2kSFXApEnVrJ+/IxGyfyw8kf4N2IZpW5nEP847lpfj0SZZ" +
-			"Fwrd1mnfnDbYohX2zRptLy2ZUn06Qo9pkG5ntvFEPo9bfZeULtjYzIl6K8gJ2uGZ" + "HQIDAQAB", "12345", "",
-		"Vml2YW11cyBmZXJtZtesting123"}
-	expected := []bool{true, true, true, true, false, false, false}
-	for i := 0; i < len(tests); i++ {
-		result := IsBase64(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+			"Fwrd1mnfnDbYohX2zRptLy2ZUn06Qo9pkG5ntvFEPo9bfZeULtjYzIl6K8gJ2uGZ" + "HQIDAQAB", true},
+		{"12345", false},
+		{"", false},
+		{"Vml2YW11cyBmZXJtZtesting123", false},
+	}
+	for _, test := range tests {
+		actual := IsBase64(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsBase64(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
@@ -493,37 +799,64 @@ func TestIsIP(t *testing.T) {
 }
 
 func TestIsMAC(t *testing.T) {
-	tests := []string{"3D:F2:C9:A6:B3:4F", "3D-F2-C9-A6-B3:4F", "123", "", "abacaba"}
-	expected := []bool{true, false, false, false, false}
-	for i := 0; i < len(tests); i++ {
-		result := IsMAC(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"3D:F2:C9:A6:B3:4F", true},
+		{"3D-F2-C9-A6-B3:4F", false},
+		{"123", false},
+		{"", false},
+		{"abacaba", false},
+	}
+	for _, test := range tests {
+		actual := IsMAC(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsMAC(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsLatitude(t *testing.T) {
-	tests := []string{"-90.000", "+90", "47.1231231", "+99.9", "108"}
-	expected := []bool{true, true, true, false, false}
-	for i := 0; i < len(tests); i++ {
-		result := IsLatitude(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"-90.000", true},
+		{"+90", true},
+		{"47.1231231", true},
+		{"+99.9", false},
+		{"108", false},
+	}
+	for _, test := range tests {
+		actual := IsLatitude(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsLatitude(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestIsLongitude(t *testing.T) {
-	tests := []string{"-180.000", "180.1", "+73.234", "+382.3811", "23.11111111"}
-	expected := []bool{true, false, true, false, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsLongitude(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct{
+		param		string
+		expected	bool
+	}{
+		{"-180.000", true},
+		{"180.1", false},
+		{"+73.234", true},
+		{"+382.3811", false},
+		{"23.11111111", true},
+	}
+	for _, test := range tests {
+		actual := IsLongitude(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsLongitude(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
