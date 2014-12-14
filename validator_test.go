@@ -5,9 +5,9 @@ import "testing"
 func TestIsAlpha(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"", false},
 		{"   fooo   ", false},
@@ -24,12 +24,12 @@ func TestIsAlpha(t *testing.T) {
 	}
 }
 
-func TestIsUnicodeLetter(t *testing.T) {
+func TestIsUTFLetter(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{`\n`, false},
 		{"Ⅸ", false},
@@ -40,9 +40,9 @@ func TestIsUnicodeLetter(t *testing.T) {
 		{"FoObAr", true},
 	}
 	for _, test := range tests {
-		actual := IsUnicodeLetter(test.param)
+		actual := IsUTFLetter(test.param)
 		if actual != test.expected {
-			t.Errorf("Expected IsUnicodeLetter(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected IsUTFLetter(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
@@ -50,9 +50,9 @@ func TestIsUnicodeLetter(t *testing.T) {
 func TestIsAlphanumeric(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"foo ", false},
 		{"abc!!!", false},
@@ -67,12 +67,12 @@ func TestIsAlphanumeric(t *testing.T) {
 	}
 }
 
-func TestIsUnicodeLetterNumeric(t *testing.T) {
+func TestIsUTFLetterNumeric(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"foo ", false},
 		{"abc!!!", false},
@@ -81,9 +81,9 @@ func TestIsUnicodeLetterNumeric(t *testing.T) {
 		{"〩Hours", true},
 	}
 	for _, test := range tests {
-		actual := IsUnicodeLetterNumeric(test.param)
+		actual := IsUTFLetterNumeric(test.param)
 		if actual != test.expected {
-			t.Errorf("Expected IsUnicodeLetterNumeric(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected IsUTFLetterNumeric(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
@@ -91,9 +91,9 @@ func TestIsUnicodeLetterNumeric(t *testing.T) {
 func TestIsNumeric(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"123", true},
 		{"0123", true},
@@ -112,12 +112,12 @@ func TestIsNumeric(t *testing.T) {
 	}
 }
 
-func TestIsUnicodeNumeric(t *testing.T) {
+func TestIsUTFNumeric(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"12𐅪3", true},
 		{"-1¾", true},
@@ -129,19 +129,19 @@ func TestIsUnicodeNumeric(t *testing.T) {
 		{".", false},
 	}
 	for _, test := range tests {
-		actual := IsUnicodeNumeric(test.param)
+		actual := IsUTFNumeric(test.param)
 		if actual != test.expected {
-			t.Errorf("Expected IsUnicodeNumeric(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected IsUTFNumeric(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
-func TestIsUnicodeDigit(t *testing.T) {
+func TestIsUTFDigit(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"12𐅪3", false},
 		{"1483920", true},
@@ -154,9 +154,9 @@ func TestIsUnicodeDigit(t *testing.T) {
 		{".", false},
 	}
 	for _, test := range tests {
-		actual := IsUnicodeDigit(test.param)
+		actual := IsUTFDigit(test.param)
 		if actual != test.expected {
-			t.Errorf("Expected IsUnicodeDigit(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected IsUTFDigit(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
@@ -164,9 +164,9 @@ func TestIsUnicodeDigit(t *testing.T) {
 func TestIsLowerCase(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"abc123", true},
 		{"abc", true},
@@ -185,9 +185,9 @@ func TestIsLowerCase(t *testing.T) {
 func TestIsUpperCase(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"ABC123", true},
 		{"ABC", true},
@@ -206,9 +206,9 @@ func TestIsUpperCase(t *testing.T) {
 func TestIsInt(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"123", true},
 		{"0", true},
@@ -229,14 +229,16 @@ func TestIsInt(t *testing.T) {
 func TestIsEmail(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"foo@bar.com", true},
 		{"x@x.x", true},
 		{"foo@bar.com.au", true},
 		{"foo+bar@bar.com", true},
+		{"foo@bar.coffee", true},
+		{"foo@bar.中文网", true},
 		{"invalidemail@", false},
 		{"invalid.com", false},
 		{"@invalid.com", false},
@@ -255,13 +257,15 @@ func TestIsEmail(t *testing.T) {
 func TestIsURL(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"http://foobar.com", true},
 		{"https://foobar.com", true},
 		{"foobar.com", true},
+		{"http://foobar.coffee/", true},
+		{"http://foobar.中文网/", true},
 		{"http://foobar.org/", true},
 		{"http://foobar.org:8080/", true},
 		{"ftp://foobar.ru/", true},
@@ -296,9 +300,9 @@ func TestIsURL(t *testing.T) {
 func TestIsFloat(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"", false},
 		{"  ", false},
@@ -325,9 +329,9 @@ func TestIsFloat(t *testing.T) {
 func TestIsHexadecimal(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"abcdefg", false},
 		{"", false},
@@ -346,9 +350,9 @@ func TestIsHexadecimal(t *testing.T) {
 func TestIsHexcolor(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"#ff", false},
 		{"fff0", false},
@@ -368,9 +372,9 @@ func TestIsHexcolor(t *testing.T) {
 func TestIsRGBcolor(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"rgb(0,31,255)", true},
 		{"rgb(1,349,275)", false},
@@ -390,9 +394,9 @@ func TestIsRGBcolor(t *testing.T) {
 func TestIsNull(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"abacaba", false},
 		{"", true},
@@ -408,10 +412,10 @@ func TestIsNull(t *testing.T) {
 func TestIsDivisibleBy(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param1		string
-		param2		string
-		expected	bool
+	var tests = []struct {
+		param1   string
+		param2   string
+		expected bool
 	}{
 		{"4", "2", true},
 		{"100", "10", true},
@@ -435,11 +439,11 @@ func ExampleIsDivisibleBy() {
 func TestIsByteLength(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param1		string
-		param2		int
-		param3		int
-		expected	bool
+	var tests = []struct {
+		param1   string
+		param2   int
+		param3   int
+		expected bool
 	}{
 		{"abacaba", 100, -1, false},
 		{"abacaba", 1, 3, false},
@@ -458,9 +462,9 @@ func TestIsByteLength(t *testing.T) {
 func TestIsJSON(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"", false},
 		{"145", true},
@@ -483,9 +487,9 @@ func TestIsJSON(t *testing.T) {
 func TestIsMultibyte(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"abc", false},
 		{"123", false},
@@ -508,9 +512,9 @@ func TestIsMultibyte(t *testing.T) {
 func TestIsASCII(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"ｆｏｏbar", false},
 		{"ｘｙｚ０９８", false},
@@ -532,9 +536,9 @@ func TestIsASCII(t *testing.T) {
 func TestIsFullWidth(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"abc", false},
 		{"abc123", false},
@@ -555,9 +559,9 @@ func TestIsFullWidth(t *testing.T) {
 func TestIsHalfWidth(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"あいうえお", false},
 		{"００１１", false},
@@ -577,9 +581,9 @@ func TestIsHalfWidth(t *testing.T) {
 func TestIsVariableWidth(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"ひらがなカタカナ漢字ABCDE", true},
 		{"３ー０123", true},
@@ -602,9 +606,9 @@ func TestIsVariableWidth(t *testing.T) {
 
 func TestIsUUID(t *testing.T) {
 	// Tests without version
-	tests := []string{"", "xxxA987FBC9-4BED-3078-CF07-9141BA07C9F3", "A987FBC9-4BED-3078-CF07-9141BA07C9F3xxx",
-		"A987FBC94BED3078CF079141BA07C9F3", "934859", "987FBC9-4BED-3078-CF07A-9141BA07C9F3",
-		"AAAAAAAA-1111-1111-AAAG-111111111111", "A987FBC9-4BED-3078-CF07-9141BA07C9F3"}
+	tests := []string{"", "xxxa987fbc9-4bed-3078-cf07-9141ba07c9f3", "a987fbc9-4bed-3078-cf07-9141ba07c9f3xxx",
+		"a987fbc94bed3078cf079141ba07c9f3", "934859", "987fbc9-4bed-3078-cf07a-9141ba07c9f3",
+		"aaaaaaaa-1111-1111-aaag-111111111111", "a987fbc9-4bed-3078-cf07-9141ba07c9f3"}
 	expected := []bool{false, false, false, false, false, false, false, true}
 	for i := 0; i < len(tests); i++ {
 		result := IsUUID(tests[i])
@@ -614,8 +618,8 @@ func TestIsUUID(t *testing.T) {
 		}
 	}
 	// UUID ver. 3
-	tests = []string{"", "412452646", "xxxA987FBC9-4BED-3078-CF07-9141BA07C9F3", "A987FBC9-4BED-4078-8F07-9141BA07C9F3",
-		"A987FBC9-4BED-3078-CF07-9141BA07C9F3"}
+	tests = []string{"", "412452646", "xxxa987fbc9-4bed-3078-cf07-9141ba07c9f3", "a987fbc9-4bed-4078-8f07-9141ba07c9f3",
+		"a987fbc9-4bed-3078-cf07-9141ba07c9f3"}
 	expected = []bool{false, false, false, false, true}
 	for i := 0; i < len(tests); i++ {
 		result := IsUUIDv3(tests[i])
@@ -625,8 +629,8 @@ func TestIsUUID(t *testing.T) {
 		}
 	}
 	// UUID ver. 4
-	tests = []string{"", "xxxA987FBC9-4BED-3078-CF07-9141BA07C9F3", "A987FBC9-4BED-5078-AF07-9141BA07C9F3",
-		"934859", "57B73598-8764-4AD0-A76A-679BB6640EB1", "625E63F3-58F5-40B7-83A1-A72AD31ACFFB"}
+	tests = []string{"", "xxxa987fbc9-4bed-3078-cf07-9141ba07c9f3", "a987fbc9-4bed-5078-af07-9141ba07c9f3",
+		"934859", "57b73598-8764-4ad0-a76a-679bb6640eb1", "625e63f3-58f5-40b7-83a1-a72ad31acffb"}
 	expected = []bool{false, false, false, false, true, true}
 	for i := 0; i < len(tests); i++ {
 		result := IsUUIDv4(tests[i])
@@ -636,8 +640,8 @@ func TestIsUUID(t *testing.T) {
 		}
 	}
 	// UUID ver. 5
-	tests = []string{"xxxA987FBC9-4BED-3078-CF07-9141BA07C9F3", "9c858901-8a57-4791-81fe-4c455b099bc9", "A987FBC9-4BED-3078-CF07-9141BA07C9F3",
-		"", "987FBC97-4BED-5078-AF07-9141BA07C9F3", "987FBC97-4BED-5078-9F07-9141BA07C9F3"}
+	tests = []string{"xxxa987fbc9-4bed-3078-cf07-9141ba07c9f3", "9c858901-8a57-4791-81fe-4c455b099bc9", "a987fbc9-4bed-3078-cf07-9141ba07c9f3",
+		"", "987fbc97-4bed-5078-af07-9141ba07c9f3", "987fbc97-4bed-5078-9f07-9141ba07c9f3"}
 	expected = []bool{false, false, false, false, true, true}
 	for i := 0; i < len(tests); i++ {
 		result := IsUUIDv5(tests[i])
@@ -652,9 +656,9 @@ func TestIsUUID(t *testing.T) {
 func TestIsCreditCard(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"foo", false},
 		{"5398228707871528", false},
@@ -712,9 +716,9 @@ func TestIsISBN(t *testing.T) {
 func TestIsDataURI(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"data:image/png;base64,TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4=", true},
 		{"data:text/plain;base64,Vml2YW11cyBmZXJtZW50dW0gc2VtcGVyIHBvcnRhLg==", true},
@@ -740,9 +744,9 @@ func TestIsDataURI(t *testing.T) {
 func TestIsBase64(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4=", true},
 		{"Vml2YW11cyBmZXJtZW50dW0gc2VtcGVyIHBvcnRhLg==", true},
@@ -801,9 +805,9 @@ func TestIsIP(t *testing.T) {
 func TestIsMAC(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"3D:F2:C9:A6:B3:4F", true},
 		{"3D-F2-C9-A6-B3:4F", false},
@@ -822,9 +826,9 @@ func TestIsMAC(t *testing.T) {
 func TestIsLatitude(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"-90.000", true},
 		{"+90", true},
@@ -843,9 +847,9 @@ func TestIsLatitude(t *testing.T) {
 func TestIsLongitude(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct{
-		param		string
-		expected	bool
+	var tests = []struct {
+		param    string
+		expected bool
 	}{
 		{"-180.000", true},
 		{"180.1", false},

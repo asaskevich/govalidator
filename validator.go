@@ -31,9 +31,9 @@ func IsAlpha(str string) bool {
 	return rxAlpha.MatchString(str)
 }
 
-//IsUnicodeLetter check if the string contains only unicode letter characters.
+//IsUTFLetter check if the string contains only unicode letter characters.
 //Similar to IsAlpha but for all languages.
-func IsUnicodeLetter(str string) bool {
+func IsUTFLetter(str string) bool {
 
 	for _, c := range str {
 		if !unicode.IsLetter(c) {
@@ -49,8 +49,8 @@ func IsAlphanumeric(str string) bool {
 	return rxAlphanumeric.MatchString(str)
 }
 
-// IsUnicodeLetterNumeric check if the string contains only unicode letters and numbers.
-func IsUnicodeLetterNumeric(str string) bool {
+// IsUTFLetterNumeric check if the string contains only unicode letters and numbers.
+func IsUTFLetterNumeric(str string) bool {
 
 	for _, c := range str {
 		if !unicode.IsLetter(c) && !unicode.IsNumber(c) { //letters && numbers are ok
@@ -66,9 +66,9 @@ func IsNumeric(str string) bool {
 	return rxNumeric.MatchString(str)
 }
 
-// IsUnicodeNumeric check if the string contains only unicode numbers of any kind.
+// IsUTFNumeric check if the string contains only unicode numbers of any kind.
 // Numbers can be 0-9 but also Fractions ¾,Roman Ⅸ and Hangzhou 〩.
-func IsUnicodeNumeric(str string) bool {
+func IsUTFNumeric(str string) bool {
 
 	for _, c := range str {
 		if unicode.IsNumber(c) == false && c != '-' { //numbers && minus sign are ok
@@ -79,8 +79,8 @@ func IsUnicodeNumeric(str string) bool {
 
 }
 
-// IsUnicodeDigit check if the string contains only unicode radix-10 decimal digits.
-func IsUnicodeDigit(str string) bool {
+// IsUTFDigit check if the string contains only unicode radix-10 decimal digits.
+func IsUTFDigit(str string) bool {
 
 	for _, c := range str {
 		if !unicode.IsDigit(c) && c != '-' { //digits && minus sign are ok
