@@ -189,6 +189,12 @@ Full information about code coverage is also available here: [govalidator on goc
 #### Support
 If you do have a contribution for the package feel free to put up a Pull Request or open Issue.
 
+#### Special thanks to contributors
+* [Attila Oláh](https://github.com/attilaolah)
+* [Steven Wilkin](https://github.com/stevenwilkin)
+* [Deiwin Sarjas](https://github.com/deiwin)
+* [Noah Shibley](https://github.com/slugmobile)
+
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/asaskevich/govalidator/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
