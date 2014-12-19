@@ -839,34 +839,65 @@ func TestIsBase64(t *testing.T) {
 }
 
 func TestIsIP(t *testing.T) {
-	// IPv4
-	tests := []string{"127.0.0.1", "0.0.0.0", "255.255.255.255", "1.2.3.4", "::1", "2001:db8:0000:1:1:1:1:1"}
-	expected := []bool{true, true, true, true, false, false}
-	for i := 0; i < len(tests); i++ {
-		result := IsIPv4(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
-		}
-	}
-	// IPv6
-	tests = []string{"127.0.0.1", "0.0.0.0", "255.255.255.255", "1.2.3.4", "::1", "2001:db8:0000:1:1:1:1:1"}
-	expected = []bool{false, false, false, false, true, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsIPv6(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
-		}
-	}
+	t.Parallel()
+
 	// Without version
-	tests = []string{"127.0.0.1", "0.0.0.0", "255.255.255.255", "1.2.3.4", "::1", "2001:db8:0000:1:1:1:1:1", "300.0.0.0"}
-	expected = []bool{true, true, true, true, true, true, false}
-	for i := 0; i < len(tests); i++ {
-		result := IsIP(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"127.0.0.1", true},
+		{"0.0.0.0", true},
+		{"255.255.255.255", true},
+		{"1.2.3.4", true},
+		{"::1", true},
+		{"2001:db8:0000:1:1:1:1:1", true},
+		{"300.0.0.0", false},
+	}
+	for _, test := range tests {
+		actual := IsIP(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsIP(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+
+	// IPv4
+	tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"127.0.0.1", true},
+		{"0.0.0.0", true},
+		{"255.255.255.255", true},
+		{"1.2.3.4", true},
+		{"::1", false},
+		{"2001:db8:0000:1:1:1:1:1", false},
+		{"300.0.0.0", false},
+	}
+	for _, test := range tests {
+		actual := IsIPv4(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsIPv4(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+
+	// IPv6
+	tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"127.0.0.1", false},
+		{"0.0.0.0", false},
+		{"255.255.255.255", false},
+		{"1.2.3.4", false},
+		{"::1", true},
+		{"2001:db8:0000:1:1:1:1:1", true},
+		{"300.0.0.0", false},
+	}
+	for _, test := range tests {
+		actual := IsIPv6(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsIPv6(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
