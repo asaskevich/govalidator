@@ -605,52 +605,84 @@ func TestIsVariableWidth(t *testing.T) {
 }
 
 func TestIsUUID(t *testing.T) {
+	t.Parallel()
+
 	// Tests without version
-	tests := []string{"", "xxxa987fbc9-4bed-3078-cf07-9141ba07c9f3", "a987fbc9-4bed-3078-cf07-9141ba07c9f3xxx",
-		"a987fbc94bed3078cf079141ba07c9f3", "934859", "987fbc9-4bed-3078-cf07a-9141ba07c9f3",
-		"aaaaaaaa-1111-1111-aaag-111111111111", "a987fbc9-4bed-3078-cf07-9141ba07c9f3"}
-	expected := []bool{false, false, false, false, false, false, false, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsUUID(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
-		}
+	var tests = []struct {
+			param    string
+			expected bool
+	}{
+		{"", false},
+		{"xxxa987fbc9-4bed-3078-cf07-9141ba07c9f3", false},
+		{"a987fbc9-4bed-3078-cf07-9141ba07c9f3xxx", false},
+		{"a987fbc94bed3078cf079141ba07c9f3", false},
+		{"934859", false},
+		{"987fbc9-4bed-3078-cf07a-9141ba07c9f3", false},
+		{"aaaaaaaa-1111-1111-aaag-111111111111", false},
+		{"a987fbc9-4bed-3078-cf07-9141ba07c9f3", true},
 	}
-	// UUID ver. 3
-	tests = []string{"", "412452646", "xxxa987fbc9-4bed-3078-cf07-9141ba07c9f3", "a987fbc9-4bed-4078-8f07-9141ba07c9f3",
-		"a987fbc9-4bed-3078-cf07-9141ba07c9f3"}
-	expected = []bool{false, false, false, false, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsUUIDv3(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
-		}
-	}
-	// UUID ver. 4
-	tests = []string{"", "xxxa987fbc9-4bed-3078-cf07-9141ba07c9f3", "a987fbc9-4bed-5078-af07-9141ba07c9f3",
-		"934859", "57b73598-8764-4ad0-a76a-679bb6640eb1", "625e63f3-58f5-40b7-83a1-a72ad31acffb"}
-	expected = []bool{false, false, false, false, true, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsUUIDv4(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
-		}
-	}
-	// UUID ver. 5
-	tests = []string{"xxxa987fbc9-4bed-3078-cf07-9141ba07c9f3", "9c858901-8a57-4791-81fe-4c455b099bc9", "a987fbc9-4bed-3078-cf07-9141ba07c9f3",
-		"", "987fbc97-4bed-5078-af07-9141ba07c9f3", "987fbc97-4bed-5078-9f07-9141ba07c9f3"}
-	expected = []bool{false, false, false, false, true, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsUUIDv5(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	for _, test := range tests {
+		actual := IsUUID(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsUUID(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 
+	// UUID ver. 3
+	tests = []struct {
+			param    string
+			expected bool
+	}{
+		{"", false},
+		{"412452646", false },
+		{"xxxa987fbc9-4bed-3078-cf07-9141ba07c9f3", false},
+		{"a987fbc9-4bed-4078-8f07-9141ba07c9f3", false},
+		{"a987fbc9-4bed-3078-cf07-9141ba07c9f3", true},
+	}
+	for _, test := range tests {
+		actual := IsUUIDv3(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsUUIDv3(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+
+	// UUID ver. 4
+	tests = []struct {
+			param    string
+			expected bool
+	}{
+		{"", false },
+		{"xxxa987fbc9-4bed-3078-cf07-9141ba07c9f3", false},
+		{"a987fbc9-4bed-5078-af07-9141ba07c9f3", false},
+		{"934859", false},
+		{"57b73598-8764-4ad0-a76a-679bb6640eb1", true},
+		{"625e63f3-58f5-40b7-83a1-a72ad31acffb", true},
+	}
+	for _, test := range tests {
+		actual := IsUUIDv4(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsUUIDv4(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+
+	// UUID ver. 5
+	tests = []struct {
+			param    string
+			expected bool
+	}{
+		{"", false},
+		{"xxxa987fbc9-4bed-3078-cf07-9141ba07c9f3", false},
+		{"9c858901-8a57-4791-81fe-4c455b099bc9", false},
+		{"a987fbc9-4bed-3078-cf07-9141ba07c9f3", false},
+		{"987fbc97-4bed-5078-af07-9141ba07c9f3", true},
+		{"987fbc97-4bed-5078-9f07-9141ba07c9f3", true},
+	}
+	for _, test := range tests {
+		actual := IsUUIDv5(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsUUIDv5(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
 }
 
 func TestIsCreditCard(t *testing.T) {
