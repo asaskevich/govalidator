@@ -477,9 +477,18 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 		}
 		result := true
 		for i := 0; i < v.Len(); i++ {
-			resultItem, err := ValidateStruct(v.Index(i).Interface())
-			if err != nil {
-				return false, err
+			var resultItem bool
+			var err error
+			if v.Index(i).Kind() != reflect.Struct {
+				resultItem, err = typeCheck(v.Index(i), t)
+				if err != nil {
+					return false, err
+				}
+			} else {
+				resultItem, err = ValidateStruct(v.Index(i).Interface())
+				if err != nil {
+					return false, err
+				}
 			}
 			result = result && resultItem
 		}
@@ -487,9 +496,18 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 	case reflect.Array:
 		result := true
 		for i := 0; i < v.Len(); i++ {
-			resultItem, err := ValidateStruct(v.Index(i).Interface())
-			if err != nil {
-				return false, err
+			var resultItem bool
+			var err error
+			if v.Index(i).Kind() != reflect.Struct {
+				resultItem, err = typeCheck(v.Index(i), t)
+				if err != nil {
+					return false, err
+				}
+			} else {
+				resultItem, err = ValidateStruct(v.Index(i).Interface())
+				if err != nil {
+					return false, err
+				}
 			}
 			result = result && resultItem
 		}

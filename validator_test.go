@@ -882,6 +882,8 @@ type User struct {
 type PrivateStruct struct {
 	privateField string `valid:"required,alpha,d_k"`
 	NonZero      int
+	ListInt      []int
+	ListString   []string `valid:"alpha"`
 	Work         [2]Address
 	Home         Address
 	Map          map[string]Address
@@ -934,7 +936,7 @@ func TestValidateStruct(t *testing.T) {
 	TagMap["d_k"] = Validator(func(str string) bool {
 		return str == "d_k"
 	})
-	result, err = ValidateStruct(PrivateStruct{"d_k", 0, [2]Address{Address{"Street", "123456"},
+	result, err = ValidateStruct(PrivateStruct{"d_k", 0, []int{1, 2}, []string{"hi", "super"}, [2]Address{Address{"Street", "123456"},
 		Address{"Street", "123456"}}, Address{"Street", "123456"}, map[string]Address{"address": Address{"Street", "123456"}}})
 	if result != true {
 		t.Log("Case ", 6, ": expected ", true, " when result is ", result)
