@@ -670,6 +670,7 @@ func TestIsUUID(t *testing.T) {
 			param    string
 			expected bool
 	}{
+
 		{"", false},
 		{"xxxa987fbc9-4bed-3078-cf07-9141ba07c9f3", false},
 		{"9c858901-8a57-4791-81fe-4c455b099bc9", false},
@@ -710,37 +711,73 @@ func TestIsCreditCard(t *testing.T) {
 }
 
 func TestIsISBN(t *testing.T) {
-	// ISBN 10
-	tests := []string{"", "foo", "3423214121", "978-3836221191", "3-423-21412-1", "3 423 21412 1", "3836221195", "1-61729-085-8",
-		"3 423 21412 0", "3 401 01319 X"}
-	expected := []bool{false, false, false, false, false, false, true, true, true, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsISBN10(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
-		}
-	}
-	// ISBN 13
-	tests = []string{"", "3-8362-2119-5", "01234567890ab", "978 3 8362 2119 0", "9784873113685", "978-4-87311-368-5",
-		"978 3401013190", "978-3-8362-2119-1"}
-	expected = []bool{false, false, false, false, true, true, true, true}
-	for i := 0; i < len(tests); i++ {
-		result := IsISBN13(tests[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
-		}
-	}
+	t.Parallel()
+
 	// Without version
-	tests = []string{"3836221195", "1-61729-085-8", "3 423 21412 0", "3 401 01319 X", "9784873113685", "978-4-87311-368-5",
-		"978 3401013190", "978-3-8362-2119-1", "", "foo"}
-	expected = []bool{true, true, true, true, true, true, true, true, false, false}
-	for i := 0; i < len(tests); i++ {
-		result := IsISBN(tests[i], -1)
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	var tests = []struct {
+		param	 string
+		expected bool
+	}{
+		{"", false},
+		{"foo", false},
+		{"3836221195", true},
+		{"1-61729-085-8", true},
+		{"3 423 21412 0", true},
+		{"3 401 01319 X", true},
+		{"9784873113685", true},
+		{"978-4-87311-368-5", true},
+		{"978 3401013190", true},
+		{"978-3-8362-2119-1", true},
+	}
+	for _, test := range tests {
+		actual := IsISBN(test.param, -1)
+		if actual != test.expected {
+			t.Errorf("Expected IsISBN(%q, -1) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+
+	// ISBN 10
+	tests = []struct {
+		param	 string
+		expected bool
+	}{
+		{"", false},
+		{"foo", false},
+		{"3423214121", false},
+		{"978-3836221191", false},
+		{"3-423-21412-1", false},
+		{"3 423 21412 1", false},
+		{"3836221195", true},
+		{"1-61729-085-8", true},
+		{"3 423 21412 0", true},
+		{"3 401 01319 X", true},
+	}
+	for _, test := range tests {
+		actual := IsISBN10(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsISBN10(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+
+	// ISBN 13
+	tests = []struct {
+		param	 string
+		expected bool
+	}{
+		{"", false},
+		{"foo", false},
+		{"3-8362-2119-5", false},
+		{"01234567890ab", false},
+		{"978 3 8362 2119 0", false},
+		{"9784873113685", true},
+		{"978-4-87311-368-5", true},
+		{"978 3401013190", true},
+		{"978-3-8362-2119-1", true},
+	}
+	for _, test := range tests {
+		actual := IsISBN13(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsISBN13(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
