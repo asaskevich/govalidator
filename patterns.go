@@ -29,6 +29,7 @@ const (
 	Latitude     string = "^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)$"
 	Longitude    string = "^[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$"
 	URL          string = `^((ftp|http|https):\/\/)?(\S+(:\S*)?@)?((([1-9]\d?|1\d\d|2[01]\d|22[0-3])(\.(1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.([0-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|((www\.)?)?(([a-z\x{00a1}-\x{ffff}0-9]+-?-?_?)*[a-z\x{00a1}-\x{ffff}0-9]+)(?:\.([a-z\x{00a1}-\x{ffff}]{2,}))?)|localhost)(:(\d{1,5}))?((\/|\?|#)[^\s]*)?$`
+	SSN          string = `^\d{3}[- ]?\d{2}[- ]?\d{4}$`
 	tagName      string = "valid"
 )
 
@@ -58,4 +59,5 @@ var (
 	rxLatitude     = regexp.MustCompile(Latitude)
 	rxLongitude    = regexp.MustCompile(Longitude)
 	rxURL          = regexp.MustCompile(URL)
+	rxSSN          = regexp.MustCompile(SSN)
 )

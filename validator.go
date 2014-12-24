@@ -392,6 +392,14 @@ func isValidTag(s string) bool {
 	return true
 }
 
+// IsSSN will validate the given string as a U.S. Social Security Number
+func IsSSN(str string) bool {
+	if str == "" || len(str) != 11 {
+		return false
+	}
+	return rxSSN.MatchString(str)
+}
+
 // Contains returns whether checks that a comma-separated list of options
 // contains a particular substr flag. substr must be surrounded by a
 // string boundary or commas.

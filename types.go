@@ -55,4 +55,5 @@ var TagMap = map[string]Validator{
 	"mac":           IsMAC,
 	"latitude":      IsLatitude,
 	"longitude":     IsLongitude,
+	"ssn":           IsSSN,
 }
