@@ -609,8 +609,8 @@ func TestIsUUID(t *testing.T) {
 
 	// Tests without version
 	var tests = []struct {
-			param    string
-			expected bool
+		param    string
+		expected bool
 	}{
 		{"", false},
 		{"xxxa987fbc9-4bed-3078-cf07-9141ba07c9f3", false},
@@ -630,11 +630,11 @@ func TestIsUUID(t *testing.T) {
 
 	// UUID ver. 3
 	tests = []struct {
-			param    string
-			expected bool
+		param    string
+		expected bool
 	}{
 		{"", false},
-		{"412452646", false },
+		{"412452646", false},
 		{"xxxa987fbc9-4bed-3078-cf07-9141ba07c9f3", false},
 		{"a987fbc9-4bed-4078-8f07-9141ba07c9f3", false},
 		{"a987fbc9-4bed-3078-cf07-9141ba07c9f3", true},
@@ -648,10 +648,10 @@ func TestIsUUID(t *testing.T) {
 
 	// UUID ver. 4
 	tests = []struct {
-			param    string
-			expected bool
+		param    string
+		expected bool
 	}{
-		{"", false },
+		{"", false},
 		{"xxxa987fbc9-4bed-3078-cf07-9141ba07c9f3", false},
 		{"a987fbc9-4bed-5078-af07-9141ba07c9f3", false},
 		{"934859", false},
@@ -667,8 +667,8 @@ func TestIsUUID(t *testing.T) {
 
 	// UUID ver. 5
 	tests = []struct {
-			param    string
-			expected bool
+		param    string
+		expected bool
 	}{
 
 		{"", false},
@@ -715,7 +715,7 @@ func TestIsISBN(t *testing.T) {
 
 	// Without version
 	var tests = []struct {
-		param	 string
+		param    string
 		expected bool
 	}{
 		{"", false},
@@ -738,7 +738,7 @@ func TestIsISBN(t *testing.T) {
 
 	// ISBN 10
 	tests = []struct {
-		param	 string
+		param    string
 		expected bool
 	}{
 		{"", false},
@@ -761,7 +761,7 @@ func TestIsISBN(t *testing.T) {
 
 	// ISBN 13
 	tests = []struct {
-		param	 string
+		param    string
 		expected bool
 	}{
 		{"", false},
@@ -961,6 +961,26 @@ func TestIsLongitude(t *testing.T) {
 		actual := IsLongitude(test.param)
 		if actual != test.expected {
 			t.Errorf("Expected IsLongitude(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsSSN(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"00-90-8787", false},
+		{"66690-76", false},
+		{"191 60 2869", true},
+		{"191-60-2869", true},
+	}
+	for _, test := range tests {
+		actual := IsSSN(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsSSN(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
