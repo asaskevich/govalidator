@@ -60,6 +60,7 @@ func IsLatitude(str string) bool
 func IsLongitude(str string) bool
 func IsLowerCase(str string) bool
 func IsMAC(str string) bool
+func IsMongoId(str string) bool 
 func IsMultibyte(str string) bool
 func IsNull(str string) bool
 func IsNumeric(str string) bool
@@ -73,6 +74,7 @@ func IsUpperCase(str string) bool
 func IsVariableWidth(str string) bool
 func LeftTrim(str, chars string) string
 func Matches(str, pattern string) bool
+func NormalizeEmail(str string) (string, error)
 func RemoveTags(s string) string
 func ReplacePattern(str, pattern, replace string) string
 func Reverse(s string) string

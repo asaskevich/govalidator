@@ -15,6 +15,7 @@ import (
 
 // IsEmail check if the string is an email.
 func IsEmail(str string) bool {
+	// TODO uppercase letters are not supported
 	return rxEmail.MatchString(str)
 }
 
@@ -324,6 +325,11 @@ func IsIPv6(str string) bool {
 func IsMAC(str string) bool {
 	_, err := net.ParseMAC(str)
 	return err == nil
+}
+
+// IsMongoId check if the string is a valid hex-encoded representation of a MongoDB ObjectId.
+func IsMongoId(str string) bool {
+	return rxHexadecimal.MatchString(str) && (len(str) == 24)
 }
 
 // IsLatitude check if a string is valid latitude.

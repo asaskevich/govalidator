@@ -244,3 +244,30 @@ func TestSafeFileName(t *testing.T) {
 		}
 	}
 }
+
+func TestNormalizeEmail(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected string
+	}{
+		{`test@me.com`, `test@me.com`},
+		{`some.name@gmail.com`, `somename@gmail.com`},
+		{`some.name@googlemail.com`, `somename@gmail.com`},
+		{`some.name+extension@gmail.com`, `somename@gmail.com`},
+		{`some.name+extension@googlemail.com`, `somename@gmail.com`},
+		{`some.name.middlename+extension@gmail.com`, `somenamemiddlename@gmail.com`},
+		{`some.name.middlename+extension@googlemail.com`, `somenamemiddlename@gmail.com`},
+		{`some.name.midd.lena.me.+extension@gmail.com`, `somenamemiddlename@gmail.com`},
+		{`some.name.midd.lena.me.+extension@googlemail.com`, `somenamemiddlename@gmail.com`},
+		{`some.name+extension@unknown.com`, `some.name+extension@unknown.com`},
+		{`hans@m端ller.com`, `hans@m端ller.com`},
+	}
+	for _, test := range tests {
+		actual, err := NormalizeEmail(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected NormalizeEmail(%q) to be %v, got %v, err %v", test.param, test.expected, actual, err)
+		}
+	}
+}

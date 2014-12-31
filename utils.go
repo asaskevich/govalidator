@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 	"unicode"
+	"fmt"
 )
 
 // Contains check if the string contains the substring.
@@ -166,4 +167,24 @@ func SafeFileName(str string) string {
 		name = strings.Replace(name, "--", "-", -1)
 	}
 	return name
+}
+
+// NormalizeEmail canonicalize an email address.
+// The local part of the email address is lowercased for all domains; the hostname is always lowercased and
+// the local part of the email address is always lowercased for hosts that are known to be case-insensitive (currently only GMail).
+// Normalization follows special rules for known providers: currently, GMail addresses have dots removed in the local part and
+// are stripped of tags (e.g. some.one+tag@gmail.com becomes someone@gmail.com) and all @googlemail.com addresses are
+// normalized to @gmail.com.
+func NormalizeEmail(str string) (string, error) {
+	if (!IsEmail(str)) {
+		return "", errors.New(fmt.Sprintf("%s is not an email", str))
+	}
+	parts := strings.Split(str, "@")
+	parts[0] = strings.ToLower(parts[0])
+	parts[1] = strings.ToLower(parts[1])
+	if (parts[1] == "gmail.com" || parts[1] == "googlemail.com") {
+		parts[1] = "gmail.com"
+		parts[0] = strings.Split(ReplacePattern(parts[0], `\.`, ""), "+")[0];
+	}
+	return strings.Join(parts, "@"), nil
 }

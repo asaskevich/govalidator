@@ -985,6 +985,27 @@ func TestIsSSN(t *testing.T) {
 	}
 }
 
+func TestIsMongoId(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"507f1f77bcf86cd799439011", true},
+		{"507f1f77bcf86cd7994390", false},
+		{"507f1f77bcf86cd79943901z", false},
+		{"507f1f77bcf86cd799439011 ", false},
+		{"", false},
+	}
+	for _, test := range tests {
+		actual := IsMongoId(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsSSN(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
 type Address struct {
 	Street string `valid:"-"`
 	Zip    string `json:"zip" valid:"numeric,required"`
