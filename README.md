@@ -66,6 +66,8 @@ func IsNull(str string) bool
 func IsNumeric(str string) bool
 func IsRGBcolor(str string) bool
 func IsURL(str string) bool
+func IsRequestURL(rawurl string) bool
+func IsRequestURI(rawurl string) bool
 func IsUUID(str string) bool
 func IsUUIDv3(str string) bool
 func IsUUIDv4(str string) bool
