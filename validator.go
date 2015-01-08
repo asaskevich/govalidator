@@ -11,6 +11,7 @@ import (
 	"sort"
 	"strings"
 	"unicode"
+	"net/url"
 )
 
 // IsEmail check if the string is an email.
@@ -25,6 +26,28 @@ func IsURL(str string) bool {
 		return false
 	}
 	return rxURL.MatchString(str)
+}
+
+// IsRequestURL check if the string rawurl, assuming
+// it was recieved in an HTTP request, is a valid
+// URL confirm to RFC 3986
+func IsRequestURL(rawurl string) bool {
+	url,err := url.ParseRequestURI(rawurl)
+	if err != nil {
+		return false //Couldn't even parse the rawurl
+	}
+	if len(url.Scheme) == 0 {
+		return false //No Scheme found
+	}
+	return true
+}
+
+// IsRequestURL check if the string rawurl, assuming
+// it was recieved in an HTTP request, is an
+// absolute URI or an absolute path.
+func IsRequestURI(rawurl string) bool {
+	_,err := url.ParseRequestURI(rawurl)
+	return err == nil
 }
 
 // IsAlpha check if the string contains only letters (a-zA-Z).
