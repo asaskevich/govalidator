@@ -193,8 +193,9 @@ Full information about code coverage is also available here: [govalidator on goc
 #### Support
 If you do have a contribution for the package feel free to put up a Pull Request or open Issue.
 
-#### Special thanks to contributors
+#### Special thanks to [contributors](https://github.com/asaskevich/govalidator/graphs/contributors)
 * [Attila Oláh](https://github.com/attilaolah)
+* [Daniel Korner](https://github.com/Dadie)
 * [Steven Wilkin](https://github.com/stevenwilkin)
 * [Deiwin Sarjas](https://github.com/deiwin)
 * [Noah Shibley](https://github.com/slugmobile)
