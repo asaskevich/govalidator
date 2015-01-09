@@ -1,68 +1,106 @@
 package govalidator
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func TestContains(t *testing.T) {
-	tests1 := []string{"abacada", "abacada", "abacada", "abacada"}
-	tests2 := []string{"", "ritir", "a", "aca"}
-	expected := []bool{true, false, true, true}
-	for i := 0; i < len(tests1); i++ {
-		result := Contains(tests1[i], tests2[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct {
+		param1   string
+		param2   string
+		expected bool
+	}{
+		{"abacada", "", true},
+		{"abacada", "ritir", false},
+		{"abacada", "a", true},
+		{"abacada", "aca", true},
+	}
+	for _, test := range tests {
+		actual := Contains(test.param1, test.param2)
+		if actual != test.expected {
+			t.Errorf("Expected Contains(%q,%q) to be %v, got %v", test.param1, test.param2, test.expected, actual)
 		}
 	}
 }
 
 func TestMatches(t *testing.T) {
-	tests1 := []string{"123456789", "abacada", "111222333", "abacaba"}
-	tests2 := []string{"[0-9]+", "cab$", "((111|222|333)+)+", "((123+]"}
-	expected := []bool{true, false, true, false}
-	for i := 0; i < len(tests1); i++ {
-		result := Matches(tests1[i], tests2[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct {
+		param1   string
+		param2   string
+		expected bool
+	}{
+		{"123456789", "[0-9]+", true},
+		{"abacada", "cab$", false},
+		{"111222333", "((111|222|333)+)+", true},
+		{"abacaba", "((123+]", false},
+	}
+	for _, test := range tests {
+		actual := Matches(test.param1, test.param2)
+		if actual != test.expected {
+			t.Errorf("Expected Matches(%q,%q) to be %v, got %v", test.param1, test.param2, test.expected, actual)
 		}
 	}
 }
 
 func TestLeftTrim(t *testing.T) {
-	tests1 := []string{"  \r\n\tfoo  \r\n\t   ", "010100201000"}
-	tests2 := []string{"", "01"}
-	expected := []string{"foo  \r\n\t   ", "201000"}
-	for i := 0; i < len(tests1); i++ {
-		result := LeftTrim(tests1[i], tests2[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct {
+		param1   string
+		param2   string
+		expected string
+	}{
+		{"  \r\n\tfoo  \r\n\t   ", "", "foo  \r\n\t   "},
+		{"010100201000", "01", "201000"},
+	}
+	for _, test := range tests {
+		actual := LeftTrim(test.param1, test.param2)
+		if actual != test.expected {
+			t.Errorf("Expected LeftTrim(%q,%q) to be %v, got %v", test.param1, test.param2, test.expected, actual)
 		}
 	}
 }
 
 func TestRightTrim(t *testing.T) {
-	tests1 := []string{"  \r\n\tfoo  \r\n\t   ", "010100201000"}
-	tests2 := []string{"", "01"}
-	expected := []string{"  \r\n\tfoo", "0101002"}
-	for i := 0; i < len(tests1); i++ {
-		result := RightTrim(tests1[i], tests2[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct {
+		param1   string
+		param2   string
+		expected string
+	}{
+		{"  \r\n\tfoo  \r\n\t   ", "", "  \r\n\tfoo"},
+		{"010100201000", "01", "0101002"},
+	}
+	for _, test := range tests {
+		actual := RightTrim(test.param1, test.param2)
+		if actual != test.expected {
+			t.Errorf("Expected RightTrim(%q,%q) to be %v, got %v", test.param1, test.param2, test.expected, actual)
 		}
 	}
 }
 
 func TestTrim(t *testing.T) {
-	tests1 := []string{"  \r\n\tfoo  \r\n\t   ", "010100201000", "1234567890987654321"}
-	tests2 := []string{"", "01", "1-8"}
-	expected := []string{"foo", "2", "909"}
-	for i := 0; i < len(tests1); i++ {
-		result := Trim(tests1[i], tests2[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct {
+		param1   string
+		param2   string
+		expected string
+	}{
+		{"  \r\n\tfoo  \r\n\t   ", "", "foo"},
+		{"010100201000", "01", "2"},
+		{"1234567890987654321", "1-8", "909"},
+	}
+	for _, test := range tests {
+		actual := Trim(test.param1, test.param2)
+		if actual != test.expected {
+			t.Errorf("Expected Trim(%q,%q) to be %v, got %v", test.param1, test.param2, test.expected, actual)
 		}
 	}
 }
@@ -77,14 +115,23 @@ func ExampleTrim() {
 }
 
 func TestWhiteList(t *testing.T) {
-	tests1 := []string{"abcdef", "aaaaaaaaaabbbbbbbbbb", "a1b2c3", "   ", "a3a43a5a4a3a2a23a4a5a4a3a4"}
-	tests2 := []string{"abc", "abc", "abc", "abc", "a-z"}
-	expected := []string{"abc", "aaaaaaaaaabbbbbbbbbb", "abc", "", "aaaaaaaaaaaa"}
-	for i := 0; i < len(tests1); i++ {
-		result := WhiteList(tests1[i], tests2[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct {
+		param1   string
+		param2   string
+		expected string
+	}{
+		{"abcdef", "abc", "abc"},
+		{"aaaaaaaaaabbbbbbbbbb", "abc", "aaaaaaaaaabbbbbbbbbb"},
+		{"a1b2c3", "abc", "abc"},
+		{"   ", "abc", ""},
+		{"a3a43a5a4a3a2a23a4a5a4a3a4", "a-z", "aaaaaaaaaaaa"},
+	}
+	for _, test := range tests {
+		actual := WhiteList(test.param1, test.param2)
+		if actual != test.expected {
+			t.Errorf("Expected WhiteList(%q,%q) to be %v, got %v", test.param1, test.param2, test.expected, actual)
 		}
 	}
 }
@@ -96,42 +143,72 @@ func ExampleWhiteList() {
 }
 
 func TestBlackList(t *testing.T) {
-	tests1 := []string{"abcdef", "aaaaaaaaaabbbbbbbbbb", "a1b2c3", "   "}
-	tests2 := []string{"abc", "abc", "abc", "abc"}
-	expected := []string{"def", "", "123", "   "}
-	for i := 0; i < len(tests1); i++ {
-		result := BlackList(tests1[i], tests2[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct {
+		param1   string
+		param2   string
+		expected string
+	}{
+		{"abcdef", "abc", "def"},
+		{"aaaaaaaaaabbbbbbbbbb", "abc", ""},
+		{"a1b2c3", "abc", "123"},
+		{"   ", "abc", "   "},
+		{"a3a43a5a4a3a2a23a4a5a4a3a4", "a-z", "34354322345434"},
+	}
+	for _, test := range tests {
+		actual := BlackList(test.param1, test.param2)
+		if actual != test.expected {
+			t.Errorf("Expected BlackList(%q,%q) to be %v, got %v", test.param1, test.param2, test.expected, actual)
 		}
 	}
 }
 
 func TestStripLow(t *testing.T) {
-	tests1 := []string{"foo\x00", "\x7Ffoo\x02", "\x01\x09", "foo\x0A\x0D", "perch\u00e9", "\u20ac",
-		"\u2206\x0A", "foo\x0A\x0D", "\x03foo\x0A\x0D"}
-	tests2 := []bool{false, false, false, false, false, false, false, true, true}
-	expected := []string{"foo", "foo", "", "foo", "perch\u00e9", "\u20ac", "\u2206", "foo\x0A\x0D", "foo\x0A\x0D"}
-	for i := 0; i < len(tests1); i++ {
-		result := StripLow(tests1[i], tests2[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct {
+		param1   string
+		param2   bool
+		expected string
+	}{
+		{"foo\x00", false, "foo"},
+		{"\x7Ffoo\x02", false, "foo"},
+		{"\x01\x09", false, ""},
+		{"foo\x0A\x0D", false, "foo"},
+		{"perch\u00e9", false, "perch\u00e9"},
+		{"\u20ac", false, "\u20ac"},
+		{"\u2206\x0A", false, "\u2206"},
+		{"foo\x0A\x0D", true, "foo\x0A\x0D"},
+		{"\x03foo\x0A\x0D", true, "foo\x0A\x0D"},
+	}
+	for _, test := range tests {
+		actual := StripLow(test.param1, test.param2)
+		if actual != test.expected {
+			t.Errorf("Expected StripLow(%q,%t) to be %v, got %v", test.param1, test.param2, test.expected, actual)
 		}
 	}
 }
 
 func TestReplacePattern(t *testing.T) {
-	tests1 := []string{"ab123ba", "abacaba", "httpftp://github.comio", "aaaaaaaaaa", "http123123ftp://git534543hub.comio"}
-	tests2 := []string{"[0-9]+", "[0-9]+", "(ftp|io)", "a", "(ftp|io|[0-9]+)"}
-	tests3 := []string{"aca", "aca", "", "", ""}
-	expected := []string{"abacaba", "abacaba", "http://github.com", "", "http://github.com"}
-	for i := 0; i < len(tests1); i++ {
-		result := ReplacePattern(tests1[i], tests2[i], tests3[i])
-		if result != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct {
+		param1   string
+		param2   string
+		param3   string
+		expected string
+	}{
+		{"ab123ba", "[0-9]+", "aca", "abacaba"},
+		{"abacaba", "[0-9]+", "aca", "abacaba"},
+		{"httpftp://github.comio", "(ftp|io)", "", "http://github.com"},
+		{"aaaaaaaaaa", "a", "", ""},
+		{"http123123ftp://git534543hub.comio", "(ftp|io|[0-9]+)", "", "http://github.com"},
+	}
+	for _, test := range tests {
+		actual := ReplacePattern(test.param1, test.param2, test.param3)
+		if actual != test.expected {
+			t.Errorf("Expected ReplacePattern(%q,%q,%q) to be %v, got %v", test.param1, test.param2, test.param3, test.expected, actual)
 		}
 	}
 }
@@ -147,100 +224,155 @@ func ExampleReplacePattern() {
 }
 
 func TestEscape(t *testing.T) {
-	tests := []string{`<img alt="foo&bar">`}
-	expected := []string{"&lt;img alt=&#34;foo&amp;bar&#34;&gt;"}
-	for i := 0; i < len(tests); i++ {
-		res := Escape(tests[i])
-		if res != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", res)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected string
+	}{
+		{`<img alt="foo&bar">`, "&lt;img alt=&#34;foo&amp;bar&#34;&gt;"},
+	}
+	for _, test := range tests {
+		actual := Escape(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected Escape(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestUnderscoreToCamelCase(t *testing.T) {
-	tests := []string{"a_b_c", "my_func", "1ab_cd"}
-	expected := []string{"ABC", "MyFunc", "1abCd"}
-	for i := 0; i < len(tests); i++ {
-		res := UnderscoreToCamelCase(tests[i])
-		if res != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", res)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected string
+	}{
+		{"a_b_c", "ABC"},
+		{"my_func", "MyFunc"},
+		{"1ab_cd", "1abCd"},
+	}
+	for _, test := range tests {
+		actual := UnderscoreToCamelCase(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected UnderscoreToCamelCase(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestCamelCaseToUnderscore(t *testing.T) {
-	tests := []string{"MyFunc", "ABC", "1B"}
-	expected := []string{"my_func", "a_b_c", "1_b"}
-	for i := 0; i < len(tests); i++ {
-		res := CamelCaseToUnderscore(tests[i])
-		if res != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", res)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected string
+	}{
+		{"MyFunc", "my_func"},
+		{"ABC", "a_b_c"},
+		{"1B", "1_b"},
+	}
+	for _, test := range tests {
+		actual := CamelCaseToUnderscore(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected CamelCaseToUnderscore(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestReverse(t *testing.T) {
-	tests := []string{"abc", "ｶﾀｶﾅ"}
-	expected := []string{"cba", "ﾅｶﾀｶ"}
-	for i := 0; i < len(tests); i++ {
-		res := Reverse(tests[i])
-		if res != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", res)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected string
+	}{
+		{"abc", "cba"},
+		{"ｶﾀｶﾅ", "ﾅｶﾀｶ"},
+	}
+	for _, test := range tests {
+		actual := Reverse(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected Reverse(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestGetLines(t *testing.T) {
-	tests := []string{"abc", "a\nb\nc"}
-	expected := []([]string){{"abc"}, {"a", "b", "c"}}
-	for i := 0; i < len(tests); i++ {
-		res := GetLines(tests[i])
-		for j := 0; j < len(res); j++ {
-			if res[j] != expected[i][j] {
-				t.Log("Case ", i, ": expected ", expected[i], " when result is ", res)
-				t.FailNow()
-			}
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected []string
+	}{
+		{"abc", []string{"abc"}},
+		{"a\nb\nc", []string{"a", "b", "c"}},
+	}
+	for _, test := range tests {
+		actual := GetLines(test.param)
+		if !reflect.DeepEqual(actual, test.expected) {
+			t.Errorf("Expected GetLines(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestGetLine(t *testing.T) {
-	tests1 := []string{"abc", "a\nb\nc", "abc", "abacaba\n", "abc"}
-	tests2 := []int{0, 0, -1, 1, 3}
-	expected := []string{"abc", "a", "", "", ""}
-	for i := 0; i < len(tests1); i++ {
-		res, _ := GetLine(tests1[i], tests2[i])
-		if res != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", res)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct {
+		param1   string
+		param2   int
+		expected string
+	}{
+		{"abc", 0, "abc"},
+		{"a\nb\nc", 0, "a"},
+		{"abc", -1, ""},
+		{"abacaba\n", 1, ""},
+		{"abc", 3, ""},
+	}
+	for _, test := range tests {
+		actual, _ := GetLine(test.param1, test.param2)
+		if actual != test.expected {
+			t.Errorf("Expected GetLine(%q, %d) to be %v, got %v", test.param1, test.param2, test.expected, actual)
 		}
 	}
 }
 
 func TestRemoveTags(t *testing.T) {
-	tests := []string{"abc", "<!-- Test -->", "<div><div><p><a>Text</a></p></div></div>", `<a href="#">Link</a>`}
-	expected := []string{"abc", "", "Text", "Link"}
-	for i := 0; i < len(tests); i++ {
-		res := RemoveTags(tests[i])
-		if res != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", res)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected string
+	}{
+		{"abc", "abc"},
+		{"<!-- Test -->", ""},
+		{"<div><div><p><a>Text</a></p></div></div>", "Text"},
+		{`<a href="#">Link</a>`, "Link"},
+	}
+	for _, test := range tests {
+		actual := RemoveTags(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected RemoveTags(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
 
 func TestSafeFileName(t *testing.T) {
-	tests := []string{"abc", "123456789     '_-?ASDF@£$%£%^é.html", "ReadMe.md", "file:///c:/test.go", "../../../Hello World!.txt"}
-	expected := []string{"abc", "123456789-asdf.html", "readme.md", "test.go", "hello-world.txt"}
-	for i := 0; i < len(tests); i++ {
-		res := SafeFileName(tests[i])
-		if res != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", res)
-			t.FailNow()
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected string
+	}{
+		{"abc", "abc"},
+		{"123456789     '_-?ASDF@£$%£%^é.html", "123456789-asdf.html"},
+		{"ReadMe.md", "readme.md"},
+		{"file:///c:/test.go", "test.go"},
+		{"../../../Hello World!.txt", "hello-world.txt"},
+	}
+	for _, test := range tests {
+		actual := SafeFileName(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected SafeFileName(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
