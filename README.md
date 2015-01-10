@@ -54,13 +54,15 @@ func IsIPv6(str string) bool
 func IsISBN(str string, version int) bool
 func IsISBN10(str string) bool
 func IsISBN13(str string) bool
+func IsISO3166Alpha2(str string) bool
+func IsISO3166Alpha3(str string) bool
 func IsInt(str string) bool
 func IsJSON(str string) bool
 func IsLatitude(str string) bool
 func IsLongitude(str string) bool
 func IsLowerCase(str string) bool
 func IsMAC(str string) bool
-func IsMongoId(str string) bool 
+func IsMongoId(str string) bool
 func IsMultibyte(str string) bool
 func IsNull(str string) bool
 func IsNumeric(str string) bool
