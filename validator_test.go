@@ -9,7 +9,7 @@ func TestIsAlpha(t *testing.T) {
 		param    string
 		expected bool
 	}{
-		{"", false},
+		{"", true},
 		{"   fooo   ", false},
 		{"abc1", false},
 		{"abc", true},
@@ -35,6 +35,7 @@ func TestIsUTFLetter(t *testing.T) {
 		{"Ⅸ", false},
 		{"   fooo   ", false},
 		{"abc〩", false},
+		{"", true},
 		{"abc", true},
 		{"소주", true},
 		{"FoObAr", true},
@@ -58,6 +59,7 @@ func TestIsAlphanumeric(t *testing.T) {
 		{"abc!!!", false},
 		{"abc123", true},
 		{"ABC111", true},
+		{"", true},
 	}
 	for _, test := range tests {
 		actual := IsAlphanumeric(test.param)
@@ -79,6 +81,7 @@ func TestIsUTFLetterNumeric(t *testing.T) {
 		{"달기&Co.", false},
 		{"소주", true},
 		{"〩Hours", true},
+		{"", true},
 	}
 	for _, test := range tests {
 		actual := IsUTFLetterNumeric(test.param)
@@ -95,9 +98,11 @@ func TestIsNumeric(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"", true},
 		{"123", true},
 		{"0123", true},
 		{"-00123", true},
+		{"+00123", true},
 		{"0", true},
 		{"-0", true},
 		{"123.123", false},
@@ -119,6 +124,7 @@ func TestIsUTFNumeric(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"", true},
 		{"12𐅪3", true},
 		{"-1¾", true},
 		{"Ⅸ", true},
@@ -145,6 +151,7 @@ func TestIsUTFDigit(t *testing.T) {
 	}{
 		{"12𐅪3", false},
 		{"1483920", true},
+		{"", true},
 		{"۳۵۶۰", true},
 		{"-29", true},
 		{"〥〩", false},
@@ -168,6 +175,7 @@ func TestIsLowerCase(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"", true},
 		{"abc123", true},
 		{"abc", true},
 		{"tr竪s 端ber", true},
@@ -189,6 +197,7 @@ func TestIsUpperCase(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"", true},
 		{"ABC123", true},
 		{"ABC", true},
 		{"S T R", true},
@@ -213,6 +222,7 @@ func TestIsInt(t *testing.T) {
 		{"123", true},
 		{"0", true},
 		{"-0", true},
+		{"+0", true},
 		{"01", false},
 		{"123.123", false},
 		{" ", false},
@@ -271,6 +281,7 @@ func TestIsURL(t *testing.T) {
 		{"http://foobar.org:8080/", true},
 		{"ftp://foobar.ru/", true},
 		{"http://user:pass@www.foobar.com/", true},
+		{"http://user:pass@www.foobar.com/path/file", true},
 		{"http://127.0.0.1/", true},
 		{"http://duckduckgo.com/?q=%2F", true},
 		{"http://localhost:3000/", true},
@@ -416,6 +427,7 @@ func TestIsFloat(t *testing.T) {
 		{"123.", true},
 		{"123.123", true},
 		{"-123.123", true},
+		{"+123.123", true},
 		{"0.123", true},
 		{"-0.123", true},
 		{".0", true},
@@ -628,6 +640,7 @@ func TestIsASCII(t *testing.T) {
 		{"0987654321", true},
 		{"test@example.com", true},
 		{"1234abcDEF", true},
+		{"", true},
 	}
 	for _, test := range tests {
 		actual := IsASCII(test.param)
@@ -651,6 +664,7 @@ func TestIsFullWidth(t *testing.T) {
 		{"３ー０　ａ＠ｃｏｍ", true},
 		{"Ｆｶﾀｶﾅﾞﾬ", true},
 		{"Good＝Parts", true},
+		{"", true},
 	}
 	for _, test := range tests {
 		actual := IsFullWidth(test.param)
@@ -673,6 +687,7 @@ func TestIsHalfWidth(t *testing.T) {
 		{"l-btn_02--active", true},
 		{"abc123い", true},
 		{"ｶﾀｶﾅﾞﾬ￩", true},
+		{"", true},
 	}
 	for _, test := range tests {
 		actual := IsHalfWidth(test.param)
@@ -692,6 +707,7 @@ func TestIsVariableWidth(t *testing.T) {
 		{"ひらがなカタカナ漢字ABCDE", true},
 		{"３ー０123", true},
 		{"Ｆｶﾀｶﾅﾞﾬ", true},
+		{"", true},
 		{"Good＝Parts", true},
 		{"abc", false},
 		{"abc123", false},

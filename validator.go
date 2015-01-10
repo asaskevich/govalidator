@@ -50,14 +50,20 @@ func IsRequestURI(rawurl string) bool {
 	return err == nil
 }
 
-// IsAlpha check if the string contains only letters (a-zA-Z).
+// IsAlpha check if the string contains only letters (a-zA-Z). Empty string is valid.
 func IsAlpha(str string) bool {
+	if (IsNull(str)) {
+		return true
+	}
 	return rxAlpha.MatchString(str)
 }
 
 //IsUTFLetter check if the string contains only unicode letter characters.
-//Similar to IsAlpha but for all languages.
+//Similar to IsAlpha but for all languages. Empty string is valid.
 func IsUTFLetter(str string) bool {
+	if (IsNull(str)) {
+		return true
+	}
 
 	for _, c := range str {
 		if !unicode.IsLetter(c) {
@@ -68,14 +74,19 @@ func IsUTFLetter(str string) bool {
 
 }
 
-// IsAlphanumeric check if the string contains only letters and numbers.
+// IsAlphanumeric check if the string contains only letters and numbers. Empty string is valid.
 func IsAlphanumeric(str string) bool {
+	if (IsNull(str)) {
+		return true
+	}
 	return rxAlphanumeric.MatchString(str)
 }
 
-// IsUTFLetterNumeric check if the string contains only unicode letters and numbers.
+// IsUTFLetterNumeric check if the string contains only unicode letters and numbers. Empty string is valid.
 func IsUTFLetterNumeric(str string) bool {
-
+	if (IsNull(str)) {
+		return true
+	}
 	for _, c := range str {
 		if !unicode.IsLetter(c) && !unicode.IsNumber(c) { //letters && numbers are ok
 			return false
@@ -85,15 +96,20 @@ func IsUTFLetterNumeric(str string) bool {
 
 }
 
-// IsNumeric check if the string contains only numbers.
+// IsNumeric check if the string contains only numbers. Empty string is valid.
 func IsNumeric(str string) bool {
+	if (IsNull(str)) {
+		return true
+	}
 	return rxNumeric.MatchString(str)
 }
 
 // IsUTFNumeric check if the string contains only unicode numbers of any kind.
-// Numbers can be 0-9 but also Fractions ¾,Roman Ⅸ and Hangzhou 〩.
+// Numbers can be 0-9 but also Fractions ¾,Roman Ⅸ and Hangzhou 〩. Empty string is valid.
 func IsUTFNumeric(str string) bool {
-
+	if (IsNull(str)) {
+		return true
+	}
 	for _, c := range str {
 		if unicode.IsNumber(c) == false && c != '-' { //numbers && minus sign are ok
 			return false
@@ -103,9 +119,11 @@ func IsUTFNumeric(str string) bool {
 
 }
 
-// IsUTFDigit check if the string contains only unicode radix-10 decimal digits.
+// IsUTFDigit check if the string contains only unicode radix-10 decimal digits. Empty string is valid.
 func IsUTFDigit(str string) bool {
-
+	if (IsNull(str)) {
+		return true
+	}
 	for _, c := range str {
 		if !unicode.IsDigit(c) && c != '-' { //digits && minus sign are ok
 			return false
@@ -130,18 +148,27 @@ func IsRGBcolor(str string) bool {
 	return rxRGBcolor.MatchString(str)
 }
 
-// IsLowerCase check if the string is lowercase.
+// IsLowerCase check if the string is lowercase. Empty string is valid.
 func IsLowerCase(str string) bool {
+	if (IsNull(str)) {
+		return true
+	}
 	return str == strings.ToLower(str)
 }
 
-// IsUpperCase check if the string is uppercase.
+// IsUpperCase check if the string is uppercase. Empty string is valid.
 func IsUpperCase(str string) bool {
+	if (IsNull(str)) {
+		return true
+	}
 	return str == strings.ToUpper(str)
 }
 
-// IsInt check if the string is an integer.
+// IsInt check if the string is an integer. Empty string is valid.
 func IsInt(str string) bool {
+	if (IsNull(str)) {
+		return true
+	}
 	return rxInt.MatchString(str)
 }
 
@@ -281,28 +308,43 @@ func IsJSON(str string) bool {
 	return json.Unmarshal([]byte(str), &js) == nil
 }
 
-// IsMultibyte check if the string contains one or more multibyte chars.
+// IsMultibyte check if the string contains one or more multibyte chars. Empty string is valid.
 func IsMultibyte(str string) bool {
+	if (IsNull(str)) {
+		return true
+	}
 	return rxMultibyte.MatchString(str)
 }
 
-// IsASCII check if the string contains ASCII chars only.
+// IsASCII check if the string contains ASCII chars only. Empty string is valid.
 func IsASCII(str string) bool {
+	if (IsNull(str)) {
+		return true
+	}
 	return rxASCII.MatchString(str)
 }
 
-// IsFullWidth check if the string contains any full-width chars.
+// IsFullWidth check if the string contains any full-width chars. Empty string is valid.
 func IsFullWidth(str string) bool {
+	if (IsNull(str)) {
+		return true
+	}
 	return rxFullWidth.MatchString(str)
 }
 
-// IsHalfWidth check if the string contains any half-width chars.
+// IsHalfWidth check if the string contains any half-width chars. Empty string is valid.
 func IsHalfWidth(str string) bool {
+	if (IsNull(str)) {
+		return true
+	}
 	return rxHalfWidth.MatchString(str)
 }
 
-// IsVariableWidth check if the string contains a mixture of full and half-width chars.
+// IsVariableWidth check if the string contains a mixture of full and half-width chars. Empty string is valid.
 func IsVariableWidth(str string) bool {
+	if (IsNull(str)) {
+		return true
+	}
 	return rxHalfWidth.MatchString(str) && rxFullWidth.MatchString(str)
 }
 
