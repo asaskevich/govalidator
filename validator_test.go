@@ -958,6 +958,63 @@ func TestIsBase64(t *testing.T) {
 	}
 }
 
+func TestIsISO3166Alpha2(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"", false},
+		{"ABCD", false},
+		{"A", false},
+		{"AC", false},
+		{"AP", false},
+		{"GER", false},
+		{"NU", true},
+		{"DE", true},
+		{"JP", true},
+		{"JPN", false},
+		{"ZWE", false},
+		{"GER", false},
+		{"DEU", false},
+	}
+	for _, test := range tests {
+		actual := IsISO3166Alpha2(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsISO3166Alpha2(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsISO3166Alpha3(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"", false},
+		{"ABCD", false},
+		{"A", false},
+		{"AC", false},
+		{"AP", false},
+		{"NU", false},
+		{"DE", false},
+		{"JP", false},
+		{"ZWE", true},
+		{"JPN", true},
+		{"GER", false},
+		{"DEU", true},
+	}
+	for _, test := range tests {
+		actual := IsISO3166Alpha3(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsISO3166Alpha3(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
 func TestIsIP(t *testing.T) {
 	t.Parallel()
 

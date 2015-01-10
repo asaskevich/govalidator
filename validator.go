@@ -362,6 +362,24 @@ func IsDataURI(str string) bool {
 	return IsBase64(dataURI[1])
 }
 
+func IsISO3166Alpha2(str string) bool {
+	for _,entry := range ISO3166List {
+		if str == entry.Alpha2Code {
+			return true
+		}
+	}
+	return false
+}
+
+func IsISO3166Alpha3(str string) bool {
+	for _,entry := range ISO3166List {
+		if str == entry.Alpha3Code {
+			return true
+		}
+	}
+	return false
+}
+
 // IsIP checks if a string is either IP version 4 or 6.
 func IsIP(str string) bool {
 	return net.ParseIP(str) != nil
