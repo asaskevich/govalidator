@@ -9,12 +9,49 @@ func TestIsAlpha(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"\n", false},
+		{"\r", false},
+		{"Ⅸ", false},
 		{"", true},
 		{"   fooo   ", false},
+		{"abc!!!", false},
 		{"abc1", false},
+		{"abc〩", false},
 		{"abc", true},
+		{"소주", false},
 		{"ABC", true},
 		{"FoObAr", true},
+		{"소aBC", false},
+		{"소", false},
+		{"달기&Co.", false},
+		{"〩Hours", false},
+		{"\ufff0", false},
+		{"\u0070", true},  //UTF-8(ASCII): p
+		{"\u0026", false}, //UTF-8(ASCII): &
+		{"\u0030", false}, //UTF-8(ASCII): 0
+		{"123", false},
+		{"0123", false},
+		{"-00123", false},
+		{"0", false},
+		{"-0", false},
+		{"123.123", false},
+		{" ", false},
+		{".", false},
+		{"-1¾", false},
+		{"1¾", false},
+		{"〥〩", false},
+		{"모자", false},
+		{"ix", true},
+		{"۳۵۶۰", false},
+		{"1--", false},
+		{"1-1", false},
+		{"-", false},
+		{"--", false},
+		{"1++", false},
+		{"1+1", false},
+		{"+", false},
+		{"++", false},
+		{"+1", false},
 	}
 	for _, test := range tests {
 		actual := IsAlpha(test.param)
@@ -31,14 +68,50 @@ func TestIsUTFLetter(t *testing.T) {
 		param    string
 		expected bool
 	}{
-		{`\n`, false},
+		{"\n", false},
+		{"\r", false},
 		{"Ⅸ", false},
+		{"", true},
 		{"   fooo   ", false},
+		{"abc!!!", false},
+		{"abc1", false},
 		{"abc〩", false},
 		{"", true},
 		{"abc", true},
 		{"소주", true},
+		{"ABC", true},
 		{"FoObAr", true},
+		{"소aBC", true},
+		{"소", true},
+		{"달기&Co.", false},
+		{"〩Hours", false},
+		{"\ufff0", false},
+		{"\u0070", true},  //UTF-8(ASCII): p
+		{"\u0026", false}, //UTF-8(ASCII): &
+		{"\u0030", false}, //UTF-8(ASCII): 0
+		{"123", false},
+		{"0123", false},
+		{"-00123", false},
+		{"0", false},
+		{"-0", false},
+		{"123.123", false},
+		{" ", false},
+		{".", false},
+		{"-1¾", false},
+		{"1¾", false},
+		{"〥〩", false},
+		{"모자", true},
+		{"ix", true},
+		{"۳۵۶۰", false},
+		{"1--", false},
+		{"1-1", false},
+		{"-", false},
+		{"--", false},
+		{"1++", false},
+		{"1+1", false},
+		{"+", false},
+		{"++", false},
+		{"+1", false},
 	}
 	for _, test := range tests {
 		actual := IsUTFLetter(test.param)
@@ -55,11 +128,51 @@ func TestIsAlphanumeric(t *testing.T) {
 		param    string
 		expected bool
 	}{
-		{"foo ", false},
+		{"\n", false},
+		{"\r", false},
+		{"Ⅸ", false},
+		{"", true},
+		{"   fooo   ", false},
 		{"abc!!!", false},
 		{"abc123", true},
 		{"ABC111", true},
-		{"", true},
+		{"abc1", true},
+		{"abc〩", false},
+		{"abc", true},
+		{"소주", false},
+		{"ABC", true},
+		{"FoObAr", true},
+		{"소aBC", false},
+		{"소", false},
+		{"달기&Co.", false},
+		{"〩Hours", false},
+		{"\ufff0", false},
+		{"\u0070", true},  //UTF-8(ASCII): p
+		{"\u0026", false}, //UTF-8(ASCII): &
+		{"\u0030", true},  //UTF-8(ASCII): 0
+		{"123", true},
+		{"0123", true},
+		{"-00123", false},
+		{"0", true},
+		{"-0", false},
+		{"123.123", false},
+		{" ", false},
+		{".", false},
+		{"-1¾", false},
+		{"1¾", false},
+		{"〥〩", false},
+		{"모자", false},
+		{"ix", true},
+		{"۳۵۶۰", false},
+		{"1--", false},
+		{"1-1", false},
+		{"-", false},
+		{"--", false},
+		{"1++", false},
+		{"1+1", false},
+		{"+", false},
+		{"++", false},
+		{"+1", false},
 	}
 	for _, test := range tests {
 		actual := IsAlphanumeric(test.param)
@@ -76,12 +189,49 @@ func TestIsUTFLetterNumeric(t *testing.T) {
 		param    string
 		expected bool
 	}{
-		{"foo ", false},
-		{"abc!!!", false},
-		{"달기&Co.", false},
-		{"소주", true},
-		{"〩Hours", true},
+		{"\n", false},
+		{"\r", false},
+		{"Ⅸ", true},
 		{"", true},
+		{"   fooo   ", false},
+		{"abc!!!", false},
+		{"abc1", true},
+		{"abc〩", true},
+		{"abc", true},
+		{"소주", true},
+		{"ABC", true},
+		{"FoObAr", true},
+		{"소aBC", true},
+		{"소", true},
+		{"달기&Co.", false},
+		{"〩Hours", true},
+		{"\ufff0", false},
+		{"\u0070", true},  //UTF-8(ASCII): p
+		{"\u0026", false}, //UTF-8(ASCII): &
+		{"\u0030", true},  //UTF-8(ASCII): 0
+		{"123", true},
+		{"0123", true},
+		{"-00123", false},
+		{"0", true},
+		{"-0", false},
+		{"123.123", false},
+		{" ", false},
+		{".", false},
+		{"-1¾", false},
+		{"1¾", true},
+		{"〥〩", true},
+		{"모자", true},
+		{"ix", true},
+		{"۳۵۶۰", true},
+		{"1--", false},
+		{"1-1", false},
+		{"-", false},
+		{"--", false},
+		{"1++", false},
+		{"1+1", false},
+		{"+", false},
+		{"++", false},
+		{"+1", false},
 	}
 	for _, test := range tests {
 		actual := IsUTFLetterNumeric(test.param)
@@ -98,7 +248,26 @@ func TestIsNumeric(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"\n", false},
+		{"\r", false},
+		{"Ⅸ", false},
 		{"", true},
+		{"   fooo   ", false},
+		{"abc!!!", false},
+		{"abc1", false},
+		{"abc〩", false},
+		{"abc", false},
+		{"소주", false},
+		{"ABC", false},
+		{"FoObAr", false},
+		{"소aBC", false},
+		{"소", false},
+		{"달기&Co.", false},
+		{"〩Hours", false},
+		{"\ufff0", false},
+		{"\u0070", false}, //UTF-8(ASCII): p
+		{"\u0026", false}, //UTF-8(ASCII): &
+		{"\u0030", true},  //UTF-8(ASCII): 0
 		{"123", true},
 		{"0123", true},
 		{"-00123", true},
@@ -108,6 +277,22 @@ func TestIsNumeric(t *testing.T) {
 		{"123.123", false},
 		{" ", false},
 		{".", false},
+		{"12𐅪3", false},
+		{"-1¾", false},
+		{"1¾", false},
+		{"〥〩", false},
+		{"모자", false},
+		{"ix", false},
+		{"۳۵۶۰", false},
+		{"1--", false},
+		{"1-1", false},
+		{"-", false},
+		{"--", false},
+		{"1++", false},
+		{"1+1", false},
+		{"+", false},
+		{"++", false},
+		{"+1", true},
 	}
 	for _, test := range tests {
 		actual := IsNumeric(test.param)
@@ -124,15 +309,45 @@ func TestIsUTFNumeric(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"\n", false},
+		{"\r", false},
+		{"Ⅸ", true},
 		{"", true},
+		{"   fooo   ", false},
+		{"abc!!!", false},
+		{"abc1", false},
+		{"abc〩", false},
+		{"abc", false},
+		{"소주", false},
+		{"ABC", false},
+		{"FoObAr", false},
+		{"소aBC", false},
+		{"소", false},
+		{"달기&Co.", false},
+		{"〩Hours", false},
+		{"\ufff0", false},
+		{"\u0070", false}, //UTF-8(ASCII): p
+		{"\u0026", false}, //UTF-8(ASCII): &
+		{"\u0030", true},  //UTF-8(ASCII): 0
+		{"123", true},
+		{"0123", true},
+		{"-00123", true},
+		{"0", true},
+		{"-0", true},
+		{"123.123", false},
+		{" ", false},
+		{".", false},
 		{"12𐅪3", true},
 		{"-1¾", true},
-		{"Ⅸ", true},
+		{"1¾", true},
 		{"〥〩", true},
 		{"모자", false},
 		{"ix", false},
-		{" ", false},
-		{".", false},
+		{"۳۵۶۰", true},
+		{"1++", false},
+		{"1+1", false},
+		{"+", false},
+		{"++", false},
 	}
 	for _, test := range tests {
 		actual := IsUTFNumeric(test.param)
@@ -149,16 +364,50 @@ func TestIsUTFDigit(t *testing.T) {
 		param    string
 		expected bool
 	}{
+
+		{"\n", false},
+		{"\r", false},
+		{"Ⅸ", false},
+		{"", true},
+		{"   fooo   ", false},
+		{"abc!!!", false},
+		{"abc1", false},
+		{"abc〩", false},
+		{"abc", false},
+		{"소주", false},
+		{"ABC", false},
+		{"FoObAr", false},
+		{"소aBC", false},
+		{"소", false},
+		{"달기&Co.", false},
+		{"〩Hours", false},
+		{"\ufff0", false},
+		{"\u0070", false}, //UTF-8(ASCII): p
+		{"\u0026", false}, //UTF-8(ASCII): &
+		{"\u0030", true},  //UTF-8(ASCII): 0
+		{"123", true},
+		{"0123", true},
+		{"-00123", true},
+		{"0", true},
+		{"-0", true},
+		{"123.123", false},
+		{" ", false},
+		{".", false},
 		{"12𐅪3", false},
 		{"1483920", true},
 		{"", true},
 		{"۳۵۶۰", true},
 		{"-29", true},
+		{"-1¾", false},
+		{"1¾", false},
 		{"〥〩", false},
 		{"모자", false},
 		{"ix", false},
-		{" ", false},
-		{".", false},
+		{"۳۵۶۰", true},
+		{"1++", false},
+		{"1+1", false},
+		{"+", false},
+		{"++", false},
 	}
 	for _, test := range tests {
 		actual := IsUTFDigit(test.param)
@@ -178,9 +427,19 @@ func TestIsLowerCase(t *testing.T) {
 		{"", true},
 		{"abc123", true},
 		{"abc", true},
+		{"a b c", true},
+		{"abcß", true},
+		{"abcẞ", false},
+		{"ABCẞ", false},
 		{"tr竪s 端ber", true},
 		{"fooBar", false},
 		{"123ABC", false},
+		{"ABC123", false},
+		{"ABC", false},
+		{"S T R", false},
+		{"fooBar", false},
+		{"abacaba123", true},
+
 	}
 	for _, test := range tests {
 		actual := IsLowerCase(test.param)
@@ -198,6 +457,15 @@ func TestIsUpperCase(t *testing.T) {
 		expected bool
 	}{
 		{"", true},
+		{"abc123", false},
+		{"abc", false},
+		{"a b c", false},
+		{"abcß", false},
+		{"abcẞ", false},
+		{"ABCẞ", true},
+		{"tr竪s 端ber", false},
+		{"fooBar", false},
+		{"123ABC", true},
 		{"ABC123", true},
 		{"ABC", true},
 		{"S T R", true},
@@ -219,6 +487,19 @@ func TestIsInt(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"-2147483648", true}, //Signed 32 Bit Min Int
+		{"2147483647", true}, //Signed 32 Bit Max Int
+		{"-2147483649", true}, //Signed 32 Bit Min Int - 1
+		{"2147483648", true}, //Signed 32 Bit Max Int + 1
+		{"4294967295", true}, //Unsigned 32 Bit Max Int
+		{"4294967296", true}, //Unsigned 32 Bit Max Int + 1
+		{"-9223372036854775808", true}, //Signed 64 Bit Min Int
+		{"9223372036854775807", true}, //Signed 64 Bit Max Int
+		{"-9223372036854775809", true}, //Signed 64 Bit Min Int - 1
+		{"9223372036854775808", true}, //Signed 64 Bit Max Int + 1
+		{"18446744073709551615", true}, //Unsigned 64 Bit Max Int
+		{"18446744073709551616", true}, //Unsigned 64 Bit Max Int + 1
+		{"", true},
 		{"123", true},
 		{"0", true},
 		{"-0", true},
@@ -243,6 +524,7 @@ func TestIsEmail(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"", false},
 		{"foo@bar.com", true},
 		{"x@x.x", true},
 		{"foo@bar.com.au", true},
@@ -271,6 +553,7 @@ func TestIsURL(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"", false},
 		{"http://foo.bar#com", true},
 		{"http://foobar.com", true},
 		{"https://foobar.com", true},
@@ -321,6 +604,7 @@ func TestIsRequestURL(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"", false},
 		{"http://foo.bar#com", true},
 		{"http://foobar.com", true},
 		{"https://foobar.com", true},
@@ -370,6 +654,7 @@ func TestIsRequestURI(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"", false},
 		{"http://foo.bar#com", true},
 		{"http://foobar.com", true},
 		{"https://foobar.com", true},
@@ -386,7 +671,6 @@ func TestIsRequestURI(t *testing.T) {
 		{"http://foobar.com/?foo=bar#baz=qux", true},
 		{"http://foobar.com?foo=bar", true},
 		{"http://www.xn--froschgrn-x9a.net/", true},
-		{"", false},
 		{"xyz://foobar.com", true},
 		{"invalid.", false},
 		{".com", false},
@@ -423,6 +707,9 @@ func TestIsFloat(t *testing.T) {
 		{"  ", false},
 		{"-.123", false},
 		{"abacaba", false},
+		{"1f", false},
+		{"-1f", false},
+		{"+1f", false},
 		{"123", true},
 		{"123.", true},
 		{"123.123", true},
@@ -430,9 +717,11 @@ func TestIsFloat(t *testing.T) {
 		{"+123.123", true},
 		{"0.123", true},
 		{"-0.123", true},
+		{"+0.123", true},
 		{".0", true},
 		{"01.123", true},
 		{"-0.22250738585072011e-307", true},
+		{"+0.22250738585072011e-307", true},
 	}
 	for _, test := range tests {
 		actual := IsFloat(test.param)
@@ -470,6 +759,7 @@ func TestIsHexcolor(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"", false},
 		{"#ff", false},
 		{"fff0", false},
 		{"#ff12FG", false},
@@ -492,6 +782,7 @@ func TestIsRGBcolor(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"", false},
 		{"rgb(0,31,255)", true},
 		{"rgb(1,349,275)", false},
 		{"rgb(01,31,255)", false},
@@ -632,6 +923,7 @@ func TestIsASCII(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"", true},
 		{"ｆｏｏbar", false},
 		{"ｘｙｚ０９８", false},
 		{"１２３456", false},
@@ -657,6 +949,7 @@ func TestIsFullWidth(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"", true},
 		{"abc", false},
 		{"abc123", false},
 		{"!\"#$%&()<>/+=-_? ~^|.,@`{}[]", false},
@@ -681,6 +974,7 @@ func TestIsHalfWidth(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"", true},
 		{"あいうえお", false},
 		{"００１１", false},
 		{"!\"#$%&()<>/+=-_? ~^|.,@`{}[]", true},
@@ -704,6 +998,7 @@ func TestIsVariableWidth(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"", true},
 		{"ひらがなカタカナ漢字ABCDE", true},
 		{"３ー０123", true},
 		{"Ｆｶﾀｶﾅﾞﾬ", true},
@@ -813,6 +1108,7 @@ func TestIsCreditCard(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"", false},
 		{"foo", false},
 		{"5398228707871528", false},
 		{"375556917985515", true},
@@ -1023,6 +1319,7 @@ func TestIsIP(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"", false},
 		{"127.0.0.1", true},
 		{"0.0.0.0", true},
 		{"255.255.255.255", true},
@@ -1043,6 +1340,7 @@ func TestIsIP(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"", false},
 		{"127.0.0.1", true},
 		{"0.0.0.0", true},
 		{"255.255.255.255", true},
@@ -1063,6 +1361,7 @@ func TestIsIP(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"", false},
 		{"127.0.0.1", false},
 		{"0.0.0.0", false},
 		{"255.255.255.255", false},
@@ -1107,6 +1406,7 @@ func TestIsLatitude(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"", false},
 		{"-90.000", true},
 		{"+90", true},
 		{"47.1231231", true},
@@ -1128,6 +1428,7 @@ func TestIsLongitude(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"", false},
 		{"-180.000", true},
 		{"180.1", false},
 		{"+73.234", true},
@@ -1149,6 +1450,7 @@ func TestIsSSN(t *testing.T) {
 		param    string
 		expected bool
 	}{
+		{"", false},
 		{"00-90-8787", false},
 		{"66690-76", false},
 		{"191 60 2869", true},
