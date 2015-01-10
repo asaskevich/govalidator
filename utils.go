@@ -177,7 +177,7 @@ func SafeFileName(str string) string {
 // normalized to @gmail.com.
 func NormalizeEmail(str string) (string, error) {
 	if (!IsEmail(str)) {
-		return "", errors.New(fmt.Sprintf("%s is not an email", str))
+		return "", fmt.Errorf("%s is not an email", str)
 	}
 	parts := strings.Split(str, "@")
 	parts[0] = strings.ToLower(parts[0])

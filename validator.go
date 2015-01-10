@@ -42,7 +42,7 @@ func IsRequestURL(rawurl string) bool {
 	return true
 }
 
-// IsRequestURL check if the string rawurl, assuming
+// IsRequestURI check if the string rawurl, assuming
 // it was recieved in an HTTP request, is an
 // absolute URI or an absolute path.
 func IsRequestURI(rawurl string) bool {
@@ -392,8 +392,8 @@ func IsMAC(str string) bool {
 	return err == nil
 }
 
-// IsMongoId check if the string is a valid hex-encoded representation of a MongoDB ObjectId.
-func IsMongoId(str string) bool {
+// IsMongoID check if the string is a valid hex-encoded representation of a MongoDB ObjectId.
+func IsMongoID(str string) bool {
 	return rxHexadecimal.MatchString(str) && (len(str) == 24)
 }
 

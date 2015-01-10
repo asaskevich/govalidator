@@ -1105,7 +1105,7 @@ func TestIsSSN(t *testing.T) {
 	}
 }
 
-func TestIsMongoId(t *testing.T) {
+func TestIsMongoID(t *testing.T) {
 	t.Parallel()
 
 	var tests = []struct {
@@ -1119,7 +1119,7 @@ func TestIsMongoId(t *testing.T) {
 		{"", false},
 	}
 	for _, test := range tests {
-		actual := IsMongoId(test.param)
+		actual := IsMongoID(test.param)
 		if actual != test.expected {
 			t.Errorf("Expected IsSSN(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
