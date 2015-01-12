@@ -110,8 +110,15 @@ func IsUTFNumeric(str string) bool {
 	if IsNull(str) {
 		return true
 	}
+	if strings.IndexAny(str, "+-") > 0 {
+		return false
+	}
+	if len(str) > 1 {
+		str = strings.TrimPrefix(str, "-")
+		str = strings.TrimPrefix(str, "+")
+	}
 	for _, c := range str {
-		if unicode.IsNumber(c) == false && c != '-' { //numbers && minus sign are ok
+		if unicode.IsNumber(c) == false { //numbers && minus sign are ok
 			return false
 		}
 	}
@@ -124,8 +131,15 @@ func IsUTFDigit(str string) bool {
 	if IsNull(str) {
 		return true
 	}
+	if strings.IndexAny(str, "+-") > 0 {
+		return false
+	}
+	if len(str) > 1 {
+		str = strings.TrimPrefix(str, "-")
+		str = strings.TrimPrefix(str, "+")
+	}
 	for _, c := range str {
-		if !unicode.IsDigit(c) && c != '-' { //digits && minus sign are ok
+		if !unicode.IsDigit(c) { //digits && minus sign are ok
 			return false
 		}
 	}
