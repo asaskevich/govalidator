@@ -1404,6 +1404,32 @@ func TestIsMAC(t *testing.T) {
 	}
 }
 
+func TestFilePath(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+		osType int
+	}{
+		{"c:\\path\\file", true, Win},
+		{"c:\\path\\file:exe", false, Unknown},
+		{"C:\\", true, Win},
+		{"c:\\path\\file\\", true, Win},
+		{"c:/path/file/", false, Unknown},
+		{"/path/file/", true, Unix},
+		{"/path/file:SAMPLE/", true, Unix},
+		{"/path/file:/.txt", true, Unix},
+		{"/path", true, Unix},
+	}
+	for _, test := range tests {
+		actual, osType := IsFilePath(test.param)
+		if actual != test.expected || osType != test.osType {
+			t.Errorf("Expected IsFilePath(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
 func TestIsLatitude(t *testing.T) {
 	t.Parallel()
 

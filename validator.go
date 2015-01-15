@@ -367,6 +367,15 @@ func IsBase64(str string) bool {
 	return rxBase64.MatchString(str)
 }
 
+func IsFilePath(str string) (bool, int) {
+	if rxWinPath.MatchString(str) {
+		return true, Win
+	} else if rxUnixPath.MatchString(str) {
+		return true, Unix
+	}
+	return false, Unknown
+}
+
 // IsDataURI checks if a string is base64 encoded data URI such as an image
 func IsDataURI(str string) bool {
 	dataURI := strings.Split(str, ",")

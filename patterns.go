@@ -30,7 +30,16 @@ const (
 	Longitude    string = "^[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$"
 	URL          string = `^((ftp|http|https):\/\/)?(\S+(:\S*)?@)?((([1-9]\d?|1\d\d|2[01]\d|22[0-3])(\.(1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.([0-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|((www\.)?)?(([a-z\x{00a1}-\x{ffff}0-9]+-?-?_?)*[a-z\x{00a1}-\x{ffff}0-9]+)(?:\.([a-z\x{00a1}-\x{ffff}]{2,}))?)|localhost)(:(\d{1,5}))?((\/|\?|#)[^\s]*)?$`
 	SSN          string = `^\d{3}[- ]?\d{2}[- ]?\d{4}$`
+	WinPath      string = `^[a-zA-Z]:\\(?:[^\\/:*?"<>|\r\n]+\\)*[^\\/:*?"<>|\r\n]*$`
+	UnixPath     string = `^((?:\/[a-zA-Z0-9\.\:]+(?:_[a-zA-Z0-9\:\.]+)*(?:\-[\:a-zA-Z0-9\.]+)*)+\/?)$`
 	tagName      string = "valid"
+)
+
+const (
+	// Used by IsFilePath func
+	Unknown = iota
+	Win
+	Unix
 )
 
 var (
@@ -60,4 +69,6 @@ var (
 	rxLongitude    = regexp.MustCompile(Longitude)
 	rxURL          = regexp.MustCompile(URL)
 	rxSSN          = regexp.MustCompile(SSN)
+	rxWinPath      = regexp.MustCompile(WinPath)
+	rxUnixPath      = regexp.MustCompile(UnixPath)
 )
