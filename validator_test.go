@@ -1,6 +1,9 @@
 package govalidator
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestIsAlpha(t *testing.T) {
 	t.Parallel()
@@ -1410,8 +1413,11 @@ func TestFilePath(t *testing.T) {
 	var tests = []struct {
 		param    string
 		expected bool
-		osType int
+		osType   int
 	}{
+		{"c:\\" + strings.Repeat("a", 32767), true, Win}, //See http://msdn.microsoft.com/en-us/library/aa365247(VS.85).aspx#maxpath
+		{"c:\\" + strings.Repeat("a", 32768), false, Win},
+		{"c:\\path\\file (x86)\bar", true, Win},
 		{"c:\\path\\file", true, Win},
 		{"c:\\path\\file:exe", false, Unknown},
 		{"C:\\", true, Win},
