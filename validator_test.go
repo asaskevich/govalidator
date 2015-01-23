@@ -545,6 +545,8 @@ func TestIsEmail(t *testing.T) {
 		{"test|123@m端ller.com", true},
 		{"hans@m端ller.com", true},
 		{"hans.m端ller@test.com", true},
+		{"NathAn.daVIeS@DomaIn.cOM", true},
+		{"NATHAN.DAVIES@DOMAIN.CO.UK", true},
 	}
 	for _, test := range tests {
 		actual := IsEmail(test.param)
