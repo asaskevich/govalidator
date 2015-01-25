@@ -58,6 +58,7 @@ var TagMap = map[string]Validator{
 	"ssn":           IsSSN,
 }
 
+// ISO3166Entry stores country codes
 type ISO3166Entry struct {
 	EnglishShortName string
 	FrenchShortName  string
@@ -66,7 +67,7 @@ type ISO3166Entry struct {
 	Numeric          string
 }
 
-//BASED ON https://www.iso.org/obp/ui/#search/code/ Code Type "Officially Assigned Codes"
+//ISO3166List based on https://www.iso.org/obp/ui/#search/code/ Code Type "Officially Assigned Codes"
 var ISO3166List = []ISO3166Entry{
 	{"Afghanistan", "Afghanistan (l')", "AF", "AFG", "004"},
 	{"Albania", "Albanie (l')", "AL", "ALB", "008"},

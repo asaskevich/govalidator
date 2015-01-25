@@ -35,10 +35,13 @@ const (
 	tagName      string = "valid"
 )
 
+// Used by IsFilePath func
 const (
-	// Used by IsFilePath func
+	// Unknown is unresolved OS type
 	Unknown = iota
+	// Win is Windows type
 	Win
+	// Unix is *nix OS types
 	Unix
 )
 

@@ -367,6 +367,7 @@ func IsBase64(str string) bool {
 	return rxBase64.MatchString(str)
 }
 
+// IsFilePath check is a string is Win or Unix file path and returns it's type.
 func IsFilePath(str string) (bool, int) {
 	if rxWinPath.MatchString(str) {
 		//check windows path limit see:
@@ -390,6 +391,7 @@ func IsDataURI(str string) bool {
 	return IsBase64(dataURI[1])
 }
 
+// IsISO3166Alpha2 checks if a string is valid two-letter country code
 func IsISO3166Alpha2(str string) bool {
 	for _, entry := range ISO3166List {
 		if str == entry.Alpha2Code {
@@ -399,6 +401,7 @@ func IsISO3166Alpha2(str string) bool {
 	return false
 }
 
+// IsISO3166Alpha3 checks if a string is valid three-letter country code
 func IsISO3166Alpha3(str string) bool {
 	for _, entry := range ISO3166List {
 		if str == entry.Alpha3Code {
