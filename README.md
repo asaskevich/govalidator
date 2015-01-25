@@ -31,7 +31,6 @@ import (
 func BlackList(str, chars string) string
 func CamelCaseToUnderscore(str string) string
 func Contains(str, substring string) bool
-func Escape(str string) string
 func GetLine(s string, index int) (string, error)
 func GetLines(s string) []string
 func IsASCII(str string) bool
@@ -43,12 +42,13 @@ func IsCreditCard(str string) bool
 func IsDataURI(str string) bool
 func IsDivisibleBy(str, num string) bool
 func IsEmail(str string) bool
+func IsFilePath(str string) (bool, int)
 func IsFloat(str string) bool
 func IsFullWidth(str string) bool
 func IsHalfWidth(str string) bool
 func IsHexadecimal(str string) bool
 func IsHexcolor(str string) bool
-func IsIP(str string, version int) bool
+func IsIP(str string) bool
 func IsIPv4(str string) bool
 func IsIPv6(str string) bool
 func IsISBN(str string, version int) bool
@@ -62,14 +62,19 @@ func IsLatitude(str string) bool
 func IsLongitude(str string) bool
 func IsLowerCase(str string) bool
 func IsMAC(str string) bool
-func IsMongoId(str string) bool
+func IsMongoID(str string) bool
 func IsMultibyte(str string) bool
 func IsNull(str string) bool
 func IsNumeric(str string) bool
 func IsRGBcolor(str string) bool
-func IsURL(str string) bool
-func IsRequestURL(rawurl string) bool
 func IsRequestURI(rawurl string) bool
+func IsRequestURL(rawurl string) bool
+func IsSSN(str string) bool
+func IsURL(str string) bool
+func IsUTFDigit(str string) bool
+func IsUTFLetter(str string) bool
+func IsUTFLetterNumeric(str string) bool
+func IsUTFNumeric(str string) bool
 func IsUUID(str string) bool
 func IsUUIDv3(str string) bool
 func IsUUIDv4(str string) bool
@@ -93,8 +98,9 @@ func Trim(str, chars string) string
 func UnderscoreToCamelCase(s string) string
 func ValidateStruct(s interface{}) (bool, error)
 func WhiteList(str, chars string) string
+type ISO3166Entry
 type UnsupportedTypeError
-	func (e *UnsupportedTypeError) Error() string
+    func (e *UnsupportedTypeError) Error() string
 type Validator
 ```
 
