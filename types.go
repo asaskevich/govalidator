@@ -19,6 +19,8 @@ type stringValues []reflect.Value
 var TagMap = map[string]Validator{
 	"email":         IsEmail,
 	"url":           IsURL,
+	"requrl":        IsRequestURL,
+	"requri":        IsRequestURI,
 	"alpha":         IsAlpha,
 	"utfletter":     IsUTFLetter,
 	"alphanum":      IsAlphanumeric,
