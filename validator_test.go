@@ -1519,7 +1519,7 @@ func TestIsMongoID(t *testing.T) {
 	for _, test := range tests {
 		actual := IsMongoID(test.param)
 		if actual != test.expected {
-			t.Errorf("Expected IsSSN(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected IsMongoID(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
