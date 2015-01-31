@@ -564,14 +564,26 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 		//for each tag option check the map of validator functions
 		for i := range options {
 			tagOpt := options[i]
+			negate := false
+			//Check wether the tag looks like '!something' or 'something'
+			if len(tagOpt) > 0 && tagOpt[0] == '!' {
+				tagOpt = string(tagOpt[1:])
+				negate = true
+			}
 			if ok := isValidTag(tagOpt); !ok {
 				continue
 			}
 			if validatefunc, ok := TagMap[tagOpt]; ok {
 				if v.Kind() == reflect.String { //TODO:other options/types to string
 					field := fmt.Sprint(v) //make value into string, then validate with regex
-					if result := validatefunc(field); !result {
-						err := fmt.Errorf("value: %s=%s does not validate as %s", t.Name, field, tagOpt)
+					if result := validatefunc(field); !result && !negate || result && negate {
+						var err error
+						if !negate {
+							err = fmt.Errorf("value: %s=%s does not validate as %s", t.Name, field, tagOpt)
+						} else {
+							err = fmt.Errorf("value: %s=%s does validate as %s", t.Name, field, tagOpt)
+						}
+
 						return result, err
 					}
 				}
