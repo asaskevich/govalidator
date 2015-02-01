@@ -1548,6 +1548,39 @@ type PrivateStruct struct {
 	Map          map[string]Address
 }
 
+type NegationStruct struct {
+	NotInt string `valid:"!int"`
+	Int    string `valid:"int"`
+}
+
+func TestValidateNegationStruct(t *testing.T) {
+
+	var tests = []struct {
+		param    NegationStruct
+		expected bool
+	}{
+		{NegationStruct{"a1", "11"}, true},
+		{NegationStruct{"email@email.email", "11"}, true},
+		{NegationStruct{"123456----", "11"}, true},
+		{NegationStruct{"::1", "11"}, true},
+		{NegationStruct{"123.123", "11"}, true},
+		{NegationStruct{"a1", "a1"}, false},
+		{NegationStruct{"11", "a1"}, false},
+		{NegationStruct{"11", "11"}, false},
+	}
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			if err != nil {
+				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+			}
+		}
+
+	}
+
+}
+
 func TestValidateStruct(t *testing.T) {
 	// Valid structure
 	user := &User{"John", "john@yahoo.com", "123G#678", 20, &Address{"Street", "123456"}, []Address{Address{"Street", "123456"}, Address{"Street", "123456"}}}
