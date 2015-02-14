@@ -552,8 +552,9 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 		if options.contains("required") {
 			result := func(field interface{}) bool {
 				//test is underlying type is not: nil, 0, ""
-				return field != nil || field != reflect.Zero(reflect.TypeOf(v)).Interface()
-			}(v)
+				return field != nil && field != reflect.Zero(t.Type).Interface()
+			}(v.Interface())
+			
 			if result == false {
 				err := fmt.Errorf("non zero value required for type %s", t.Name)
 				return result, err
