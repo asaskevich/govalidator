@@ -550,13 +550,11 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 		}
 		options := parseTag(tag)
 		if options.contains("required") {
-			result := func(field interface{}) bool {
-				//test is underlying type is not: nil, 0, ""
-				return field != nil || field != reflect.Zero(reflect.TypeOf(v)).Interface()
-			}(v)
-			if result == false {
+			isNil := v.Interface() == nil
+			isZero := v.Interface() == reflect.Zero(v.Type()).Interface()
+			if isNil || isZero {
 				err := fmt.Errorf("non zero value required for type %s", t.Name)
-				return result, err
+				return false, err
 			}
 		} else if isEmptyValue(v) { //not required and empty is valid
 			return true, nil

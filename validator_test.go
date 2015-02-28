@@ -1593,14 +1593,14 @@ func TestValidateStruct(t *testing.T) {
 	// Not valid
 	user = &User{"John", "john!yahoo.com", "12345678", 20, &Address{"Street", "ABC456D89"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}}
 	result, err = ValidateStruct(user)
-	if result == true {
+	if result != false {
 		t.Log("Case ", 1, ": expected ", false, " when result is ", result)
 		t.Error(err)
 		t.FailNow()
 	}
 	user = &User{"John", "", "12345", 0, &Address{"Street", "123456789"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}}
 	result, err = ValidateStruct(user)
-	if result == true {
+	if result != false {
 		t.Log("Case ", 2, ": expected ", false, " when result is ", result)
 		t.Error(err)
 		t.FailNow()
@@ -1613,13 +1613,13 @@ func TestValidateStruct(t *testing.T) {
 	}
 	user = &User{"John", "john@yahoo.com", "123G#678", 0, &Address{"Street", "123456"}, []Address{}}
 	result, err = ValidateStruct(user)
-	if result != true {
-		t.Log("Case ", 4, ": expected ", true, " when result is ", result)
+	if result != false {
+		t.Log("Case ", 4, ": expected ", false, " when result is ", result)
 		t.Error(err)
 		t.FailNow()
 	}
 	result, err = ValidateStruct("im not a struct")
-	if result == true {
+	if result != false {
 		t.Log("Case ", 5, ": expected ", false, " when result is ", result)
 		t.Error(err)
 		t.FailNow()
