@@ -1575,9 +1575,7 @@ func TestValidateNegationStruct(t *testing.T) {
 				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
 			}
 		}
-
 	}
-
 }
 
 func TestValidateStruct(t *testing.T) {

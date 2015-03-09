@@ -585,7 +585,7 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 						} else {
 							err = fmt.Errorf("value: %s=%s does validate as %s", t.Name, field, tagOpt)
 						}
-						return result, Error{t.Name, err}
+						return false, Error{t.Name, err}
 					}
 				}
 			}
