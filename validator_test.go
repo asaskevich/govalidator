@@ -1554,7 +1554,6 @@ type NegationStruct struct {
 }
 
 func TestValidateNegationStruct(t *testing.T) {
-
 	var tests = []struct {
 		param    NegationStruct
 		expected bool
