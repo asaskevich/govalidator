@@ -557,7 +557,7 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 			isNil := v.Interface() == nil
 			isZero := v.Interface() == reflect.Zero(v.Type()).Interface()
 			if isNil || isZero {
-				err := fmt.Errorf("non zero value required for type %s", t.Name)
+				err := fmt.Errorf("non zero value required")
 				return false, Error{t.Name, err}
 			}
 		} else if isEmptyValue(v) { // not required and empty is valid
@@ -581,9 +581,9 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 					if result := validatefunc(field); !result && !negate || result && negate {
 						var err error
 						if !negate {
-							err = fmt.Errorf("value: %s=%s does not validate as %s", t.Name, field, tagOpt)
+							err = fmt.Errorf("%s does not validate as %s", field, tagOpt)
 						} else {
-							err = fmt.Errorf("value: %s=%s does validate as %s", t.Name, field, tagOpt)
+							err = fmt.Errorf("%s does validate as %s", field, tagOpt)
 						}
 						return false, Error{t.Name, err}
 					}
