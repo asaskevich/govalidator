@@ -471,6 +471,7 @@ func ValidateStruct(s interface{}) (bool, error) {
 	if val.Kind() != reflect.Struct {
 		return false, fmt.Errorf("function only accepts structs; got %T", val)
 	}
+	var errs Errors
 	for i := 0; i < val.NumField(); i++ {
 		valueField := val.Field(i)
 		typeField := val.Type().Field(i)
@@ -479,9 +480,12 @@ func ValidateStruct(s interface{}) (bool, error) {
 		}
 		resultField, err := typeCheck(valueField, typeField)
 		if err != nil {
-			return false, err
+			errs = append(errs, err)
 		}
 		result = result && resultField
+	}
+	if len(errs) > 0 {
+		err = errs
 	}
 	return result, err
 }
@@ -553,17 +557,17 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 			isNil := v.Interface() == nil
 			isZero := v.Interface() == reflect.Zero(v.Type()).Interface()
 			if isNil || isZero {
-				err := fmt.Errorf("non zero value required for type %s", t.Name)
-				return false, err
+				err := fmt.Errorf("non zero value required")
+				return false, Error{t.Name, err}
 			}
-		} else if isEmptyValue(v) { //not required and empty is valid
+		} else if isEmptyValue(v) { // not required and empty is valid
 			return true, nil
 		}
-		//for each tag option check the map of validator functions
+		// for each tag option check the map of validator functions
 		for i := range options {
 			tagOpt := options[i]
 			negate := false
-			//Check wether the tag looks like '!something' or 'something'
+			// Check wether the tag looks like '!something' or 'something'
 			if len(tagOpt) > 0 && tagOpt[0] == '!' {
 				tagOpt = string(tagOpt[1:])
 				negate = true
@@ -572,17 +576,16 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 				continue
 			}
 			if validatefunc, ok := TagMap[tagOpt]; ok {
-				if v.Kind() == reflect.String { //TODO:other options/types to string
-					field := fmt.Sprint(v) //make value into string, then validate with regex
+				if v.Kind() == reflect.String { // TODO: other options/types to string
+					field := fmt.Sprint(v) // make value into string, then validate with regex
 					if result := validatefunc(field); !result && !negate || result && negate {
 						var err error
 						if !negate {
-							err = fmt.Errorf("value: %s=%s does not validate as %s", t.Name, field, tagOpt)
+							err = fmt.Errorf("%s does not validate as %s", field, tagOpt)
 						} else {
-							err = fmt.Errorf("value: %s=%s does validate as %s", t.Name, field, tagOpt)
+							err = fmt.Errorf("%s does validate as %s", field, tagOpt)
 						}
-
-						return result, err
+						return false, Error{t.Name, err}
 					}
 				}
 			}
@@ -592,7 +595,7 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 		if v.Type().Key().Kind() != reflect.String {
 			return false, &UnsupportedTypeError{v.Type()}
 		}
-		//an empty map is not validated, always true
+		// an empty map is not validated, always true
 		if v.IsNil() {
 			return true, nil
 		}
@@ -609,7 +612,7 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 		}
 		return result, nil
 	case reflect.Slice:
-		//an empty slice is not validated, always true
+		// an empty slice is not validated, always true
 		if v.IsNil() {
 			return true, nil
 		}
