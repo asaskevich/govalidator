@@ -40,7 +40,8 @@ func TestToString(t *testing.T) {
 	toString(t, 12.3, "12.3")
 	toString(t, true, "true")
 	toString(t, 1.5 + 10i, "(1.5+10i)")
-	toString(t, struct{ Keys map[int]int }{Keys: map[int]int{1: 2, 3: 4}}, "{map[1:2 3:4]}")
+	// Sprintf function not guarantee that maps with equal keys always will be equal in string  representation
+	//toString(t, struct{ Keys map[int]int }{Keys: map[int]int{1: 2, 3: 4}}, "{map[1:2 3:4]}")
 }
 
 func TestToFloat(t *testing.T) {
