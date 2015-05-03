@@ -20,22 +20,27 @@ func TestToBoolean(t *testing.T) {
 	for i := 0; i < len(tests); i++ {
 		res, _ := ToBoolean(tests[i])
 		if res != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", expected)
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", res)
 			t.FailNow()
 		}
 	}
 }
 
-func TestToString(t *testing.T) {
-	tests := []interface{}{"string", 100, -1.23, []int32{1, 2, 3}, struct{ Keys map[int]int }{Keys: map[int]int{1: 2, 3: 4}}}
-	expected := []string{"\"string\"", "100", "-1.23", "[1,2,3]", ""}
-	for i := 0; i < len(tests); i++ {
-		res, _ := ToString(tests[i])
-		if res != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", expected)
-			t.FailNow()
-		}
+func toString(t *testing.T, test interface{}, expected string) {
+	res := ToString(test)
+	if res != expected {
+		t.Log("Case ToString: expected ", expected, " when result is ", res)
+		t.FailNow()
 	}
+}
+
+func TestToString(t *testing.T) {
+	toString(t, "str123", "str123")
+	toString(t, 123, "123")
+	toString(t, 12.3, "12.3")
+	toString(t, true, "true")
+	toString(t, 1.5 + 10i, "(1.5+10i)")
+	toString(t, struct{ Keys map[int]int }{Keys: map[int]int{1: 2, 3: 4}}, "{map[1:2 3:4]}")
 }
 
 func TestToFloat(t *testing.T) {
@@ -44,7 +49,7 @@ func TestToFloat(t *testing.T) {
 	for i := 0; i < len(tests); i++ {
 		res, _ := ToFloat(tests[i])
 		if res != expected[i] {
-			t.Log("Case ", i, ": expected ", expected[i], " when result is ", expected)
+			t.Log("Case ", i, ": expected ", expected[i], " when result is ", res)
 			t.FailNow()
 		}
 	}
