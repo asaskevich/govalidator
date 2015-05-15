@@ -3,12 +3,22 @@ package govalidator
 import (
 	"strconv"
 	"fmt"
+	"encoding/json"
 )
 
 // ToString convert the input to a string.
 func ToString(obj interface{}) string {
 	res := fmt.Sprintf("%v", obj)
 	return string(res)
+}
+
+// ToJSON convert the input to a valid JSON string
+func ToJSON(obj interface{}) (string, error) {
+	res, err := json.Marshal(obj)
+	if err != nil {
+		res = []byte("")
+	}
+	return string(res), err
 }
 
 // ToFloat convert the input string to a float, or 0.0 if the input is not a float.
