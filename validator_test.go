@@ -952,6 +952,33 @@ func TestIsASCII(t *testing.T) {
 	}
 }
 
+func TestIsPrintableASCII(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"", true},
+		{"ｆｏｏbar", false},
+		{"ｘｙｚ０９８", false},
+		{"１２３456", false},
+		{"ｶﾀｶﾅ", false},
+		{"foobar", true},
+		{"0987654321", true},
+		{"test@example.com", true},
+		{"1234abcDEF", true},
+		{"newline\n", false},
+		{"\x19test\x7F", false},
+	}
+	for _, test := range tests {
+		actual := IsPrintableASCII(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsPrintableASCII(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
 func TestIsFullWidth(t *testing.T) {
 	t.Parallel()
 
