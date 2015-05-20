@@ -338,6 +338,14 @@ func IsASCII(str string) bool {
 	return rxASCII.MatchString(str)
 }
 
+// IsPrintableASCII check if the string contains printable ASCII chars only. Empty string is valid.
+func IsPrintableASCII(str string) bool {
+	if IsNull(str) {
+		return true
+	}
+	return rxPrintableASCII.MatchString(str)
+}
+
 // IsFullWidth check if the string contains any full-width chars. Empty string is valid.
 func IsFullWidth(str string) bool {
 	if IsNull(str) {
