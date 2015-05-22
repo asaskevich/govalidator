@@ -403,3 +403,24 @@ func TestNormalizeEmail(t *testing.T) {
 		}
 	}
 }
+
+func TestTruncate(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param1   string
+		param2   int
+		param3   string
+		expected string
+	}{
+		{`Lorem ipsum dolor sit amet, consectetur adipiscing elit.`, 25, `...`, `Lorem ipsum dolor sit amet...`},
+		{`Measuring programming progress by lines of code is like measuring aircraft building progress by weight.`, 35, ` new born babies!`, `Measuring programming progress by new born babies!`},
+		{`Testestestestestestestestestest testestestestestestestestest`, 7, `...`, `Testestestestestestestestestest...`},
+	}
+	for _, test := range tests {
+		actual := Truncate(test.param1, test.param2, test.param3)
+		if actual != test.expected {
+			t.Errorf("Expected Truncate(%q, %d, %q) to be %v, got %v", test.param1, test.param2, test.param3, test.expected, actual)
+		}
+	}
+}
