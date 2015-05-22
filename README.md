@@ -96,6 +96,7 @@ func ToFloat(str string) (float64, error)
 func ToInt(str string) (int64, error)
 func ToString(obj interface{}) (string, error)
 func Trim(str, chars string) string
+func Truncate(str string, length int, ending string) string
 func UnderscoreToCamelCase(s string) string
 func ValidateStruct(s interface{}) (bool, error)
 func WhiteList(str, chars string) string
