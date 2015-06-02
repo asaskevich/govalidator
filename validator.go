@@ -587,7 +587,8 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 				continue
 			}
 			if validatefunc, ok := TagMap[tagOpt]; ok {
-				if v.Kind() == reflect.String { // TODO: other options/types to string
+				switch v.Kind() {
+				case reflect.String:
 					field := fmt.Sprint(v) // make value into string, then validate with regex
 					if result := validatefunc(field); !result && !negate || result && negate {
 						var err error
@@ -598,6 +599,10 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 						}
 						return false, Error{t.Name, err}
 					}
+				default:
+					//Not Yet Supported Types (Fail here!)
+					err := fmt.Errorf("Validator %s doesn't supported Kind %s", tagOpt, v.Kind())
+					return false, Error{t.Name, err}
 				}
 			}
 		}
