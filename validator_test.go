@@ -1565,6 +1565,15 @@ type User struct {
 	Work     []Address
 }
 
+type UserValid struct {
+	Name     string `valid:"required"`
+	Email    string `valid:"required,email"`
+	Password string `valid:"required"`
+	Age      int    `valid:"required"`
+	Home     *Address
+	Work     []Address
+}
+
 type PrivateStruct struct {
 	privateField string `valid:"required,alpha,d_k"`
 	NonZero      int
@@ -1606,53 +1615,37 @@ func TestValidateNegationStruct(t *testing.T) {
 }
 
 func TestValidateStruct(t *testing.T) {
-	// Valid structure
-	user := &User{"John", "john@yahoo.com", "123G#678", 20, &Address{"Street", "123456"}, []Address{Address{"Street", "123456"}, Address{"Street", "123456"}}}
-	result, err := ValidateStruct(user)
-	if result != true {
-		t.Log("Case ", 0, ": expected ", true, " when result is ", result)
-		t.Error(err)
-		t.FailNow()
+
+	var tests = []struct {
+		param    interface{}
+		expected bool
+	}{
+		{User{"John", "john@yahoo.com", "123G#678", 20, &Address{"Street", "123456"}, []Address{Address{"Street", "123456"}, Address{"Street", "123456"}}}, false},
+		{User{"John", "john!yahoo.com", "12345678", 20, &Address{"Street", "ABC456D89"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}},false},
+		{User{"John", "", "12345", 0, &Address{"Street", "123456789"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}},false},
+		{UserValid{"John", "john@yahoo.com", "123G#678", 20, &Address{"Street", "123456"}, []Address{Address{"Street", "123456"}, Address{"Street", "123456"}}}, true},
+		{UserValid{"John", "john!yahoo.com", "12345678", 20, &Address{"Street", "ABC456D89"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}},false},
+		{UserValid{"John", "", "12345", 0, &Address{"Street", "123456789"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}},false},
+		{nil,true},
+		{User{"John", "john@yahoo.com", "123G#678", 0, &Address{"Street", "123456"}, []Address{}},false},
+		{"im not a struct", false},
 	}
-	// Not valid
-	user = &User{"John", "john!yahoo.com", "12345678", 20, &Address{"Street", "ABC456D89"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}}
-	result, err = ValidateStruct(user)
-	if result != false {
-		t.Log("Case ", 1, ": expected ", false, " when result is ", result)
-		t.Error(err)
-		t.FailNow()
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			if err != nil {
+				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+			}
+		}
 	}
-	user = &User{"John", "", "12345", 0, &Address{"Street", "123456789"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}}
-	result, err = ValidateStruct(user)
-	if result != false {
-		t.Log("Case ", 2, ": expected ", false, " when result is ", result)
-		t.Error(err)
-		t.FailNow()
-	}
-	result, err = ValidateStruct(nil)
-	if result != true {
-		t.Log("Case ", 3, ": expected ", true, " when result is ", result)
-		t.Error(err)
-		t.FailNow()
-	}
-	user = &User{"John", "john@yahoo.com", "123G#678", 0, &Address{"Street", "123456"}, []Address{}}
-	result, err = ValidateStruct(user)
-	if result != false {
-		t.Log("Case ", 4, ": expected ", false, " when result is ", result)
-		t.Error(err)
-		t.FailNow()
-	}
-	result, err = ValidateStruct("im not a struct")
-	if result != false {
-		t.Log("Case ", 5, ": expected ", false, " when result is ", result)
-		t.Error(err)
-		t.FailNow()
-	}
+
+
 
 	TagMap["d_k"] = Validator(func(str string) bool {
 		return str == "d_k"
 	})
-	result, err = ValidateStruct(PrivateStruct{"d_k", 0, []int{1, 2}, []string{"hi", "super"}, [2]Address{Address{"Street", "123456"},
+	result, err := ValidateStruct(PrivateStruct{"d_k", 0, []int{1, 2}, []string{"hi", "super"}, [2]Address{Address{"Street", "123456"},
 		Address{"Street", "123456"}}, Address{"Street", "123456"}, map[string]Address{"address": Address{"Street", "123456"}}})
 	if result != true {
 		t.Log("Case ", 6, ": expected ", true, " when result is ", result)
