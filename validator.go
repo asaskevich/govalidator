@@ -1,5 +1,4 @@
-// Package govalidator is package of string validators and sanitizers.
-// ver. 0.0.1
+// Package govalidator is package of validators and sanitizers for strings, structs and collections.
 package govalidator
 
 import (
