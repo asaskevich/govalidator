@@ -28,11 +28,17 @@ import (
 
 #### List of functions:
 ```go
+func Abs(value float64) float64
 func BlackList(str, chars string) string
 func CamelCaseToUnderscore(str string) string
 func Contains(str, substring string) bool
+func Count(array []interface{}, iterator ConditionIterator) int
+func Each(array []interface{}, iterator Iterator)
+func Filter(array []interface{}, iterator ConditionIterator) []interface{}
+func Find(array []interface{}, iterator ConditionIterator) interface{}
 func GetLine(s string, index int) (string, error)
 func GetLines(s string) []string
+func InRange(value, left, right float64) bool
 func IsASCII(str string) bool
 func IsAlpha(str string) bool
 func IsAlphanumeric(str string) bool
@@ -64,8 +70,13 @@ func IsLowerCase(str string) bool
 func IsMAC(str string) bool
 func IsMongoID(str string) bool
 func IsMultibyte(str string) bool
+func IsNatural(value float64) bool
+func IsNegative(value float64) bool
+func IsNonNegative(value float64) bool
+func IsNonPositive(value float64) bool
 func IsNull(str string) bool
 func IsNumeric(str string) bool
+func IsPositive(value float64) bool
 func IsPrintableASCII(str string) bool
 func IsRGBcolor(str string) bool
 func IsRequestURI(rawurl string) bool
@@ -82,7 +93,9 @@ func IsUUIDv4(str string) bool
 func IsUUIDv5(str string) bool
 func IsUpperCase(str string) bool
 func IsVariableWidth(str string) bool
+func IsWhole(value float64) bool
 func LeftTrim(str, chars string) string
+func Map(array []interface{}, iterator ResultIterator) []interface{}
 func Matches(str, pattern string) bool
 func NormalizeEmail(str string) (string, error)
 func RemoveTags(s string) string
@@ -90,19 +103,28 @@ func ReplacePattern(str, pattern, replace string) string
 func Reverse(s string) string
 func RightTrim(str, chars string) string
 func SafeFileName(str string) string
+func Sign(value float64) float64
 func StripLow(str string, keepNewLines bool) string
 func ToBoolean(str string) (bool, error)
 func ToFloat(str string) (float64, error)
 func ToInt(str string) (int64, error)
-func ToString(obj interface{}) (string, error)
+func ToJSON(obj interface{}) (string, error)
+func ToString(obj interface{}) string
 func Trim(str, chars string) string
 func Truncate(str string, length int, ending string) string
 func UnderscoreToCamelCase(s string) string
 func ValidateStruct(s interface{}) (bool, error)
 func WhiteList(str, chars string) string
+type ConditionIterator
+type Error
+	func (e Error) Error() string
+type Errors
+	func (es Errors) Error() string
 type ISO3166Entry
+type Iterator
+type ResultIterator
 type UnsupportedTypeError
-    func (e *UnsupportedTypeError) Error() string
+	func (e *UnsupportedTypeError) Error() string
 type Validator
 ```
 
