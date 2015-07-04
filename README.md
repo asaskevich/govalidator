@@ -219,6 +219,13 @@ Here is a list of available validators for struct fields (validator - used funct
 "longitude":      IsLongitude,
 "ssn":            IsSSN
 ```
+Validator with parameters
+
+go
+```
+"legnth(min|max)" ByteLength
+```
+
 And here is small example of usage:
 ```go
 type Post struct {
