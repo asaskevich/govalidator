@@ -531,14 +531,15 @@ func IsSSN(str string) bool {
 	return rxSSN.MatchString(str)
 }
 
+// ByteLength check string's length
 func ByteLength(str string, params ...string) bool {
     if len(params) == 2 {
         min, _ := ToInt(params[0])
         max, _ := ToInt(params[1])
         return len(str) >= int(min) && len(str) <= int(max)
-    } else {
-        return false
     }
+
+    return false
 }
 
 // Contains returns whether checks that a comma-separated list of options
@@ -561,10 +562,10 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 
 	tag := t.Tag.Get(tagName)
 
-	// Check if the field should be ignored
-	if tag == "-" || tag == "" {
-		return true, nil
-	}
+    // Check if the field should be ignored
+    if tag == "-" {
+        return true, nil
+    }
 
 	switch v.Kind() {
 	case reflect.Bool,
@@ -572,6 +573,13 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
 		reflect.Float32, reflect.Float64,
 		reflect.String:
+
+        // Check if the field should be ignored
+        if tag == "" {
+            return true, nil
+        }
+
+
 		options := parseTag(tag)
 		if options.contains("required") {
 			isNil := v.Interface() == nil
