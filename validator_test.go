@@ -581,12 +581,15 @@ func TestIsURL(t *testing.T) {
 		{"http://foobar.com/?foo=bar#baz=qux", true},
 		{"http://foobar.com?foo=bar", true},
 		{"http://www.xn--froschgrn-x9a.net/", true},
+		{"http://foobar.com/a-", true},
+		{"http://foobar.پاکستان/", true},
+		{"http://foobar.c_o_m", false},
 		{"", false},
 		{"xyz://foobar.com", false},
 		{"invalid.", false},
 		{".com", false},
 		{"rtmp://foobar.com", false},
-		{"http://www.foo_bar.com/", true},
+		{"http://www.foo_bar.com/", false},
 		{"http://localhost:3000/", true},
 		{"http://foobar.com#baz=qux", true},
 		{"http://foobar.com/t$-_.+!*\\'(),", true},
@@ -1621,13 +1624,13 @@ func TestValidateStruct(t *testing.T) {
 		expected bool
 	}{
 		{User{"John", "john@yahoo.com", "123G#678", 20, &Address{"Street", "123456"}, []Address{Address{"Street", "123456"}, Address{"Street", "123456"}}}, false},
-		{User{"John", "john!yahoo.com", "12345678", 20, &Address{"Street", "ABC456D89"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}},false},
-		{User{"John", "", "12345", 0, &Address{"Street", "123456789"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}},false},
+		{User{"John", "john!yahoo.com", "12345678", 20, &Address{"Street", "ABC456D89"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}}, false},
+		{User{"John", "", "12345", 0, &Address{"Street", "123456789"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}}, false},
 		{UserValid{"John", "john@yahoo.com", "123G#678", 20, &Address{"Street", "123456"}, []Address{Address{"Street", "123456"}, Address{"Street", "123456"}}}, true},
-		{UserValid{"John", "john!yahoo.com", "12345678", 20, &Address{"Street", "ABC456D89"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}},false},
-		{UserValid{"John", "", "12345", 0, &Address{"Street", "123456789"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}},false},
-		{nil,true},
-		{User{"John", "john@yahoo.com", "123G#678", 0, &Address{"Street", "123456"}, []Address{}},false},
+		{UserValid{"John", "john!yahoo.com", "12345678", 20, &Address{"Street", "ABC456D89"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}}, false},
+		{UserValid{"John", "", "12345", 0, &Address{"Street", "123456789"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}}, false},
+		{nil, true},
+		{User{"John", "john@yahoo.com", "123G#678", 0, &Address{"Street", "123456"}, []Address{}}, false},
 		{"im not a struct", false},
 	}
 	for _, test := range tests {
@@ -1639,8 +1642,6 @@ func TestValidateStruct(t *testing.T) {
 			}
 		}
 	}
-
-
 
 	TagMap["d_k"] = Validator(func(str string) bool {
 		return str == "d_k"
