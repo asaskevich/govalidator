@@ -598,6 +598,10 @@ func TestIsURL(t *testing.T) {
 		{"irc://#channel@network", true},
 		{"/abs/test/dir", false},
 		{"./rel/test/dir", false},
+		{"http://foo^bar.org", false},
+		{"http://foo&*bar.org", false},
+		{"http://foo&bar.org", false},
+		{"http://foo bar.org", false},
 	}
 	for _, test := range tests {
 		actual := IsURL(test.param)
