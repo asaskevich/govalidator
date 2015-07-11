@@ -1734,8 +1734,8 @@ func TestErrorByField(t *testing.T) {
 		{"message", ""},
 		{"Message", ""},
 		{"title", ""},
-		{"Title", "Title: My123 does not validate as alpha"},
-		{"AuthorIP", "AuthorIP: 123 does not validate as ipv4"},
+		{"Title", "My123 does not validate as alpha"},
+		{"AuthorIP", "123 does not validate as ipv4"},
 	}
 	post := &Post{"My123", "duck13126", "123"}
 	_, err := ValidateStruct(post)

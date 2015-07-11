@@ -765,6 +765,7 @@ func ErrorByField(e error, field string) string {
 	errorList := strings.Split(errorStr, ";")
 	for _, item := range errorList {
 		if strings.HasPrefix(item, field+": ") {
+			item := strings.TrimPrefix(item, field+": ")
 			return item
 		}
 	}
