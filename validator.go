@@ -540,13 +540,13 @@ func IsSSN(str string) bool {
 
 // ByteLength check string's length
 func ByteLength(str string, params ...string) bool {
-    if len(params) == 2 {
-        min, _ := ToInt(params[0])
-        max, _ := ToInt(params[1])
-        return len(str) >= int(min) && len(str) <= int(max)
-    }
+	if len(params) == 2 {
+		min, _ := ToInt(params[0])
+		max, _ := ToInt(params[1])
+		return len(str) >= int(min) && len(str) <= int(max)
+	}
 
-    return false
+	return false
 }
 
 // Contains returns whether checks that a comma-separated list of options
@@ -569,10 +569,10 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 
 	tag := t.Tag.Get(tagName)
 
-    // Check if the field should be ignored
-    if tag == "-" {
-        return true, nil
-    }
+	// Check if the field should be ignored
+	if tag == "-" {
+		return true, nil
+	}
 
 	switch v.Kind() {
 	case reflect.Bool,
@@ -581,11 +581,10 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 		reflect.Float32, reflect.Float64,
 		reflect.String:
 
-        // Check if the field should be ignored
-        if tag == "" {
-            return true, nil
-        }
-
+		// Check if the field should be ignored
+		if tag == "" {
+			return true, nil
+		}
 
 		options := parseTag(tag)
 		if options.contains("required") {
@@ -612,31 +611,31 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 				return false, Error{t.Name, err}
 			}
 
-            // Check for param validators
-            for key, value := range ParamTagRegexMap {
-                ps := value.FindStringSubmatch(tagOpt)
-                if len(ps) > 0 {
-                    if validatefunc, ok := ParamTagMap[key]; ok {
-                        switch v.Kind() {
-                        case reflect.String:
-                            field := fmt.Sprint(v) // make value into string, then validate with regex
-                            if result := validatefunc(field, ps[1:]...); !result && !negate || result && negate {
-                                var err error
-                                if !negate {
-                                    err = fmt.Errorf("%s does not validate as %s", field, tagOpt)
-                                } else {
-                                    err = fmt.Errorf("%s does validate as %s", field, tagOpt)
-                                }
-                                return false, Error{t.Name, err}
-                            }
-                        default:
-                            //Not Yet Supported Types (Fail here!)
-                            err := fmt.Errorf("Validator %s doesn't supported Kind %s", tagOpt, v.Kind())
-                            return false, Error{t.Name, err}
-                        }
-                    }
-                }
-            }
+			// Check for param validators
+			for key, value := range ParamTagRegexMap {
+				ps := value.FindStringSubmatch(tagOpt)
+				if len(ps) > 0 {
+					if validatefunc, ok := ParamTagMap[key]; ok {
+						switch v.Kind() {
+						case reflect.String:
+							field := fmt.Sprint(v) // make value into string, then validate with regex
+							if result := validatefunc(field, ps[1:]...); !result && !negate || result && negate {
+								var err error
+								if !negate {
+									err = fmt.Errorf("%s does not validate as %s", field, tagOpt)
+								} else {
+									err = fmt.Errorf("%s does validate as %s", field, tagOpt)
+								}
+								return false, Error{t.Name, err}
+							}
+						default:
+							//Not Yet Supported Types (Fail here!)
+							err := fmt.Errorf("Validator %s doesn't supported Kind %s", tagOpt, v.Kind())
+							return false, Error{t.Name, err}
+						}
+					}
+				}
+			}
 
 			if validatefunc, ok := TagMap[tagOpt]; ok {
 				switch v.Kind() {

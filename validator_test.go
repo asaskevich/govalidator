@@ -610,6 +610,10 @@ func TestIsURL(t *testing.T) {
 		{"http://.foo.com", false},
 		{"http://,foo.com", false},
 		{",foo.com", false},
+		// according to issues #62 #66
+		{"https://pbs.twimg.com/profile_images/560826135676588032/j8fWrmYY_normal.jpeg", true},
+		{"http://me.example.com", true},
+		{"http://www.me.example.com", true},
 	}
 	for _, test := range tests {
 		actual := IsURL(test.param)
@@ -1564,25 +1568,25 @@ func TestIsMongoID(t *testing.T) {
 }
 
 func TestByteLegnth(t *testing.T) {
-    t.Parallel()
+	t.Parallel()
 
-    var tests = []struct {
-        value string
-        min string
-        max string
-        expected bool
-    }{
-        {"123456", "0", "100", true},
-        {"1239999", "0", "0", false},
-        {"1239asdfasf99", "100", "200", false},
-        {"1239999asdff29", "10", "30", true},
-    }
-    for _, test := range tests {
-        actual := ByteLength(test.value, test.min, test.max)
-        if actual != test.expected {
+	var tests = []struct {
+		value    string
+		min      string
+		max      string
+		expected bool
+	}{
+		{"123456", "0", "100", true},
+		{"1239999", "0", "0", false},
+		{"1239asdfasf99", "100", "200", false},
+		{"1239999asdff29", "10", "30", true},
+	}
+	for _, test := range tests {
+		actual := ByteLength(test.value, test.min, test.max)
+		if actual != test.expected {
 			t.Errorf("Expected ByteLength(%s, %s, %s) to be %v, got %v", test.value, test.min, test.max, test.expected, actual)
-        }
-    }
+		}
+	}
 }
 
 type Address struct {
@@ -1624,7 +1628,7 @@ type NegationStruct struct {
 }
 
 type LengthStruct struct {
-    Length string `valid:"length(10|20)"`
+	Length string `valid:"length(10|20)"`
 }
 
 func TestValidateNegationStruct(t *testing.T) {
@@ -1653,24 +1657,24 @@ func TestValidateNegationStruct(t *testing.T) {
 }
 
 func TestLengthStruct(t *testing.T) {
-    var tests = []struct {
-        param interface{}
-        expected bool
-    }{
-        {LengthStruct{"11111"}, false},
-        {LengthStruct{"11111111111111111110000000000000000"}, false},
-        {LengthStruct{"11dfffdf0099"}, true},
-    }
+	var tests = []struct {
+		param    interface{}
+		expected bool
+	}{
+		{LengthStruct{"11111"}, false},
+		{LengthStruct{"11111111111111111110000000000000000"}, false},
+		{LengthStruct{"11dfffdf0099"}, true},
+	}
 
-    for _, test := range tests {
-        actual, err := ValidateStruct(test.param)
-        if actual != test.expected {
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+		if actual != test.expected {
 			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
 				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
 			}
-        }
-    }
+		}
+	}
 }
 
 func TestValidateStruct(t *testing.T) {
@@ -1680,13 +1684,13 @@ func TestValidateStruct(t *testing.T) {
 		expected bool
 	}{
 		{User{"John", "john@yahoo.com", "123G#678", 20, &Address{"Street", "123456"}, []Address{Address{"Street", "123456"}, Address{"Street", "123456"}}}, false},
-		{User{"John", "john!yahoo.com", "12345678", 20, &Address{"Street", "ABC456D89"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}},false},
-		{User{"John", "", "12345", 0, &Address{"Street", "123456789"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}},false},
+		{User{"John", "john!yahoo.com", "12345678", 20, &Address{"Street", "ABC456D89"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}}, false},
+		{User{"John", "", "12345", 0, &Address{"Street", "123456789"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}}, false},
 		{UserValid{"John", "john@yahoo.com", "123G#678", 20, &Address{"Street", "123456"}, []Address{Address{"Street", "123456"}, Address{"Street", "123456"}}}, true},
-		{UserValid{"John", "john!yahoo.com", "12345678", 20, &Address{"Street", "ABC456D89"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}},false},
-		{UserValid{"John", "", "12345", 0, &Address{"Street", "123456789"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}},false},
-		{nil,true},
-		{User{"John", "john@yahoo.com", "123G#678", 0, &Address{"Street", "123456"}, []Address{}},false},
+		{UserValid{"John", "john!yahoo.com", "12345678", 20, &Address{"Street", "ABC456D89"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}}, false},
+		{UserValid{"John", "", "12345", 0, &Address{"Street", "123456789"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}}, false},
+		{nil, true},
+		{User{"John", "john@yahoo.com", "123G#678", 0, &Address{"Street", "123456"}, []Address{}}, false},
 		{"im not a struct", false},
 	}
 	for _, test := range tests {
@@ -1698,8 +1702,6 @@ func TestValidateStruct(t *testing.T) {
 			}
 		}
 	}
-
-
 
 	TagMap["d_k"] = Validator(func(str string) bool {
 		return str == "d_k"

@@ -28,7 +28,7 @@ func Map(array []interface{}, iterator ResultIterator) []interface{} {
 // Find iterates over the slice and apply ConditionIterator to every item. Returns first item that meet ConditionIterator or nil otherwise.
 func Find(array []interface{}, iterator ConditionIterator) interface{} {
 	for index, data := range array {
-		if (iterator(data, index)) {
+		if iterator(data, index) {
 			return data
 		}
 	}
@@ -39,7 +39,7 @@ func Find(array []interface{}, iterator ConditionIterator) interface{} {
 func Filter(array []interface{}, iterator ConditionIterator) []interface{} {
 	var result []interface{} = make([]interface{}, 0)
 	for index, data := range array {
-		if (iterator(data, index)) {
+		if iterator(data, index) {
 			result = append(result, data)
 		}
 	}
@@ -50,12 +50,9 @@ func Filter(array []interface{}, iterator ConditionIterator) []interface{} {
 func Count(array []interface{}, iterator ConditionIterator) int {
 	count := 0
 	for index, data := range array {
-		if (iterator(data, index)) {
-			count = count+1
+		if iterator(data, index) {
+			count = count + 1
 		}
 	}
 	return count
 }
-
-
-

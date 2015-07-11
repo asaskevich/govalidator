@@ -48,7 +48,7 @@ func InRange(value, left, right float64) bool {
 
 // IsWhole returns true if value is whole number
 func IsWhole(value float64) bool {
-	return Abs(math.Remainder(value, 1)) == 0;
+	return Abs(math.Remainder(value, 1)) == 0
 }
 
 // IsNatural returns true if value is natural number (positive and whole)

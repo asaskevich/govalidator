@@ -1,9 +1,9 @@
 package govalidator
 
 import (
-	"strconv"
-	"fmt"
 	"encoding/json"
+	"fmt"
+	"strconv"
 )
 
 // ToString convert the input to a string.

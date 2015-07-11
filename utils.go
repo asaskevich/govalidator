@@ -2,12 +2,12 @@ package govalidator
 
 import (
 	"errors"
+	"fmt"
 	"html"
 	"path"
 	"regexp"
 	"strings"
 	"unicode"
-	"fmt"
 )
 
 // Contains check if the string contains the substring.
@@ -176,15 +176,15 @@ func SafeFileName(str string) string {
 // are stripped of tags (e.g. some.one+tag@gmail.com becomes someone@gmail.com) and all @googlemail.com addresses are
 // normalized to @gmail.com.
 func NormalizeEmail(str string) (string, error) {
-	if (!IsEmail(str)) {
+	if !IsEmail(str) {
 		return "", fmt.Errorf("%s is not an email", str)
 	}
 	parts := strings.Split(str, "@")
 	parts[0] = strings.ToLower(parts[0])
 	parts[1] = strings.ToLower(parts[1])
-	if (parts[1] == "gmail.com" || parts[1] == "googlemail.com") {
+	if parts[1] == "gmail.com" || parts[1] == "googlemail.com" {
 		parts[1] = "gmail.com"
-		parts[0] = strings.Split(ReplacePattern(parts[0], `\.`, ""), "+")[0];
+		parts[0] = strings.Split(ReplacePattern(parts[0], `\.`, ""), "+")[0]
 	}
 	return strings.Join(parts, "@"), nil
 }
