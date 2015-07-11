@@ -30,10 +30,12 @@ import (
 ```go
 func Abs(value float64) float64
 func BlackList(str, chars string) string
+func ByteLength(str string, params ...string) bool
 func CamelCaseToUnderscore(str string) string
 func Contains(str, substring string) bool
 func Count(array []interface{}, iterator ConditionIterator) int
 func Each(array []interface{}, iterator Iterator)
+func ErrorByField(e error, field string) string
 func Filter(array []interface{}, iterator ConditionIterator) []interface{}
 func Find(array []interface{}, iterator ConditionIterator) interface{}
 func GetLine(s string, index int) (string, error)
@@ -117,14 +119,15 @@ func ValidateStruct(s interface{}) (bool, error)
 func WhiteList(str, chars string) string
 type ConditionIterator
 type Error
-	func (e Error) Error() string
+func (e Error) Error() string
 type Errors
-	func (es Errors) Error() string
+func (es Errors) Error() string
 type ISO3166Entry
 type Iterator
+type ParamValidator
 type ResultIterator
 type UnsupportedTypeError
-	func (e *UnsupportedTypeError) Error() string
+func (e *UnsupportedTypeError) Error() string
 type Validator
 ```
 
@@ -269,7 +272,9 @@ If you do have a contribution for the package feel free to put up a Pull Request
 * [Steven Wilkin](https://github.com/stevenwilkin)
 * [Deiwin Sarjas](https://github.com/deiwin)
 * [Noah Shibley](https://github.com/slugmobile)
-
+* [Nathan Davies](https://github.com/nathj07)
+* [Matt Sanford](https://github.com/mzsanford)
+* [Simon ccl1115](https://github.com/ccl1115)
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/asaskevich/govalidator/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
