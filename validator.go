@@ -753,6 +753,24 @@ func isEmptyValue(v reflect.Value) bool {
 	return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
 }
 
+// ErrorByField returns error for specified field of the struct
+// validated by ValidateStruct or empty string
+// if there are no errors/this field doesn't exists or hasn't errors
+func ErrorByField(e error, field string) string {
+	if e == nil {
+		return ""
+	}
+	// prototype for ValidateStruct
+	errorStr := e.Error()
+	errorList := strings.Split(errorStr, ";")
+	for _, item := range errorList {
+		if strings.HasPrefix(item, field+": ") {
+			return item
+		}
+	}
+	return ""
+}
+
 // Error returns string equivalent for reflect.Type
 func (e *UnsupportedTypeError) Error() string {
 	return "validator: unsupported type: " + e.Type.String()

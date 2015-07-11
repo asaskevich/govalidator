@@ -1634,6 +1634,12 @@ type LengthStruct struct {
 	Length string `valid:"length(10|20)"`
 }
 
+type Post struct {
+	Title    string `valid:"alpha,required"`
+	Message  string `valid:"ascii"`
+	AuthorIP string `valid:"ipv4"`
+}
+
 func TestValidateNegationStruct(t *testing.T) {
 	var tests = []struct {
 		param    NegationStruct
@@ -1715,6 +1721,30 @@ func TestValidateStruct(t *testing.T) {
 		t.Log("Case ", 6, ": expected ", true, " when result is ", result)
 		t.Error(err)
 		t.FailNow()
+	}
+}
+
+func TestErrorByField(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected string
+	}{
+		{"message", ""},
+		{"Message", ""},
+		{"title", ""},
+		{"Title", "Title: My123 does not validate as alpha"},
+		{"AuthorIP", "AuthorIP: 123 does not validate as ipv4"},
+	}
+	post := &Post{"My123", "duck13126", "123"}
+	_, err := ValidateStruct(post)
+
+	for _, test := range tests {
+		actual := ErrorByField(err, test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ErrorByField(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
 	}
 }
 
