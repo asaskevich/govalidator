@@ -1551,6 +1551,28 @@ func TestIsMongoID(t *testing.T) {
 	}
 }
 
+func TestByteLegnth(t *testing.T) {
+    t.Parallel()
+
+    var tests = []struct {
+        value string
+        min string
+        max string
+        expected bool
+    }{
+        {"123456", "0", "100", true},
+        {"1239999", "0", "0", false},
+        {"1239asdfasf99", "100", "200", false},
+        {"1239999asdff29", "10", "30", true},
+    }
+    for _, test := range tests {
+        actual := ByteLength(test.value, test.min, test.max)
+        if actual != test.expected {
+			t.Errorf("Expected ByteLength(%s, %s, %s) to be %v, got %v", test.value, test.min, test.max, test.expected, actual)
+        }
+    }
+}
+
 type Address struct {
 	Street string `valid:"-"`
 	Zip    string `json:"zip" valid:"numeric,required"`
@@ -1589,6 +1611,10 @@ type NegationStruct struct {
 	Int    string `valid:"int"`
 }
 
+type LengthStruct struct {
+    Length string `valid:"length(10|20)"`
+}
+
 func TestValidateNegationStruct(t *testing.T) {
 	var tests = []struct {
 		param    NegationStruct
@@ -1612,6 +1638,27 @@ func TestValidateNegationStruct(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestLengthStruct(t *testing.T) {
+    var tests = []struct {
+        param interface{}
+        expected bool
+    }{
+        {LengthStruct{"11111"}, false},
+        {LengthStruct{"11111111111111111110000000000000000"}, false},
+        {LengthStruct{"11dfffdf0099"}, true},
+    }
+
+    for _, test := range tests {
+        actual, err := ValidateStruct(test.param)
+        if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			if err != nil {
+				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+			}
+        }
+    }
 }
 
 func TestValidateStruct(t *testing.T) {

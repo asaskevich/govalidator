@@ -1,10 +1,17 @@
 package govalidator
 
-import "reflect"
+import (
+    "reflect"
+    "regexp"
+)
 
 // Validator is a wrapper for validator functions, that returns bool and accepts string.
 type Validator func(str string) bool
+
+// ParamValidator is a wrapper for validator functions that accepts additional parameters.
+type ParamValidator func(str string, params ...string) bool
 type tagOptions []string
+
 
 // UnsupportedTypeError is a wrapper for reflect.Type
 type UnsupportedTypeError struct {
@@ -14,6 +21,15 @@ type UnsupportedTypeError struct {
 // stringValues is a slice of reflect.Value holding *reflect.StringValue.
 // It implements the methods to sort by string.
 type stringValues []reflect.Value
+
+// ParamTagMap is a map of functions accept variants parameters
+var ParamTagMap = map[string]ParamValidator{
+    "length": ByteLength,
+}
+
+var ParamTagRegexMap = map[string]*regexp.Regexp {
+    "length": regexp.MustCompile("^length\\((\\d+)\\|(\\d+)\\)$"),
+}
 
 // TagMap is a map of functions, that can be used as tags for ValidateStruct function.
 var TagMap = map[string]Validator{
