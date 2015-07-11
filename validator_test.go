@@ -573,6 +573,7 @@ func TestIsURL(t *testing.T) {
 		{"http://foobar.org/", true},
 		{"http://foobar.org:8080/", true},
 		{"ftp://foobar.ru/", true},
+		{"ftp.foo.bar", true},
 		{"http://user:pass@www.foobar.com/", true},
 		{"http://user:pass@www.foobar.com/path/file", true},
 		{"http://127.0.0.1/", true},
@@ -598,6 +599,17 @@ func TestIsURL(t *testing.T) {
 		{"irc://#channel@network", true},
 		{"/abs/test/dir", false},
 		{"./rel/test/dir", false},
+		{"http://foo^bar.org", false},
+		{"http://foo&*bar.org", false},
+		{"http://foo&bar.org", false},
+		{"http://foo bar.org", false},
+		{"http://foo.bar.org", true},
+		{"http://www.foo.bar.org", true},
+		{"http://www.foo.co.uk", true},
+		{"foo", false},
+		{"http://.foo.com", false},
+		{"http://,foo.com", false},
+		{",foo.com", false},
 	}
 	for _, test := range tests {
 		actual := IsURL(test.param)
