@@ -1724,6 +1724,67 @@ func TestValidateStruct(t *testing.T) {
 	}
 }
 
+func TestRequired(t *testing.T) {
+
+	testString := "foobar"
+	var tests = []struct {
+		param    interface{}
+		expected bool
+	}{
+		{
+			struct {
+				Pointer *string `valid:"required"`
+			}{},
+			false,
+		},
+		{
+			struct {
+				Pointer *string `valid:"required"`
+			}{
+				Pointer: &testString,
+			},
+			true,
+		},
+		{
+			struct {
+				Addr Address `valid:"required"`
+			}{},
+			false,
+		},
+		{
+			struct {
+				Addr Address `valid:"required"`
+			}{
+				Addr: Address{"", "123"},
+			},
+			true,
+		},
+		{
+			struct {
+				Pointer *Address `valid:"required"`
+			}{},
+			false,
+		},
+		{
+			struct {
+				Pointer *Address `valid:"required"`
+			}{
+				Pointer: &Address{"", "123"},
+			},
+			true,
+		},
+	}
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			if err != nil {
+				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+			}
+		}
+	}
+}
+
 func TestErrorByField(t *testing.T) {
 	t.Parallel()
 

@@ -562,6 +562,16 @@ func (opts tagOptions) contains(optionName string) bool {
 	return false
 }
 
+func checkRequired(v reflect.Value, t reflect.StructField, options tagOptions) (bool, error) {
+	if options.contains("required") {
+		err := fmt.Errorf("non zero value required")
+		return false, Error{t.Name, err}
+	} else {
+		// not required and empty is valid
+		return true, nil
+	}
+}
+
 func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 	if !v.IsValid() {
 		return false, nil
@@ -570,8 +580,15 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 	tag := t.Tag.Get(tagName)
 
 	// Check if the field should be ignored
-	if tag == "-" {
+	switch tag {
+	case "", "-":
 		return true, nil
+	}
+
+	options := parseTag(tag)
+	if isEmptyValue(v) {
+		// an empty value is not validated, check only required
+		return checkRequired(v, t, options)
 	}
 
 	switch v.Kind() {
@@ -580,23 +597,6 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
 		reflect.Float32, reflect.Float64,
 		reflect.String:
-
-		// Check if the field should be ignored
-		if tag == "" {
-			return true, nil
-		}
-
-		options := parseTag(tag)
-		if options.contains("required") {
-			isNil := v.Interface() == nil
-			isZero := v.Interface() == reflect.Zero(v.Type()).Interface()
-			if isNil || isZero {
-				err := fmt.Errorf("non zero value required")
-				return false, Error{t.Name, err}
-			}
-		} else if isEmptyValue(v) { // not required and empty is valid
-			return true, nil
-		}
 		// for each tag option check the map of validator functions
 		for i := range options {
 			tagOpt := options[i]
@@ -662,10 +662,6 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 		if v.Type().Key().Kind() != reflect.String {
 			return false, &UnsupportedTypeError{v.Type()}
 		}
-		// an empty map is not validated, always true
-		if v.IsNil() {
-			return true, nil
-		}
 		var sv stringValues
 		sv = v.MapKeys()
 		sort.Sort(sv)
@@ -679,10 +675,6 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 		}
 		return result, nil
 	case reflect.Slice:
-		// an empty slice is not validated, always true
-		if v.IsNil() {
-			return true, nil
-		}
 		result := true
 		for i := 0; i < v.Len(); i++ {
 			var resultItem bool
@@ -722,11 +714,7 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 		return result, nil
 
 	case reflect.Interface, reflect.Ptr:
-		// If the value is an interface or pointer then encode its element
-		if v.IsNil() {
-			return true, nil
-		}
-		return ValidateStruct(v.Interface())
+		return typeCheck(v.Elem(), t)
 	case reflect.Struct:
 		return ValidateStruct(v.Interface())
 	default:
@@ -736,8 +724,10 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 
 func isEmptyValue(v reflect.Value) bool {
 	switch v.Kind() {
-	case reflect.Array, reflect.Map, reflect.Slice, reflect.String:
+	case reflect.String:
 		return v.Len() == 0
+	case reflect.Array, reflect.Map, reflect.Slice:
+		return v.Len() == 0 || v.IsNil()
 	case reflect.Bool:
 		return !v.Bool()
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
