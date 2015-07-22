@@ -1809,6 +1809,40 @@ func TestErrorByField(t *testing.T) {
 	}
 }
 
+func TestValidateStructPointers(t *testing.T) {
+	// Struct which uses pointers for values
+	type UserWithPointers struct {
+		Name         *string `valid:"-"`
+		Email        *string `valid:"email"`
+		FavoriteFood *string `valid:"length(0|32)"`
+		Nerd         *bool   `valid:"-"`
+	}
+
+	var tests = []struct {
+		param    string
+		expected string
+	}{
+		{"Name", ""},
+		{"Email", "invalid does not validate as email"},
+		{"FavoriteFood", ""},
+		{"Nerd", ""},
+	}
+
+	name  := "Herman"
+	email := "invalid"
+	food  := "Pizza"
+	nerd  := true
+	user := &UserWithPointers{&name, &email, &food, &nerd}
+	_, err := ValidateStruct(user)
+
+	for _, test := range tests {
+		actual := ErrorByField(err, test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ErrorByField(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
 func ExampleValidateStruct() {
 	type Post struct {
 		Title    string `valid:"alphanum,required"`
