@@ -720,13 +720,18 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 			result = result && resultItem
 		}
 		return result, nil
-
-	case reflect.Interface, reflect.Ptr:
-		// If the value is an interface or pointer then encode its element
+	case reflect.Interface:
+		// If the value is an interface then encode its element
 		if v.IsNil() {
 			return true, nil
 		}
 		return ValidateStruct(v.Interface())
+	case reflect.Ptr:
+		// If the value is a pointer then check its element
+		if v.IsNil() {
+			return true, nil
+		}
+		return typeCheck(v.Elem(), t)
 	case reflect.Struct:
 		return ValidateStruct(v.Interface())
 	default:

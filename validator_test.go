@@ -1762,7 +1762,7 @@ func TestValidateStructPointers(t *testing.T) {
 		expected string
 	}{
 		{"Name", ""},
-		{"Email", "Email does not validate as email"},
+		{"Email", "invalid does not validate as email"},
 		{"FavoriteFood", ""},
 		{"Nerd", ""},
 	}
