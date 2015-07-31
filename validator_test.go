@@ -617,6 +617,7 @@ func TestIsURL(t *testing.T) {
 		{"https://pbs.twimg.com/profile_images/560826135676588032/j8fWrmYY_normal.jpeg", true},
 		{"http://me.example.com", true},
 		{"http://www.me.example.com", true},
+		{"https://farm6.static.flickr.com", true},
 	}
 	for _, test := range tests {
 		actual := IsURL(test.param)
@@ -1828,10 +1829,10 @@ func TestValidateStructPointers(t *testing.T) {
 		{"Nerd", ""},
 	}
 
-	name  := "Herman"
+	name := "Herman"
 	email := "invalid"
-	food  := "Pizza"
-	nerd  := true
+	food := "Pizza"
+	nerd := true
 	user := &UserWithPointers{&name, &email, &food, &nerd}
 	_, err := ValidateStruct(user)
 
