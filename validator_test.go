@@ -1571,7 +1571,7 @@ func TestIsMongoID(t *testing.T) {
 	}
 }
 
-func TestByteLegnth(t *testing.T) {
+func TestByteLength(t *testing.T) {
 	t.Parallel()
 
 	var tests = []struct {
@@ -1589,6 +1589,32 @@ func TestByteLegnth(t *testing.T) {
 		actual := ByteLength(test.value, test.min, test.max)
 		if actual != test.expected {
 			t.Errorf("Expected ByteLength(%s, %s, %s) to be %v, got %v", test.value, test.min, test.max, test.expected, actual)
+		}
+	}
+}
+
+func TestStringLength(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		value    string
+		min      string
+		max      string
+		expected bool
+	}{
+		{"123456", "0", "100", true},
+		{"1239999", "0", "0", false},
+		{"1239asdfasf99", "100", "200", false},
+		{"1239999asdff29", "10", "30", true},
+		{"あいうえお", "0", "5", true},
+		{"あいうえおか", "0", "5", false},
+		{"あいうえお", "0", "0", false},
+		{"あいうえ", "5", "10", false},
+	}
+	for _, test := range tests {
+		actual := StringLength(test.value, test.min, test.max)
+		if actual != test.expected {
+			t.Errorf("Expected StringLength(%s, %s, %s) to be %v, got %v", test.value, test.min, test.max, test.expected, actual)
 		}
 	}
 }
@@ -1635,6 +1661,10 @@ type LengthStruct struct {
 	Length string `valid:"length(10|20)"`
 }
 
+type StringLengthStruct struct {
+	Length string `valid:"stringlength(10|20)"`
+}
+
 type Post struct {
 	Title    string `valid:"alpha,required"`
 	Message  string `valid:"ascii"`
@@ -1674,6 +1704,31 @@ func TestLengthStruct(t *testing.T) {
 		{LengthStruct{"11111"}, false},
 		{LengthStruct{"11111111111111111110000000000000000"}, false},
 		{LengthStruct{"11dfffdf0099"}, true},
+	}
+
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			if err != nil {
+				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+			}
+		}
+	}
+}
+
+func TestStringLengthStruct(t *testing.T) {
+	var tests = []struct {
+		param    interface{}
+		expected bool
+	}{
+		{StringLengthStruct{"11111"}, false},
+		{StringLengthStruct{"11111111111111111110000000000000000"}, false},
+		{StringLengthStruct{"11dfffdf0099"}, true},
+		{StringLengthStruct{"あいうえお"}, false},
+		{StringLengthStruct{"あいうえおかきくけこ"}, true},
+		{StringLengthStruct{"あいうえおかきくけこさしすせそたちつてと"}, true},
+		{StringLengthStruct{"あいうえおかきくけこさしすせそたちつてとな"}, false},
 	}
 
 	for _, test := range tests {
