@@ -31,6 +31,7 @@ import (
 func Abs(value float64) float64
 func BlackList(str, chars string) string
 func ByteLength(str string, params ...string) bool
+func StringLength(str string, params ...string) bool
 func CamelCaseToUnderscore(str string) string
 func Contains(str, substring string) bool
 func Count(array []interface{}, iterator ConditionIterator) int
@@ -225,7 +226,7 @@ Here is a list of available validators for struct fields (validator - used funct
 Validators with parameters
 
 ```go
-"legnth(min|max)": ByteLength,
+"length(min|max)": ByteLength,
 ```
 
 And here is small example of usage:

@@ -23,11 +23,13 @@ type stringValues []reflect.Value
 
 // ParamTagMap is a map of functions accept variants parameters
 var ParamTagMap = map[string]ParamValidator{
-	"length": ByteLength,
+	"length":       ByteLength,
+	"stringlength": StringLength,
 }
 
 var ParamTagRegexMap = map[string]*regexp.Regexp{
-	"length": regexp.MustCompile("^length\\((\\d+)\\|(\\d+)\\)$"),
+	"length":       regexp.MustCompile("^length\\((\\d+)\\|(\\d+)\\)$"),
+	"stringlength": regexp.MustCompile("^stringlength\\((\\d+)\\|(\\d+)\\)$"),
 }
 
 // TagMap is a map of functions, that can be used as tags for ValidateStruct function.

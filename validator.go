@@ -11,6 +11,7 @@ import (
 	"sort"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
 // IsEmail check if the string is an email.
@@ -544,6 +545,19 @@ func ByteLength(str string, params ...string) bool {
 		min, _ := ToInt(params[0])
 		max, _ := ToInt(params[1])
 		return len(str) >= int(min) && len(str) <= int(max)
+	}
+
+	return false
+}
+
+// StringLength check string's length (including multi byte strings)
+func StringLength(str string, params ...string) bool {
+
+	if len(params) == 2 {
+		strLength := utf8.RuneCountInString(str)
+		min, _ := ToInt(params[0])
+		max, _ := ToInt(params[1])
+		return strLength >= int(min) && strLength <= int(max)
 	}
 
 	return false
