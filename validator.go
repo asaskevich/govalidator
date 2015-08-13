@@ -14,6 +14,22 @@ import (
 	"unicode/utf8"
 )
 
+var fieldsRequiredByDefault bool
+
+// SetFieldsRequiredByDefault causes validation to fail when struct fields
+// do not include validations or are not explicitly marked as exempt (using `valid:"-"`).
+// This struct definition will fail govalidator.ValidateStruct() (and the field values do not matter):
+//     type exampleStruct struct {
+//         Name  string ``
+//         Email string `valid:"email"`
+// This, however, will only fail when Email is empty or an invalid email address:
+//     type exampleStruct2 struct {
+//         Name  string `valid:"-"`
+//         Email string `valid:"email"`
+func SetFieldsRequiredByDefault(value bool) {
+	fieldsRequiredByDefault = value
+}
+
 // IsEmail check if the string is an email.
 func IsEmail(str string) bool {
 	// TODO uppercase letters are not supported
@@ -580,10 +596,12 @@ func checkRequired(v reflect.Value, t reflect.StructField, options tagOptions) (
 	if options.contains("required") {
 		err := fmt.Errorf("non zero value required")
 		return false, Error{t.Name, err}
-	} else {
-		// not required and empty is valid
-		return true, nil
+	} else if fieldsRequiredByDefault {
+		err := fmt.Errorf("All fields are required to at least have one validation defined")
+		return false, Error{t.Name, err}
 	}
+	// not required and empty is valid
+	return true, nil
 }
 
 func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
@@ -595,7 +613,13 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 
 	// Check if the field should be ignored
 	switch tag {
-	case "", "-":
+	case "":
+		if !fieldsRequiredByDefault {
+			return true, nil
+		}
+		err := fmt.Errorf("All fields are required to at least have one validation defined")
+		return false, Error{t.Name, err}
+	case "-":
 		return true, nil
 	}
 
