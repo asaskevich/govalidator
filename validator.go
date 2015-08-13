@@ -17,7 +17,7 @@ import (
 var fieldsRequiredByDefault bool
 
 // SetFieldsRequiredByDefault causes validation to fail when struct fields
-// do not include validations or are not explicitly marked as exempt (using `valid:"-"`).
+// do not include validations or are not explicitly marked as exempt (using `valid:"-"` or `valid:"email,optional"`).
 // This struct definition will fail govalidator.ValidateStruct() (and the field values do not matter):
 //     type exampleStruct struct {
 //         Name  string ``
@@ -26,6 +26,10 @@ var fieldsRequiredByDefault bool
 //     type exampleStruct2 struct {
 //         Name  string `valid:"-"`
 //         Email string `valid:"email"`
+// Lastly, this will only fail when Email is an invalid email address but not when it's empty:
+//     type exampleStruct2 struct {
+//         Name  string `valid:"-"`
+//         Email string `valid:"email,optional"`
 func SetFieldsRequiredByDefault(value bool) {
 	fieldsRequiredByDefault = value
 }
@@ -596,7 +600,7 @@ func checkRequired(v reflect.Value, t reflect.StructField, options tagOptions) (
 	if options.contains("required") {
 		err := fmt.Errorf("non zero value required")
 		return false, Error{t.Name, err}
-	} else if fieldsRequiredByDefault {
+	} else if fieldsRequiredByDefault && !options.contains("optional") {
 		err := fmt.Errorf("All fields are required to at least have one validation defined")
 		return false, Error{t.Name, err}
 	}
