@@ -779,6 +779,8 @@ func isEmptyValue(v reflect.Value) bool {
 		return v.Len() == 0
 	case reflect.Map, reflect.Slice:
 		return v.Len() == 0 || v.IsNil()
+	case reflect.Array:
+		return v.Len() == 0
 	case reflect.Bool:
 		return !v.Bool()
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
