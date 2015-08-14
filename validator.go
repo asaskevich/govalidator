@@ -672,7 +672,7 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 							}
 						default:
 							//Not Yet Supported Types (Fail here!)
-							err := fmt.Errorf("Validator %s doesn't supported Kind %s", tagOpt, v.Kind())
+							err := fmt.Errorf("Validator %s doesn't support kind %s", tagOpt, v.Kind())
 							return false, Error{t.Name, err}
 						}
 					}
@@ -694,7 +694,7 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 					}
 				default:
 					//Not Yet Supported Types (Fail here!)
-					err := fmt.Errorf("Validator %s doesn't supported Kind %s", tagOpt, v.Kind())
+					err := fmt.Errorf("Validator %s doesn't support kind %s for value %v", tagOpt, v.Kind(), v)
 					return false, Error{t.Name, err}
 				}
 			}

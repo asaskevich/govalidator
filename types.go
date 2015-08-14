@@ -5,7 +5,7 @@ import (
 	"regexp"
 )
 
-// Validator is a wrapper for validator functions, that returns bool and accepts string.
+// Validator is a wrapper for a validator function that returns bool and accepts string.
 type Validator func(str string) bool
 
 // ParamValidator is a wrapper for validator functions that accepts additional parameters.
