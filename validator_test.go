@@ -1754,6 +1754,46 @@ func TestFieldsRequiredByDefaultButExemptOrOptionalStruct(t *testing.T) {
 	SetFieldsRequiredByDefault(false)
 }
 
+type CustomByteArray [6]byte
+
+type StructWithCustomByteArray struct {
+	ID    CustomByteArray `valid:"customByteArrayValidator"`
+	Email string          `valid:"email"`
+}
+
+func TestStructWithCustomByteArray(t *testing.T) {
+	// add our custom byte array validator that fails when the byte array is pristine (all zeroes)
+	CustomTypeTagMap["customByteArrayValidator"] = CustomTypeValidator(func(i interface{}) bool {
+		switch v := i.(type) {
+		case CustomByteArray:
+			for _, e := range v { // check if v is empty, i.e. all zeroes
+				if e != 0 {
+					return true
+				}
+			}
+		}
+		return false
+	})
+	testCustomByteArray := CustomByteArray{'1', '2', '3', '4', '5', '6'}
+	var tests = []struct {
+		param    StructWithCustomByteArray
+		expected bool
+	}{
+		{StructWithCustomByteArray{}, false},
+		{StructWithCustomByteArray{Email: "test@example.com"}, false},
+		{StructWithCustomByteArray{ID: testCustomByteArray, Email: "test@example.com"}, true},
+	}
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			if err != nil {
+				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+			}
+		}
+	}
+}
+
 func TestValidateNegationStruct(t *testing.T) {
 	var tests = []struct {
 		param    NegationStruct

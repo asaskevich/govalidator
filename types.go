@@ -8,6 +8,9 @@ import (
 // Validator is a wrapper for a validator function that returns bool and accepts string.
 type Validator func(str string) bool
 
+// CustomTypeValidator is a wrapper for validator functions that returns bool and accepts any type.
+type CustomTypeValidator func(i interface{}) bool
+
 // ParamValidator is a wrapper for validator functions that accepts additional parameters.
 type ParamValidator func(str string, params ...string) bool
 type tagOptions []string
@@ -31,6 +34,11 @@ var ParamTagRegexMap = map[string]*regexp.Regexp{
 	"length":       regexp.MustCompile("^length\\((\\d+)\\|(\\d+)\\)$"),
 	"stringlength": regexp.MustCompile("^stringlength\\((\\d+)\\|(\\d+)\\)$"),
 }
+
+// CustomTypeTagMap is a map of functions that can be used as tags for ValidateStruct function.
+// Use this to validate compound or custom types that need to be handled as a whole, e.g.
+// `type UUID [16]byte` (this would be handled as an array of bytes).
+var CustomTypeTagMap = map[string]CustomTypeValidator{}
 
 // TagMap is a map of functions, that can be used as tags for ValidateStruct function.
 var TagMap = map[string]Validator{

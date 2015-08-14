@@ -628,6 +628,20 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 	}
 
 	options := parseTag(tag)
+	for i := range options {
+		tagOpt := options[i]
+		if ok := isValidTag(tagOpt); !ok {
+			continue
+		}
+		if validatefunc, ok := CustomTypeTagMap[tagOpt]; ok {
+			options = append(options[:i], options[i+1:]...) // we found our custom validator, so remove it from the options
+			if result := validatefunc(v.Interface()); !result {
+				return false, Error{t.Name, fmt.Errorf("%s does not validate as %s", fmt.Sprint(v), tagOpt)}
+			}
+			return true, nil
+		}
+	}
+
 	if isEmptyValue(v) {
 		// an empty value is not validated, check only required
 		return checkRequired(v, t, options)
@@ -779,8 +793,6 @@ func isEmptyValue(v reflect.Value) bool {
 		return v.Len() == 0
 	case reflect.Map, reflect.Slice:
 		return v.Len() == 0 || v.IsNil()
-	case reflect.Array:
-		return v.Len() == 0
 	case reflect.Bool:
 		return !v.Bool()
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
