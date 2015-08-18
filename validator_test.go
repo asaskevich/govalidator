@@ -1671,6 +1671,89 @@ type Post struct {
 	AuthorIP string `valid:"ipv4"`
 }
 
+type MissingValidationDeclationStruct struct {
+	Name  string ``
+	Email string `valid:"required,email"`
+}
+
+type FieldsRequiredByDefaultButExemptStruct struct {
+	Name  string `valid:"-"`
+	Email string `valid:"email"`
+}
+
+type FieldsRequiredByDefaultButExemptOrOptionalStruct struct {
+	Name  string `valid:"-"`
+	Email string `valid:"optional,email"`
+}
+
+func TestValidateMissingValidationDeclationStruct(t *testing.T) {
+	var tests = []struct {
+		param    MissingValidationDeclationStruct
+		expected bool
+	}{
+		{MissingValidationDeclationStruct{}, false},
+		{MissingValidationDeclationStruct{Name: "TEST", Email: "test@example.com"}, false},
+	}
+	SetFieldsRequiredByDefault(true)
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			if err != nil {
+				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+			}
+		}
+	}
+	SetFieldsRequiredByDefault(false)
+}
+
+func TestFieldsRequiredByDefaultButExemptStruct(t *testing.T) {
+	var tests = []struct {
+		param    FieldsRequiredByDefaultButExemptStruct
+		expected bool
+	}{
+		{FieldsRequiredByDefaultButExemptStruct{}, false},
+		{FieldsRequiredByDefaultButExemptStruct{Name: "TEST"}, false},
+		{FieldsRequiredByDefaultButExemptStruct{Email: ""}, false},
+		{FieldsRequiredByDefaultButExemptStruct{Email: "test@example.com"}, true},
+	}
+	SetFieldsRequiredByDefault(true)
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			if err != nil {
+				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+			}
+		}
+	}
+	SetFieldsRequiredByDefault(false)
+}
+
+func TestFieldsRequiredByDefaultButExemptOrOptionalStruct(t *testing.T) {
+	var tests = []struct {
+		param    FieldsRequiredByDefaultButExemptOrOptionalStruct
+		expected bool
+	}{
+		{FieldsRequiredByDefaultButExemptOrOptionalStruct{}, true},
+		{FieldsRequiredByDefaultButExemptOrOptionalStruct{Name: "TEST"}, true},
+		{FieldsRequiredByDefaultButExemptOrOptionalStruct{Email: ""}, true},
+		{FieldsRequiredByDefaultButExemptOrOptionalStruct{Email: "test@example.com"}, true},
+		{FieldsRequiredByDefaultButExemptOrOptionalStruct{Email: "test@example"}, false},
+	}
+	SetFieldsRequiredByDefault(true)
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			if err != nil {
+				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+			}
+		}
+	}
+	SetFieldsRequiredByDefault(false)
+}
+
 func TestValidateNegationStruct(t *testing.T) {
 	var tests = []struct {
 		param    NegationStruct
