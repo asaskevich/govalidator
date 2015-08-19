@@ -1878,6 +1878,9 @@ func TestErrorsByField(t *testing.T) {
 	post := &Post{Title: "My123", Message: "duck13126", AuthorIP: "123"}
 	_, err := ValidateStruct(post)
 	errs := ErrorsByField(err)
+	if len(errs) != 2 {
+		t.Errorf("There should only be 2 errors but got %v", len(errs))
+	}
 
 	for _, test := range tests {
 		if actual, ok := errs[test.param]; !ok || actual != test.expected {
