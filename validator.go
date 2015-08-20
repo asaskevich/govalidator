@@ -747,9 +747,9 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 
 func isEmptyValue(v reflect.Value) bool {
 	switch v.Kind() {
-	case reflect.String:
+	case reflect.String, reflect.Array:
 		return v.Len() == 0
-	case reflect.Array, reflect.Map, reflect.Slice:
+	case reflect.Map, reflect.Slice:
 		return v.Len() == 0 || v.IsNil()
 	case reflect.Bool:
 		return !v.Bool()

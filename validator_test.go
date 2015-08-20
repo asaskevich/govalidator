@@ -1780,6 +1780,10 @@ func TestValidateStruct(t *testing.T) {
 	}
 }
 
+type testByteArray [8]byte
+type testByteMap map[byte]byte
+type testByteSlice []byte
+
 func TestRequired(t *testing.T) {
 
 	testString := "foobar"
@@ -1828,6 +1832,40 @@ func TestRequired(t *testing.T) {
 				Pointer: &Address{"", "123"},
 			},
 			true,
+		},
+		{
+			struct {
+				TestByteArray testByteArray `valid:"required"`
+			}{},
+			false,
+		},
+		{
+			struct {
+				TestByteArray testByteArray `valid:"required"`
+			}{
+				testByteArray{},
+			},
+			false,
+		},
+		{
+			struct {
+				TestByteArray testByteArray `valid:"required"`
+			}{
+				testByteArray{'1', '2', '3', '4', '5', '6', '7', 'A'},
+			},
+			true,
+		},
+		{
+			struct {
+				TestByteMap testByteMap `valid:"required"`
+			}{},
+			false,
+		},
+		{
+			struct {
+				TestByteSlice testByteSlice `valid:"required"`
+			}{},
+			false,
 		},
 	}
 	for _, test := range tests {
