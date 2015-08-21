@@ -795,22 +795,33 @@ func isEmptyValue(v reflect.Value) bool {
 }
 
 // ErrorByField returns error for specified field of the struct
-// validated by ValidateStruct or empty string
-// if there are no errors/this field doesn't exists or hasn't errors
+// validated by ValidateStruct or empty string if there are no errors
+// or this field doesn't exists or doesn't have any errors.
 func ErrorByField(e error, field string) string {
 	if e == nil {
 		return ""
+	}
+	return ErrorsByField(e)[field]
+}
+
+// ErrorsByField returns map of errors of the struct validated
+// by ValidateStruct or empty map if there are no errors.
+func ErrorsByField(e error) map[string]string {
+	m := make(map[string]string)
+	if e == nil {
+		return m
 	}
 	// prototype for ValidateStruct
 	errorStr := e.Error()
 	errorList := strings.Split(errorStr, ";")
 	for _, item := range errorList {
-		if strings.HasPrefix(item, field+": ") {
-			item := strings.TrimPrefix(item, field+": ")
-			return item
+		if len(item) == 0 {
+			continue
 		}
+		errorByField := strings.Split(item, ": ")
+		m[errorByField[0]] = errorByField[1]
 	}
-	return ""
+	return m
 }
 
 // Error returns string equivalent for reflect.Type

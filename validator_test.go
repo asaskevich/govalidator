@@ -1948,6 +1948,30 @@ func TestErrorByField(t *testing.T) {
 	}
 }
 
+func TestErrorsByField(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected string
+	}{
+		{"Title", "My123 does not validate as alpha"},
+		{"AuthorIP", "123 does not validate as ipv4"},
+	}
+	post := &Post{Title: "My123", Message: "duck13126", AuthorIP: "123"}
+	_, err := ValidateStruct(post)
+	errs := ErrorsByField(err)
+	if len(errs) != 2 {
+		t.Errorf("There should only be 2 errors but got %v", len(errs))
+	}
+
+	for _, test := range tests {
+		if actual, ok := errs[test.param]; !ok || actual != test.expected {
+			t.Errorf("Expected ErrorsByField(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
 func TestValidateStructPointers(t *testing.T) {
 	// Struct which uses pointers for values
 	type UserWithPointers struct {
