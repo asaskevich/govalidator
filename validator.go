@@ -52,7 +52,21 @@ func IsURL(str string) bool {
 	if strings.HasPrefix(u.Host, ".") {
 		return false
 	}
-	return rxURL.MatchString(str)
+	if u.Scheme != "" {
+		u.Scheme = fmt.Sprintf("%s://", u.Scheme)
+	}
+	if u.Host != "" {
+		u.Host = fmt.Sprintf("%s", u.Host)
+	}
+	if u.Path != "" {
+		u.Path = fmt.Sprintf("/%s", u.Path)
+	}
+	if u.RawQuery != "" {
+		u.RawQuery = fmt.Sprintf("?%s", u.RawQuery)
+	}
+	newURL := fmt.Sprintf("%s%s%s%s", u.Scheme, u.Host, u.Path, u.RawQuery)
+	fmt.Println(newURL)
+	return rxURL.MatchString(newURL)
 }
 
 // IsRequestURL check if the string rawurl, assuming
