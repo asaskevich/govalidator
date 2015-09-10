@@ -618,6 +618,11 @@ func TestIsURL(t *testing.T) {
 		{"http://me.example.com", true},
 		{"http://www.me.example.com", true},
 		{"https://farm6.static.flickr.com", true},
+		// According to #87
+		{"http://hyphenated-host-name.example.co.in", true},
+		{"http://cant-end-with-hyphen-.example.com", false},
+		{"http://-cant-start-with-hyphen.example.com", false},
+		{"http://www.domain-can-have-dashes.com", true},
 	}
 	for _, test := range tests {
 		actual := IsURL(test.param)
