@@ -619,6 +619,7 @@ func TestIsURL(t *testing.T) {
 		{"http://www.me.example.com", true},
 		{"https://farm6.static.flickr.com", true},
 		{"https://zh.wikipedia.org/wiki/Wikipedia:%E9%A6%96%E9%A1%B5", true},
+		{"google", false},
 	}
 	for _, test := range tests {
 		actual := IsURL(test.param)

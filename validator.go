@@ -52,7 +52,11 @@ func IsURL(str string) bool {
 	if strings.HasPrefix(u.Host, ".") {
 		return false
 	}
+	if u.Host == "" && (u.Path != "" && !strings.Contains(u.Path, ".")) {
+		return false
+	}
 	return rxURL.MatchString(str)
+
 }
 
 // IsRequestURL check if the string rawurl, assuming
