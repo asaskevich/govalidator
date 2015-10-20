@@ -508,7 +508,7 @@ func ValidateStruct(s interface{}) (bool, error) {
 	}
 	// we only accept structs
 	if val.Kind() != reflect.Struct {
-		return false, fmt.Errorf("function only accepts structs; got %T", val)
+		return false, fmt.Errorf("function only accepts structs; got %s", val.Kind())
 	}
 	var errs Errors
 	for i := 0; i < val.NumField(); i++ {
