@@ -1,6 +1,7 @@
 package govalidator
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -1693,6 +1694,11 @@ type FieldsRequiredByDefaultButExemptOrOptionalStruct struct {
 	Email string `valid:"optional,email"`
 }
 
+type MessageWithSeveralFieldsStruct struct {
+	Title string `valid:"length(1|10)"`
+	Body  string `valid:"length(1|10)"`
+}
+
 func TestValidateMissingValidationDeclationStruct(t *testing.T) {
 	var tests = []struct {
 		param    MissingValidationDeclationStruct
@@ -2048,6 +2054,47 @@ func TestErrorsByField(t *testing.T) {
 	errs := ErrorsByField(err)
 	if len(errs) != 2 {
 		t.Errorf("There should only be 2 errors but got %v", len(errs))
+	}
+
+	for _, test := range tests {
+		if actual, ok := errs[test.param]; !ok || actual != test.expected {
+			t.Errorf("Expected ErrorsByField(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+
+	tests = []struct {
+		param    string
+		expected string
+	}{
+		{"Title", ";:;message;:; does not validate as length(1|10)"},
+		{"Body", ";:;message;:; does not validate as length(1|10)"},
+	}
+
+	message := &MessageWithSeveralFieldsStruct{Title: ";:;message;:;", Body: ";:;message;:;"}
+	_, err = ValidateStruct(message)
+	errs = ErrorsByField(err)
+	if len(errs) != 2 {
+		t.Errorf("There should only be 2 errors but got %v", len(errs))
+	}
+
+	for _, test := range tests {
+		if actual, ok := errs[test.param]; !ok || actual != test.expected {
+			t.Errorf("Expected ErrorsByField(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+
+	tests = []struct {
+		param    string
+		expected string
+	}{
+		{"CustomField", "An error occured"},
+	}
+
+	err = Error{"CustomField", fmt.Errorf("An error occured")}
+	errs = ErrorsByField(err)
+
+	if len(errs) != 1 {
+		t.Errorf("There should only be 1 errors but got %v", len(errs))
 	}
 
 	for _, test := range tests {
