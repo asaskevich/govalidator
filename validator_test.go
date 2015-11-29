@@ -1673,6 +1673,10 @@ type StringLengthStruct struct {
 	Length string `valid:"stringlength(10|20)"`
 }
 
+type StringMatchesStruct struct {
+	StringMatches string `valid:"matches(^[0-9]{3}$)"`
+}
+
 type Post struct {
 	Title    string `valid:"alpha,required"`
 	Message  string `valid:"ascii"`
@@ -1865,6 +1869,27 @@ func TestStringLengthStruct(t *testing.T) {
 		{StringLengthStruct{"あいうえおかきくけこ"}, true},
 		{StringLengthStruct{"あいうえおかきくけこさしすせそたちつてと"}, true},
 		{StringLengthStruct{"あいうえおかきくけこさしすせそたちつてとな"}, false},
+	}
+
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			if err != nil {
+				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+			}
+		}
+	}
+}
+
+func TestStringMatchesStruct(t *testing.T) {
+	var tests = []struct {
+		param    interface{}
+		expected bool
+	}{
+		{StringMatchesStruct{"123"}, true},
+		{StringMatchesStruct{"123456"}, false},
+		{StringMatchesStruct{"123abcd"}, false},
 	}
 
 	for _, test := range tests {
