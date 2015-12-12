@@ -574,6 +574,15 @@ func ByteLength(str string, params ...string) bool {
 	return false
 }
 
+// StringMatches checks if a string matches a given pattern.
+func StringMatches(s string, params ...string) bool {
+	if len(params) == 1 {
+		pattern := params[0]
+		return Matches(s, pattern)
+	}
+	return false
+}
+
 // StringLength check string's length (including multi byte strings)
 func StringLength(str string, params ...string) bool {
 
