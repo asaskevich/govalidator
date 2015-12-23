@@ -1579,6 +1579,42 @@ func TestIsMongoID(t *testing.T) {
 	}
 }
 
+func TestIsSemver(t *testing.T) {
+	t.Parallel()
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"v1.0.0", true},
+		{"1.0.0", true},
+		{"1.1.01", false},
+		{"1.01.0", false},
+		{"01.1.0", false},
+		{"v1.1.01", false},
+		{"v1.01.0", false},
+		{"v01.1.0", false},
+		{"1.0.0-alpha", true},
+		{"1.0.0-alpha.1", true},
+		{"1.0.0-0.3.7", true},
+		{"1.0.0-0.03.7", false},
+		{"1.0.0-00.3.7", false},
+		{"1.0.0-x.7.z.92", true},
+		{"1.0.0-alpha+001", true},
+		{"1.0.0+20130313144700", true},
+		{"1.0.0-beta+exp.sha.5114f85", true},
+		{"1.0.0-beta+exp.sha.05114f85", true},
+		{"1.0.0-+beta", false},
+		{"1.0.0-b+-9+eta", false},
+		{"v+1.8.0-b+-9+eta", false},
+	}
+	for _, test := range tests {
+		actual := IsSemver(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsSemver(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
 func TestByteLength(t *testing.T) {
 	t.Parallel()
 
