@@ -454,7 +454,7 @@ func IsISO3166Alpha3(str string) bool {
 
 // IsDNSName will validate the given string as a DNS name
 func IsDNSName(str string) bool {
-	if str == "" || len(str) > 255 {
+	if str == "" || len(strings.Replace(str,".","",-1)) > 255 {
 		// constraints already violated
 		return false
 	}
