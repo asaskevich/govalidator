@@ -1499,6 +1499,31 @@ func TestIsDNSName(t *testing.T) {
 	}
 }
 
+func TestIsHost(t *testing.T) {
+	t.Parallel()
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"localhost", true},
+		{"localhost.localdomain", true},
+		{"2001:db8:0000:1:1:1:1:1", true},
+		{"::1", true},
+		{"play.golang.org", true},
+		{"localhost.localdomain.intern:65535", false},
+		{"-[::1]", false},
+		{"-localhost", false},
+		{".localhost", false},
+	}
+	for _, test := range tests {
+		actual := IsHost(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsHost(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+
+}
+
 func TestIsDialString(t *testing.T) {
 	t.Parallel()
 

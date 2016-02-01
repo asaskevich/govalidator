@@ -42,6 +42,7 @@ func Filter(array []interface{}, iterator ConditionIterator) []interface{}
 func Find(array []interface{}, iterator ConditionIterator) interface{}
 func GetLine(s string, index int) (string, error)
 func GetLines(s string) []string
+func IsHost(s string) bool
 func InRange(value, left, right float64) bool
 func IsASCII(str string) bool
 func IsAlpha(str string) bool
@@ -199,6 +200,7 @@ Here is a list of available validators for struct fields (validator - used funct
 "halfwidth":      IsHalfWidth,
 "hexadecimal":    IsHexadecimal,
 "hexcolor":       IsHexcolor,
+"host":           IsHost,
 "int":            IsInt,
 "ip":             IsIP,
 "ipv4":           IsIPv4,
