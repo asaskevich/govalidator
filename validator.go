@@ -883,10 +883,8 @@ func ErrorsByField(e error) map[string]string {
 			case Error:
 				m[item.(Error).Name] = item.(Error).Err.Error()
 			case Errors:
-				for _, item := range e.(Errors).Errors() {
-					for k, v := range ErrorsByField(item) {
-						m[k] = v
-					}
+				for k, v := range ErrorsByField(item) {
+					m[k] = v
 				}
 			}
 		}
