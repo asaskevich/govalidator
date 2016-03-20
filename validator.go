@@ -496,6 +496,11 @@ func IsIPv6(str string) bool {
 	return ip != nil && strings.Contains(str, ":")
 }
 
+// IsHost checks if the string is a valid IP (both v4 and v6) or a valid DNS name
+func IsHost(str string) bool {
+	return  IsIP(str) || IsDNSName(str)
+}
+
 // IsMAC check if a string is valid MAC address.
 // Possible MAC formats:
 // 01:23:45:67:89:ab
