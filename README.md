@@ -150,7 +150,7 @@ type User struct {
 	LastName string
 }
 
-str, _ := govalidator.ToString(&User{"John", "Juan"})
+str := govalidator.ToString(&User{"John", "Juan"})
 println(str)
 ```
 ###### Each, Map, Filter, Count for slices
@@ -290,4 +290,3 @@ If you do have a contribution for the package feel free to put up a Pull Request
 * [Simon ccl1115](https://github.com/ccl1115)
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/asaskevich/govalidator/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
