@@ -454,7 +454,7 @@ func IsISO3166Alpha3(str string) bool {
 
 // IsDNSName will validate the given string as a DNS name
 func IsDNSName(str string) bool {
-	if str == "" || len(strings.Replace(str,".","",-1)) > 255 {
+	if str == "" || len(strings.Replace(str, ".", "", -1)) > 255 {
 		// constraints already violated
 		return false
 	}
@@ -494,11 +494,6 @@ func IsIPv4(str string) bool {
 func IsIPv6(str string) bool {
 	ip := net.ParseIP(str)
 	return ip != nil && strings.Contains(str, ":")
-}
-
-// IsHost checks if the string is a valid IP (both v4 and v6) or a valid DNS name
-func IsHost(str string) bool {
-	return  IsIP(str) || IsDNSName(str)
 }
 
 // IsMAC check if a string is valid MAC address.
@@ -648,9 +643,19 @@ func (opts tagOptions) contains(optionName string) bool {
 	return false
 }
 
+func searchOption(limit int, predicate func(counter int) bool) int {
+	for counter := 0; counter < limit; counter++ {
+		if predicate(counter) {
+			return counter
+		}
+	}
+	return -1
+}
+
 func checkRequired(v reflect.Value, t reflect.StructField, options tagOptions) (bool, error) {
-	if options.contains("required") {
-		err := fmt.Errorf("non zero value required")
+	requiredIndex := searchOption(len(options), func(index int) bool { return strings.HasPrefix(options[index], "required~") })
+	if requiredIndex > -1 {
+		err := fmt.Errorf(strings.Split(options[requiredIndex], "~")[1])
 		return false, Error{t.Name, err}
 	} else if fieldsRequiredByDefault && !options.contains("optional") {
 		err := fmt.Errorf("All fields are required to at least have one validation defined")
@@ -708,20 +713,21 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 		// for each tag option check the map of validator functions
 		for i := range options {
 			tagOpt := options[i]
+			tagOptions := strings.Split(tagOpt, "~")
 			negate := false
 			// Check wether the tag looks like '!something' or 'something'
-			if len(tagOpt) > 0 && tagOpt[0] == '!' {
-				tagOpt = string(tagOpt[1:])
+			if len(tagOptions[0]) > 0 && tagOptions[0][0] == '!' {
+				tagOpt = string(tagOptions[0][1:])
 				negate = true
 			}
-			if ok := isValidTag(tagOpt); !ok {
-				err := fmt.Errorf("Unknown Validator %s", tagOpt)
+			if ok := isValidTag(tagOptions[0]); !ok {
+				err := fmt.Errorf("Unknown Validator %s", tagOptions[0])
 				return false, Error{t.Name, err}
 			}
 
 			// Check for param validators
 			for key, value := range ParamTagRegexMap {
-				ps := value.FindStringSubmatch(tagOpt)
+				ps := value.FindStringSubmatch(tagOptions[0])
 				if len(ps) > 0 {
 					if validatefunc, ok := ParamTagMap[key]; ok {
 						switch v.Kind() {
@@ -730,37 +736,37 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 							if result := validatefunc(field, ps[1:]...); !result && !negate || result && negate {
 								var err error
 								if !negate {
-									err = fmt.Errorf("%s does not validate as %s", field, tagOpt)
+									err = fmt.Errorf(tagOptions[1])
 								} else {
-									err = fmt.Errorf("%s does validate as %s", field, tagOpt)
+									err = fmt.Errorf(tagOptions[1])
 								}
 								return false, Error{t.Name, err}
 							}
 						default:
 							//Not Yet Supported Types (Fail here!)
-							err := fmt.Errorf("Validator %s doesn't support kind %s", tagOpt, v.Kind())
+							err := fmt.Errorf("Validator %s doesn't support kind %s", tagOptions[0], v.Kind())
 							return false, Error{t.Name, err}
 						}
 					}
 				}
 			}
 
-			if validatefunc, ok := TagMap[tagOpt]; ok {
+			if validatefunc, ok := TagMap[tagOptions[0]]; ok {
 				switch v.Kind() {
 				case reflect.String:
 					field := fmt.Sprint(v) // make value into string, then validate with regex
 					if result := validatefunc(field); !result && !negate || result && negate {
 						var err error
 						if !negate {
-							err = fmt.Errorf("%s does not validate as %s", field, tagOpt)
+							err = fmt.Errorf(tagOptions[1])
 						} else {
-							err = fmt.Errorf("%s does validate as %s", field, tagOpt)
+							err = fmt.Errorf(tagOptions[1])
 						}
 						return false, Error{t.Name, err}
 					}
 				default:
 					//Not Yet Supported Types (Fail here!)
-					err := fmt.Errorf("Validator %s doesn't support kind %s for value %v", tagOpt, v.Kind(), v)
+					err := fmt.Errorf("Validator %s doesn't support kind %s for value %v", tagOptions[0], v.Kind(), v)
 					return false, Error{t.Name, err}
 				}
 			}
@@ -884,9 +890,7 @@ func ErrorsByField(e error) map[string]string {
 		m[e.(Error).Name] = e.(Error).Err.Error()
 	case Errors:
 		for _, item := range e.(Errors).Errors() {
-			for k, v := range ErrorsByField(item) {
-				m[k] = v
-			}
+			m[item.(Error).Name] = item.(Error).Err.Error()
 		}
 	}
 

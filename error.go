@@ -20,5 +20,5 @@ type Error struct {
 }
 
 func (e Error) Error() string {
-	return e.Name + ": " + e.Err.Error()
+	return e.Err.Error()
 }
