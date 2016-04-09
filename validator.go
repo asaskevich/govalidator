@@ -509,6 +509,11 @@ func IsMAC(str string) bool {
 	return err == nil
 }
 
+// IsHost checks if the string is a valid IP (both v4 and v6) or a valid DNS name
+func IsHost(str string) bool {
+	return IsIP(str) || IsDNSName(str)
+}
+
 // IsMongoID check if the string is a valid hex-encoded representation of a MongoDB ObjectId.
 func IsMongoID(str string) bool {
 	return rxHexadecimal.MatchString(str) && (len(str) == 24)
@@ -733,6 +738,7 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 			// Check wether the tag looks like '!something' or 'something'
 			if len(tagOptions[0]) > 0 && tagOptions[0][0] == '!' {
 				tagOpt = string(tagOptions[0][1:])
+				tagOptions[0] = tagOpt
 				negate = true
 			}
 			if ok := isValidTag(tagOptions[0]); !ok {
@@ -748,7 +754,7 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 						switch v.Kind() {
 						case reflect.String:
 							field := fmt.Sprint(v) // make value into string, then validate with regex
-							if result := validatefunc(field, ps[1:]...); !result && !negate || result && negate {
+							if result := validatefunc(field, ps[1:]...); (!result && !negate) || (result && negate) {
 								var err error
 								if !negate {
 									if customMsgExists {
