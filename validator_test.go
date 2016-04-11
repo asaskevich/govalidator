@@ -1930,7 +1930,18 @@ type StructWithCustomByteArray struct {
 
 func TestStructWithCustomByteArray(t *testing.T) {
 	// add our custom byte array validator that fails when the byte array is pristine (all zeroes)
-	CustomTypeTagMap["customByteArrayValidator"] = CustomTypeValidator(func(i interface{}) bool {
+	CustomTypeTagMap["customByteArrayValidator"] = CustomTypeValidator(func(i interface{}, o interface{}) bool {
+		switch v := o.(type) {
+		case StructWithCustomByteArray:
+			if len(v.Email) > 0 {
+				if v.Email != "test@example.com" {
+					t.Errorf("v.Email should have been 'test@example.com' but was '%s'", v.Email)
+				}
+			}
+		default:
+			t.Errorf("Context object passed to custom validator should have been a StructWithCustomByteArray but was %T (%+v)", o, o)
+		}
+
 		switch v := i.(type) {
 		case CustomByteArray:
 			for _, e := range v { // check if v is empty, i.e. all zeroes
