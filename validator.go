@@ -552,9 +552,9 @@ func ValidateStruct(s interface{}) (bool, error) {
 		if typeField.PkgPath != "" {
 			continue // Private field
 		}
-		resultField, err := typeCheck(valueField, typeField)
-		if err != nil {
-			errs = append(errs, err)
+		resultField, err2 := typeCheck(valueField, typeField, val)
+		if err2 != nil {
+			errs = append(errs, err2)
 		}
 		result = result && resultField
 	}
