@@ -9,7 +9,8 @@ import (
 type Validator func(str string) bool
 
 // CustomTypeValidator is a wrapper for validator functions that returns bool and accepts any type.
-type CustomTypeValidator func(i interface{}) bool
+// The second parameter should be the context (in the case of validating a struct: the whole object being validated).
+type CustomTypeValidator func(i interface{}, o interface{}) bool
 
 // ParamValidator is a wrapper for validator functions that accepts additional parameters.
 type ParamValidator func(str string, params ...string) bool

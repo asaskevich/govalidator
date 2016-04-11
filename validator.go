@@ -680,7 +680,7 @@ func checkRequired(v reflect.Value, t reflect.StructField, options tagOptions) (
 	return true, nil
 }
 
-func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
+func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value) (bool, error) {
 	var customErrorMessageExists bool
 	if !v.IsValid() {
 		return false, nil
@@ -709,7 +709,7 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 		}
 		if validatefunc, ok := CustomTypeTagMap[tagOptions[0]]; ok {
 			options = append(options[:i], options[i+1:]...) // we found our custom validator, so remove it from the options
-			if result := validatefunc(v.Interface()); !result {
+			if result := validatefunc(v.Interface(), o.Interface()); !result {
 				if len(tagOptions) == 2 {
 					return false, Error{t.Name, fmt.Errorf(tagOptions[1]), true}
 				}
@@ -834,7 +834,7 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 			var resultItem bool
 			var err error
 			if v.Index(i).Kind() != reflect.Struct {
-				resultItem, err = typeCheck(v.Index(i), t)
+				resultItem, err = typeCheck(v.Index(i), t, o)
 				if err != nil {
 					return false, err
 				}
@@ -853,7 +853,7 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 			var resultItem bool
 			var err error
 			if v.Index(i).Kind() != reflect.Struct {
-				resultItem, err = typeCheck(v.Index(i), t)
+				resultItem, err = typeCheck(v.Index(i), t, o)
 				if err != nil {
 					return false, err
 				}
@@ -877,7 +877,7 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 		if v.IsNil() {
 			return true, nil
 		}
-		return typeCheck(v.Elem(), t)
+		return typeCheck(v.Elem(), t, o)
 	case reflect.Struct:
 		return ValidateStruct(v.Interface())
 	default:
