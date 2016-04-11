@@ -647,7 +647,7 @@ func TestIsRequestURL(t *testing.T) {
 		expected bool
 	}{
 		{"", false},
-		{"http://foo.bar#com", true},
+		{"http://foo.bar/#com", true},
 		{"http://foobar.com", true},
 		{"https://foobar.com", true},
 		{"foobar.com", false},
@@ -670,7 +670,7 @@ func TestIsRequestURL(t *testing.T) {
 		{"rtmp://foobar.com", true},
 		{"http://www.foo_bar.com/", true},
 		{"http://localhost:3000/", true},
-		{"http://foobar.com#baz=qux", true},
+		{"http://foobar.com/#baz=qux", true},
 		{"http://foobar.com/t$-_.+!*\\'(),", true},
 		{"http://www.foobar.com/~foobar", true},
 		{"http://www.-foobar.com/", true},
@@ -697,7 +697,7 @@ func TestIsRequestURI(t *testing.T) {
 		expected bool
 	}{
 		{"", false},
-		{"http://foo.bar#com", true},
+		{"http://foo.bar/#com", true},
 		{"http://foobar.com", true},
 		{"https://foobar.com", true},
 		{"foobar.com", false},
@@ -719,7 +719,7 @@ func TestIsRequestURI(t *testing.T) {
 		{"rtmp://foobar.com", true},
 		{"http://www.foo_bar.com/", true},
 		{"http://localhost:3000/", true},
-		{"http://foobar.com#baz=qux", true},
+		{"http://foobar.com/#baz=qux", true},
 		{"http://foobar.com/t$-_.+!*\\'(),", true},
 		{"http://www.foobar.com/~foobar", true},
 		{"http://www.-foobar.com/", true},
