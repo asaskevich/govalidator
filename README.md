@@ -244,8 +244,8 @@ Validators with parameters
 And here is small example of usage:
 ```go
 type Post struct {
-	Title    string `valid:"alphanum,required"`
-	Message  string `valid:"duck,ascii"`
+	Title    string `valid:"alphanum\nrequired"`
+	Message  string `valid:"duck\nascii"`
 	AuthorIP string `valid:"ipv4"`
 	Date     string `valid:"-"`
 }
