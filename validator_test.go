@@ -647,7 +647,7 @@ func TestIsRequestURL(t *testing.T) {
 		expected bool
 	}{
 		{"", false},
-		{"http://foo.bar#com", true},
+		{"http://foo.bar#com", false},
 		{"http://foobar.com", true},
 		{"https://foobar.com", true},
 		{"foobar.com", false},
@@ -670,7 +670,7 @@ func TestIsRequestURL(t *testing.T) {
 		{"rtmp://foobar.com", true},
 		{"http://www.foo_bar.com/", true},
 		{"http://localhost:3000/", true},
-		{"http://foobar.com#baz=qux", true},
+		{"http://foobar.com#baz=qux", false},
 		{"http://foobar.com/t$-_.+!*\\'(),", true},
 		{"http://www.foobar.com/~foobar", true},
 		{"http://www.-foobar.com/", true},
@@ -697,7 +697,7 @@ func TestIsRequestURI(t *testing.T) {
 		expected bool
 	}{
 		{"", false},
-		{"http://foo.bar#com", true},
+		{"http://foo.bar#com", false},
 		{"http://foobar.com", true},
 		{"https://foobar.com", true},
 		{"foobar.com", false},
@@ -719,7 +719,7 @@ func TestIsRequestURI(t *testing.T) {
 		{"rtmp://foobar.com", true},
 		{"http://www.foo_bar.com/", true},
 		{"http://localhost:3000/", true},
-		{"http://foobar.com#baz=qux", true},
+		{"http://foobar.com#baz=qux", false},
 		{"http://foobar.com/t$-_.+!*\\'(),", true},
 		{"http://www.foobar.com/~foobar", true},
 		{"http://www.-foobar.com/", true},
@@ -1784,16 +1784,16 @@ type Address struct {
 
 type User struct {
 	Name     string `valid:"required"`
-	Email    string `valid:"required,email"`
+	Email    string `valid:"required\nemail"`
 	Password string `valid:"required"`
-	Age      int    `valid:"required,numeric,@#\u0000"`
+	Age      int    `valid:"required\nnumeric,@#\u0000"`
 	Home     *Address
 	Work     []Address
 }
 
 type UserValid struct {
 	Name     string `valid:"required"`
-	Email    string `valid:"required,email"`
+	Email    string `valid:"required\nemail"`
 	Password string `valid:"required"`
 	Age      int    `valid:"required"`
 	Home     *Address
@@ -1828,7 +1828,7 @@ type StringMatchesStruct struct {
 }
 
 type Post struct {
-	Title    string `valid:"alpha,required"`
+	Title    string `valid:"alpha\nrequired"`
 	Message  string `valid:"ascii"`
 	AuthorIP string `valid:"ipv4"`
 }
@@ -1845,7 +1845,7 @@ type FieldsRequiredByDefaultButExemptStruct struct {
 
 type FieldsRequiredByDefaultButExemptOrOptionalStruct struct {
 	Name  string `valid:"-"`
-	Email string `valid:"optional,email"`
+	Email string `valid:"optional\nemail"`
 }
 
 type MessageWithSeveralFieldsStruct struct {
