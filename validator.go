@@ -701,22 +701,29 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value) (bool, e
 	}
 
 	options := parseTag(tag)
-	for i := range options {
-		tagOpt := options[i]
-		tagOptions := strings.Split(tagOpt, "~")
-		if ok := isValidTag(tagOptions[0]); !ok {
+	var customTypeErrors Errors
+	var customTypeValidatorsExist bool
+	for _, tagOpt := range options {
+		tagOpts := strings.Split(tagOpt, "~")
+		if ok := isValidTag(tagOpts[0]); !ok {
 			continue
 		}
-		if validatefunc, ok := CustomTypeTagMap[tagOptions[0]]; ok {
-			options = append(options[:i], options[i+1:]...) // we found our custom validator, so remove it from the options
+		if validatefunc, ok := CustomTypeTagMap[tagOpts[0]]; ok {
+			customTypeValidatorsExist = true
 			if result := validatefunc(v.Interface(), o.Interface()); !result {
-				if len(tagOptions) == 2 {
-					return false, Error{t.Name, fmt.Errorf(tagOptions[1]), true}
+				if len(tagOpts) == 2 {
+					customTypeErrors = append(customTypeErrors, Error{Name: t.Name, Err: fmt.Errorf(tagOpts[1]), CustomErrorMessageExists: true})
+					continue
 				}
-				return false, Error{t.Name, fmt.Errorf("%s does not validate as %s", fmt.Sprint(v), tagOptions[0]), false}
+				customTypeErrors = append(customTypeErrors, Error{Name: t.Name, Err: fmt.Errorf("%s does not validate as %s", fmt.Sprint(v), tagOpts[0]), CustomErrorMessageExists: false})
 			}
-			return true, nil
 		}
+	}
+	if customTypeValidatorsExist {
+		if len(customTypeErrors.Errors()) > 0 {
+			return false, customTypeErrors
+		}
+		return true, nil
 	}
 
 	if isEmptyValue(v) {
