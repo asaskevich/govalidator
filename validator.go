@@ -708,7 +708,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value) (bool, e
 		if ok := isValidTag(tagOpts[0]); !ok {
 			continue
 		}
-		if validatefunc, ok := CustomTypeTagMap[tagOpts[0]]; ok {
+		if validatefunc, ok := CustomTypeTagMap.Get(tagOpts[0]); ok {
 			customTypeValidatorsExist = true
 			if result := validatefunc(v.Interface(), o.Interface()); !result {
 				if len(tagOpts) == 2 {

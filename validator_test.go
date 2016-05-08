@@ -1933,7 +1933,7 @@ func TestStructWithCustomByteArray(t *testing.T) {
 	t.Parallel()
 
 	// add our custom byte array validator that fails when the byte array is pristine (all zeroes)
-	CustomTypeTagMap["customByteArrayValidator"] = CustomTypeValidator(func(i interface{}, o interface{}) bool {
+	CustomTypeTagMap.Set("customByteArrayValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
 		switch v := o.(type) {
 		case StructWithCustomByteArray:
 			if len(v.Email) > 0 {
@@ -1954,14 +1954,14 @@ func TestStructWithCustomByteArray(t *testing.T) {
 			}
 		}
 		return false
-	})
-	CustomTypeTagMap["customMinLengthValidator"] = CustomTypeValidator(func(i interface{}, o interface{}) bool {
+	}))
+	CustomTypeTagMap.Set("customMinLengthValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
 		switch v := o.(type) {
 		case StructWithCustomByteArray:
 			return len(v.ID) >= v.CustomMinLength
 		}
 		return false
-	})
+	}))
 	testCustomByteArray := CustomByteArray{'1', '2', '3', '4', '5', '6'}
 	var tests = []struct {
 		param    StructWithCustomByteArray
