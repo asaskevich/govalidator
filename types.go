@@ -3,6 +3,7 @@ package govalidator
 import (
 	"reflect"
 	"regexp"
+	"sync"
 )
 
 // Validator is a wrapper for a validator function that returns bool and accepts string.
@@ -39,10 +40,29 @@ var ParamTagRegexMap = map[string]*regexp.Regexp{
 	"matches":      regexp.MustCompile(`matches\(([^)]+)\)`),
 }
 
+type customTypeTagMap struct {
+	validators map[string]CustomTypeValidator
+
+	sync.RWMutex
+}
+
+func (tm *customTypeTagMap) Get(name string) (CustomTypeValidator, bool) {
+	tm.RLock()
+	defer tm.RUnlock()
+	v, ok := tm.validators[name]
+	return v, ok
+}
+
+func (tm *customTypeTagMap) Set(name string, ctv CustomTypeValidator) {
+	tm.Lock()
+	defer tm.Unlock()
+	tm.validators[name] = ctv
+}
+
 // CustomTypeTagMap is a map of functions that can be used as tags for ValidateStruct function.
 // Use this to validate compound or custom types that need to be handled as a whole, e.g.
 // `type UUID [16]byte` (this would be handled as an array of bytes).
-var CustomTypeTagMap = map[string]CustomTypeValidator{}
+var CustomTypeTagMap = &customTypeTagMap{validators: make(map[string]CustomTypeValidator)}
 
 // TagMap is a map of functions, that can be used as tags for ValidateStruct function.
 var TagMap = map[string]Validator{
