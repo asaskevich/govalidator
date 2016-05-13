@@ -18,7 +18,8 @@ func Contains(str, substring string) bool {
 // Matches check if string matches the pattern (pattern is regular expression)
 // In case of error return false
 func Matches(str, pattern string) bool {
-	match, _ := regexp.MatchString(pattern, str)
+	regxp := regexp.MustCompile(pattern)
+	match := regxp.MatchString(str)
 	return match
 }
 

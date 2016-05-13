@@ -567,7 +567,7 @@ func ValidateStruct(s interface{}) (bool, error) {
 // parseTag splits a struct field's tag into its
 // comma-separated options.
 func parseTag(tag string) tagOptions {
-	split := strings.SplitN(tag, ",", -1)
+	split := strings.SplitN(tag, "\n", -1)
 	return tagOptions(split)
 }
 
@@ -577,7 +577,7 @@ func isValidTag(s string) bool {
 	}
 	for _, c := range s {
 		switch {
-		case strings.ContainsRune("!#$%&()*+-./:<=>?@[]^_{|}~ ", c):
+		case strings.ContainsRune("!#$%&()*+-./:<=>?@[]^_{|}~, ", c):
 			// Backslash and quote chars are reserved, but
 			// otherwise any punctuation chars are allowed
 			// in a tag name.

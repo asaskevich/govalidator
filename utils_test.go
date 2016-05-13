@@ -2,6 +2,7 @@ package govalidator
 
 import (
 	"reflect"
+	"regexp"
 	"testing"
 )
 
@@ -37,7 +38,6 @@ func TestMatches(t *testing.T) {
 		{"123456789", "[0-9]+", true},
 		{"abacada", "cab$", false},
 		{"111222333", "((111|222|333)+)+", true},
-		{"abacaba", "((123+]", false},
 	}
 	for _, test := range tests {
 		actual := Matches(test.param1, test.param2)
@@ -45,6 +45,27 @@ func TestMatches(t *testing.T) {
 			t.Errorf("Expected Matches(%q,%q) to be %v, got %v", test.param1, test.param2, test.expected, actual)
 		}
 	}
+}
+
+func TestMatchesPanic(t *testing.T) {
+	str := "abacaba"
+	rxp := "((123+]"
+	defer func() {
+		recovered := recover()
+		if recovered == nil {
+			t.Errorf("should have panicked but didn't (str: %#v  regexp: %#v)", str, rxp)
+		} else {
+			mtchd, err := regexp.MatchString("regexp.*Compile.*error parsing regexp", recovered.(string))
+			if err != nil {
+				t.Errorf("error creating regexp matcher to chec for error (TestMatchesPanic): %s", err.Error())
+			}
+			if !mtchd {
+				t.Errorf("panicked as expected for str:%#v and rxp:%#v, but with wrong panic message: %s", str, rxp, recovered)
+			}
+		}
+	}()
+	_ = Matches(str, rxp)
+	return
 }
 
 func TestLeftTrim(t *testing.T) {
