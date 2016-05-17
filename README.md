@@ -19,7 +19,7 @@ Add following line in your `*.go` file:
 ```go
 import "github.com/asaskevich/govalidator"
 ```
-If you unhappy to use long `govalidator`, you can do something like this:
+If you are unhappy to use long `govalidator`, you can do something like this:
 ```go
 import (
   valid "github.com/asaskevich/govalidator"
