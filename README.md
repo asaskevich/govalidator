@@ -22,8 +22,66 @@ import "github.com/asaskevich/govalidator"
 If you unhappy to use long `govalidator`, you can do something like this:
 ```go
 import (
-	valid "github.com/asaskevich/govalidator"
+  valid "github.com/asaskevich/govalidator"
 )
+```
+
+#### Activate behavior to require all fields have a validation tag by default
+`SetFieldsRequiredByDefault` causes validation to fail when struct fields do not include validations or are not explicitly marked as exempt (using `valid:"-"` or `valid:"email,optional"`). A good place to activate this is a package init function or the main() function.
+
+```go
+import "github.com/asaskevich/govalidator"
+
+func init() {
+  govalidator.SetFieldsRequiredByDefault(true)
+}
+```
+
+Here's some code to explain it:
+```go
+// this struct definition will fail govalidator.ValidateStruct() (and the field values do not matter):
+type exampleStruct struct {
+  Name  string ``
+  Email string `valid:"email"`
+
+// this, however, will only fail when Email is empty or an invalid email address:
+type exampleStruct2 struct {
+  Name  string `valid:"-"`
+  Email string `valid:"email"`
+
+// lastly, this will only fail when Email is an invalid email address but not when it's empty:
+type exampleStruct2 struct {
+  Name  string `valid:"-"`
+  Email string `valid:"email,optional"`
+```
+
+#### Recent breaking changes (see [#123](https://github.com/asaskevich/govalidator/pull/123))
+##### Custom validator function signature
+A context was added as the second parameter, for structs this is the object being validated – this makes dependent validation possible.
+```go
+import "github.com/asaskevich/govalidator"
+
+// old signature
+func(i interface{}) bool
+
+// new signature
+func(i interface{}, o interface{}) bool
+```
+
+##### Adding a custom validator
+This was changed to prevent data races when accessing custom validators.
+```go
+import "github.com/asaskevich/govalidator"
+
+// before
+govalidator.CustomTypeTagMap["customByteArrayValidator"] = CustomTypeValidator(func(i interface{}, o interface{}) bool {
+  // ...
+})
+
+// after
+govalidator.CustomTypeTagMap.Set("customByteArrayValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+  // ...
+}))
 ```
 
 #### List of functions:
@@ -184,6 +242,8 @@ govalidator.TagMap["duck"] = govalidator.Validator(func(str string) bool {
 	return str == "duck"
 })
 ```
+For completely custom validators (interface-based), see below.
+
 Here is a list of available validators for struct fields (validator - used function):
 ```go
 "alpha":          IsAlpha,
@@ -270,6 +330,49 @@ println(result)
 ```go
 // Remove all characters from string ignoring characters between "a" and "z"
 println(govalidator.WhiteList("a3a43a5a4a3a2a23a4a5a4a3a4", "a-z") == "aaaaaaaaaaaa")
+```
+
+###### Custom validation functions
+Custom validation using your own domain specific validators is also available - here's an example of how to use it:
+```go
+import "github.com/asaskevich/govalidator"
+
+type CustomByteArray [6]byte // custom types are supported and can be validated
+
+type StructWithCustomByteArray struct {
+  ID              CustomByteArray `valid:"customByteArrayValidator,customMinLengthValidator"` // multiple custom validators are possible as well and will be evaluated in sequence
+  Email           string          `valid:"email"`
+  CustomMinLength int             `valid:"-"`
+}
+
+govalidator.CustomTypeTagMap.Set("customByteArrayValidator", CustomTypeValidator(func(i interface{}, context interface{}) bool {
+  switch v := context.(type) { // you can type switch on the context interface being validated
+  case StructWithCustomByteArray:
+    // you can check and validate against some other field in the context,
+    // return early or not validate against the context at all – your choice
+  case SomeOtherType:
+    // ...
+  default:
+    // expecting some other type? Throw/panic here or continue
+  }
+
+  switch v := i.(type) { // type switch on the struct field being validated
+  case CustomByteArray:
+    for _, e := range v { // this validator checks that the byte array is not empty, i.e. not all zeroes
+      if e != 0 {
+        return true
+      }
+    }
+  }
+  return false
+}))
+govalidator.CustomTypeTagMap.Set("customMinLengthValidator", CustomTypeValidator(func(i interface{}, context interface{}) bool {
+  switch v := context.(type) { // this validates a field against the value in another field, i.e. dependent validation
+  case StructWithCustomByteArray:
+    return len(v.ID) >= v.CustomMinLength
+  }
+  return false
+}))
 ```
 
 #### Notes
