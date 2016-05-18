@@ -387,6 +387,7 @@ Full information about code coverage is also available here: [govalidator on goc
 If you do have a contribution for the package feel free to put up a Pull Request or open Issue.
 
 #### Special thanks to [contributors](https://github.com/asaskevich/govalidator/graphs/contributors)
+* [Daniel Lohse](https://github.com/annismckenzie)
 * [Attila Oláh](https://github.com/attilaolah)
 * [Daniel Korner](https://github.com/Dadie)
 * [Steven Wilkin](https://github.com/stevenwilkin)
@@ -395,5 +396,3 @@ If you do have a contribution for the package feel free to put up a Pull Request
 * [Nathan Davies](https://github.com/nathj07)
 * [Matt Sanford](https://github.com/mzsanford)
 * [Simon ccl1115](https://github.com/ccl1115)
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/asaskevich/govalidator/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
