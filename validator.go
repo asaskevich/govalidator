@@ -552,9 +552,9 @@ func ValidateStruct(s interface{}) (bool, error) {
 		if typeField.PkgPath != "" {
 			continue // Private field
 		}
-		resultField, err := typeCheck(valueField, typeField)
-		if err != nil {
-			errs = append(errs, err)
+		resultField, err2 := typeCheck(valueField, typeField, val)
+		if err2 != nil {
+			errs = append(errs, err2)
 		}
 		result = result && resultField
 	}
@@ -680,7 +680,7 @@ func checkRequired(v reflect.Value, t reflect.StructField, options tagOptions) (
 	return true, nil
 }
 
-func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
+func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value) (bool, error) {
 	var customErrorMessageExists bool
 	if !v.IsValid() {
 		return false, nil
@@ -701,22 +701,29 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 	}
 
 	options := parseTag(tag)
-	for i := range options {
-		tagOpt := options[i]
-		tagOptions := strings.Split(tagOpt, "~")
-		if ok := isValidTag(tagOptions[0]); !ok {
+	var customTypeErrors Errors
+	var customTypeValidatorsExist bool
+	for _, tagOpt := range options {
+		tagOpts := strings.Split(tagOpt, "~")
+		if ok := isValidTag(tagOpts[0]); !ok {
 			continue
 		}
-		if validatefunc, ok := CustomTypeTagMap[tagOptions[0]]; ok {
-			options = append(options[:i], options[i+1:]...) // we found our custom validator, so remove it from the options
-			if result := validatefunc(v.Interface()); !result {
-				if len(tagOptions) == 2 {
-					return false, Error{t.Name, fmt.Errorf(tagOptions[1]), true}
+		if validatefunc, ok := CustomTypeTagMap.Get(tagOpts[0]); ok {
+			customTypeValidatorsExist = true
+			if result := validatefunc(v.Interface(), o.Interface()); !result {
+				if len(tagOpts) == 2 {
+					customTypeErrors = append(customTypeErrors, Error{Name: t.Name, Err: fmt.Errorf(tagOpts[1]), CustomErrorMessageExists: true})
+					continue
 				}
-				return false, Error{t.Name, fmt.Errorf("%s does not validate as %s", fmt.Sprint(v), tagOptions[0]), false}
+				customTypeErrors = append(customTypeErrors, Error{Name: t.Name, Err: fmt.Errorf("%s does not validate as %s", fmt.Sprint(v), tagOpts[0]), CustomErrorMessageExists: false})
 			}
-			return true, nil
 		}
+	}
+	if customTypeValidatorsExist {
+		if len(customTypeErrors.Errors()) > 0 {
+			return false, customTypeErrors
+		}
+		return true, nil
 	}
 
 	if isEmptyValue(v) {
@@ -834,7 +841,7 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 			var resultItem bool
 			var err error
 			if v.Index(i).Kind() != reflect.Struct {
-				resultItem, err = typeCheck(v.Index(i), t)
+				resultItem, err = typeCheck(v.Index(i), t, o)
 				if err != nil {
 					return false, err
 				}
@@ -853,7 +860,7 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 			var resultItem bool
 			var err error
 			if v.Index(i).Kind() != reflect.Struct {
-				resultItem, err = typeCheck(v.Index(i), t)
+				resultItem, err = typeCheck(v.Index(i), t, o)
 				if err != nil {
 					return false, err
 				}
@@ -877,7 +884,7 @@ func typeCheck(v reflect.Value, t reflect.StructField) (bool, error) {
 		if v.IsNil() {
 			return true, nil
 		}
-		return typeCheck(v.Elem(), t)
+		return typeCheck(v.Elem(), t, o)
 	case reflect.Struct:
 		return ValidateStruct(v.Interface())
 	default:
