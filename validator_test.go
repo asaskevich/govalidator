@@ -1833,7 +1833,7 @@ type Post struct {
 	AuthorIP string `valid:"ipv4"`
 }
 
-type MissingValidationDeclationStruct struct {
+type MissingValidationDeclarationStruct struct {
 	Name  string ``
 	Email string `valid:"required,email"`
 }
@@ -1853,13 +1853,13 @@ type MessageWithSeveralFieldsStruct struct {
 	Body  string `valid:"length(1|10)"`
 }
 
-func TestValidateMissingValidationDeclationStruct(t *testing.T) {
+func TestValidateMissingValidationDeclarationStruct(t *testing.T) {
 	var tests = []struct {
-		param    MissingValidationDeclationStruct
+		param    MissingValidationDeclarationStruct
 		expected bool
 	}{
-		{MissingValidationDeclationStruct{}, false},
-		{MissingValidationDeclationStruct{Name: "TEST", Email: "test@example.com"}, false},
+		{MissingValidationDeclarationStruct{}, false},
+		{MissingValidationDeclarationStruct{Name: "TEST", Email: "test@example.com"}, false},
 	}
 	SetFieldsRequiredByDefault(true)
 	for _, test := range tests {
