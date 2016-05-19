@@ -1797,7 +1797,7 @@ type UserValid struct {
 	Password string `valid:"required"`
 	Age      int    `valid:"required"`
 	Home     *Address
-	Work     []Address
+	Work     []Address `valid:"required"`
 }
 
 type PrivateStruct struct {
@@ -1833,7 +1833,7 @@ type Post struct {
 	AuthorIP string `valid:"ipv4"`
 }
 
-type MissingValidationDeclationStruct struct {
+type MissingValidationDeclarationStruct struct {
 	Name  string ``
 	Email string `valid:"required,email"`
 }
@@ -1853,13 +1853,13 @@ type MessageWithSeveralFieldsStruct struct {
 	Body  string `valid:"length(1|10)"`
 }
 
-func TestValidateMissingValidationDeclationStruct(t *testing.T) {
+func TestValidateMissingValidationDeclarationStruct(t *testing.T) {
 	var tests = []struct {
-		param    MissingValidationDeclationStruct
+		param    MissingValidationDeclarationStruct
 		expected bool
 	}{
-		{MissingValidationDeclationStruct{}, false},
-		{MissingValidationDeclationStruct{Name: "TEST", Email: "test@example.com"}, false},
+		{MissingValidationDeclarationStruct{}, false},
+		{MissingValidationDeclarationStruct{Name: "TEST", Email: "test@example.com"}, false},
 	}
 	SetFieldsRequiredByDefault(true)
 	for _, test := range tests {
@@ -2087,6 +2087,7 @@ func TestValidateStruct(t *testing.T) {
 		{User{"John", "john!yahoo.com", "12345678", 20, &Address{"Street", "ABC456D89"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}}, false},
 		{User{"John", "", "12345", 0, &Address{"Street", "123456789"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}}, false},
 		{UserValid{"John", "john@yahoo.com", "123G#678", 20, &Address{"Street", "123456"}, []Address{Address{"Street", "123456"}, Address{"Street", "123456"}}}, true},
+		{UserValid{"John", "john!yahoo.com", "12345678", 20, &Address{"Street", "ABC456D89"}, []Address{}}, false},
 		{UserValid{"John", "john!yahoo.com", "12345678", 20, &Address{"Street", "ABC456D89"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}}, false},
 		{UserValid{"John", "", "12345", 0, &Address{"Street", "123456789"}, []Address{Address{"Street", "ABC456D89"}, Address{"Street", "123456"}}}, false},
 		{nil, true},
