@@ -15,7 +15,7 @@ type CustomTypeValidator func(i interface{}, o interface{}) bool
 
 // ParamValidator is a wrapper for validator functions that accepts additional parameters.
 type ParamValidator func(str string, params ...string) bool
-type tagOptions []string
+type tagOptionsMap map[string]string
 
 // UnsupportedTypeError is a wrapper for reflect.Type
 type UnsupportedTypeError struct {
