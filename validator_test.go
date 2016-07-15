@@ -2303,6 +2303,35 @@ func TestErrorsByField(t *testing.T) {
 			t.Errorf("Expected ErrorsByField(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
+
+	type StructWithCustomValidation struct {
+		Email string `valid:"email"`
+		ID    string `valid:"falseValidation"`
+	}
+
+	CustomTypeTagMap.Set("falseValidation", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+		return false
+	}))
+
+	tests = []struct {
+		param    string
+		expected string
+	}{
+		{"Email", "My123 does not validate as email"},
+		{"ID", "duck13126 does not validate as falseValidation"},
+	}
+	s := &StructWithCustomValidation{Email: "My123", ID: "duck13126"}
+	_, err = ValidateStruct(s)
+	errs = ErrorsByField(err)
+	if len(errs) != 2 {
+		t.Errorf("There should only be 2 errors but got %v", len(errs))
+	}
+
+	for _, test := range tests {
+		if actual, ok := errs[test.param]; !ok || actual != test.expected {
+			t.Errorf("Expected ErrorsByField(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
 }
 
 func TestValidateStructPointers(t *testing.T) {
