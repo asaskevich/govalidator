@@ -531,9 +531,15 @@ func IsLongitude(str string) bool {
 
 // ValidateStruct use tags for fields.
 // result will be equal to `false` if there are any errors.
+
+var originalStruct interface{}
+
 func ValidateStruct(s interface{}) (bool, error) {
 	if s == nil {
 		return true, nil
+	}
+	if originalStruct == nil {
+		originalStruct = s
 	}
 	result := true
 	var err error
@@ -684,7 +690,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value) (bool, e
 	for validatorName, customErrorMessage := range options {
 		if validatefunc, ok := CustomTypeTagMap.Get(validatorName); ok {
 			customTypeValidatorsExist = true
-			if result := validatefunc(v.Interface(), o.Interface()); !result {
+			if result := validatefunc(v.Interface(), o.Interface(), originalStruct); !result {
 				if len(customErrorMessage) > 0 {
 					customTypeErrors = append(customTypeErrors, Error{Name: t.Name, Err: fmt.Errorf(customErrorMessage), CustomErrorMessageExists: true})
 					continue
