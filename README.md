@@ -72,7 +72,7 @@ import "github.com/asaskevich/govalidator"
 func(i interface{}) bool
 
 // new signature
-func(i interface{}, o interface{}) bool
+func(i interface{}, o interface{}, original interface{}) bool
 ```
 
 ##### Adding a custom validator
@@ -86,7 +86,7 @@ govalidator.CustomTypeTagMap["customByteArrayValidator"] = CustomTypeValidator(f
 })
 
 // after
-govalidator.CustomTypeTagMap.Set("customByteArrayValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+govalidator.CustomTypeTagMap.Set("customByteArrayValidator", CustomTypeValidator(func(i interface{}, o interface{}, original interface{}) bool {
   // ...
 }))
 ```
