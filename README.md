@@ -62,16 +62,40 @@ type exampleStruct2 struct {
 }
 ```
 
-#### Recent breaking changes (see [#123](https://github.com/asaskevich/govalidator/pull/123))
-##### Custom validator function signature
+#### Recent breaking changes (see [#144](https://github.com/asaskevich/govalidator/pull/144))
+##### Added Original Struct to CustomTypeTagMap
 A context was added as the second parameter, for structs this is the object being validated – this makes dependent validation possible.
+Original struct was added as third parameter, in case on custom validators needs to check parent struct or slices, used on complex structs with multiple child.
+
+For Example:
+```go
+type UserPost struct{
+  Firstname string
+  Lastname string
+  UploadedImages []Image
+  Post struct{
+    Title string
+    Content string
+    Images []int `valid:"myCustomCheckUploadedImagesSlice"``
+  }
+}
+
+type Image struct{
+  Id int
+  Path string
+}
+```
+
 ```go
 import "github.com/asaskevich/govalidator"
 
 // old signature
 func(i interface{}) bool
 
-// new signature
+// v4 signature
+func(i interface{}, o interface{}) bool
+
+// new v5 signature
 func(i interface{}, o interface{}, original interface{}) bool
 ```
 
@@ -85,7 +109,12 @@ govalidator.CustomTypeTagMap["customByteArrayValidator"] = CustomTypeValidator(f
   // ...
 })
 
-// after
+// v4
+govalidator.CustomTypeTagMap.Set("customByteArrayValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+  // ...
+}))
+
+// new v5
 govalidator.CustomTypeTagMap.Set("customByteArrayValidator", CustomTypeValidator(func(i interface{}, o interface{}, original interface{}) bool {
   // ...
 }))
@@ -352,7 +381,7 @@ type StructWithCustomByteArray struct {
   CustomMinLength int             `valid:"-"`
 }
 
-govalidator.CustomTypeTagMap.Set("customByteArrayValidator", CustomTypeValidator(func(i interface{}, context interface{}) bool {
+govalidator.CustomTypeTagMap.Set("customByteArrayValidator", CustomTypeValidator(func(i interface{}, context interface{}, original interface{}) bool {
   switch v := context.(type) { // you can type switch on the context interface being validated
   case StructWithCustomByteArray:
     // you can check and validate against some other field in the context,
@@ -373,13 +402,33 @@ govalidator.CustomTypeTagMap.Set("customByteArrayValidator", CustomTypeValidator
   }
   return false
 }))
-govalidator.CustomTypeTagMap.Set("customMinLengthValidator", CustomTypeValidator(func(i interface{}, context interface{}) bool {
+govalidator.CustomTypeTagMap.Set("customMinLengthValidator", CustomTypeValidator(func(i interface{}, context interface{}, original interface{}) bool {
   switch v := context.(type) { // this validates a field against the value in another field, i.e. dependent validation
   case StructWithCustomByteArray:
     return len(v.ID) >= v.CustomMinLength
   }
   return false
 }))
+```
+
+###### Custom error messages
+Put ~ after validator to display your custom error message
+
+From v5 and above, you can use %s to return the value
+
+```go
+import "github.com/asaskevich/govalidator"
+
+type Driver struct{
+	Name string `valid:"-"`
+    Car CustomCarType `valid:"customCarTypeValidator~Custom Error Message"`
+}
+
+// v5 and above
+type Driver struct{
+	Name string `valid:"-"`
+    Car CustomCarType `valid:"customCarTypeValidator~Custom Error Message value %s not valid"` //Add %s if you want to return current value
+}
 ```
 
 #### Notes
