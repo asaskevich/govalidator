@@ -2213,6 +2213,18 @@ func TestRequired(t *testing.T) {
 			}{},
 			false,
 		},
+		{
+			struct {
+				Boolean bool `valid:"required"`
+			}{},
+			true,
+		},
+		{
+			struct {
+				BoolPtr *bool `valid:"required"`
+			}{},
+			false,
+		},
 	}
 	for _, test := range tests {
 		actual, err := ValidateStruct(test.param)

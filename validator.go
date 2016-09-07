@@ -654,6 +654,10 @@ func StringLength(str string, params ...string) bool {
 }
 
 func checkRequired(v reflect.Value, t reflect.StructField, options tagOptionsMap) (bool, error) {
+	// do not check bool type for required tag because bool only contains true/false
+	if reflect.Bool == t.Type.Kind() {
+		return true, nil
+	}
 	if requiredOption, isRequired := options["required"]; isRequired {
 		if len(requiredOption) > 0 {
 			return false, Error{t.Name, fmt.Errorf(requiredOption), true}
