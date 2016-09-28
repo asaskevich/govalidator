@@ -2387,3 +2387,25 @@ func ExampleValidateStruct() {
 	}
 	println(result)
 }
+
+func TestIsCIDR(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"193.168.3.20/7", true},
+		{"2001:db8::/32", true},
+		{"2001:0db8:85a3:0000:0000:8a2e:0370:7334/64", true},
+		{"193.138.3.20/60", false},
+		{"500.323.2.23/43", false},
+		{"", false},
+	}
+	for _, test := range tests {
+		actual := IsCIDR(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsCIDR(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
