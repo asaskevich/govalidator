@@ -631,6 +631,15 @@ func TestIsURL(t *testing.T) {
 		{"http://cant-end-with-hyphen-.example.com", false},
 		{"http://-cant-start-with-hyphen.example.com", false},
 		{"http://www.domain-can-have-dashes.com", true},
+		{"http://m.abcd.com/test.html", true},
+		{"http://m.abcd.com/a/b/c/d/test.html?args=a&b=c", true},
+		{"http://[::1]:9093", true},
+		{"http://[::1]:909388", false},
+		{"1200::AB00:1234::2552:7777:1313", false},
+		{"http://[2001:db8:a0b:12f0::1]/index.html", true},
+		{"http://[1200:0000:AB00:1234:0000:2552:7777:1313]", true},
+		{"http://user:pass@[::1]:9093/a/b/c/?a=v#abc", true},
+		{"https://127.0.0.1/a/b/c?a=v&c=11d", true},
 	}
 	for _, test := range tests {
 		actual := IsURL(test.param)
