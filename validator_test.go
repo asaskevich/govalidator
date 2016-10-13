@@ -6,6 +6,15 @@ import (
 	"testing"
 )
 
+func init() {
+	CustomTypeTagMap.Set("customFalseValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+		return false
+	}))
+	CustomTypeTagMap.Set("customTrueValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+		return true
+	}))
+}
+
 func TestIsAlpha(t *testing.T) {
 	t.Parallel()
 
@@ -1929,6 +1938,50 @@ func TestFieldsRequiredByDefaultButExemptOrOptionalStruct(t *testing.T) {
 		}
 	}
 	SetFieldsRequiredByDefault(false)
+}
+
+func TestInvalidValidator(t *testing.T) {
+	type InvalidStruct struct {
+		Field int `valid:"someInvalidValidator"`
+	}
+
+	invalidStruct := InvalidStruct{1}
+	if valid, err := ValidateStruct(&invalidStruct); valid || err == nil ||
+		err.Error() != `Field: The following validator is invalid or can't be applied to the field: "someInvalidValidator";` {
+		t.Errorf("Got an unexpected result for struct with invalid validator: %t %s", valid, err)
+	}
+}
+
+func TestCustomValidator(t *testing.T) {
+	type ValidStruct struct {
+		Field int `valid:"customTrueValidator"`
+	}
+
+	type InvalidStruct struct {
+		Field int `valid:"customFalseValidator~Custom validator error"`
+	}
+
+	type StructWithCustomAndBuiltinValidator struct {
+		Field int `valid:"customTrueValidator,required"`
+	}
+
+	if valid, err := ValidateStruct(&ValidStruct{}); !valid || err != nil {
+		t.Errorf("Got an unexpected result for struct with custom always true validator: %t %s", valid, err)
+	}
+
+	if valid, err := ValidateStruct(&InvalidStruct{}); valid || err == nil || err.Error() != "Custom validator error;;" {
+		t.Errorf("Got an unexpected result for struct with custom always false validator: %t %s", valid, err)
+	}
+
+	mixedStruct := StructWithCustomAndBuiltinValidator{}
+	if valid, err := ValidateStruct(&mixedStruct); valid || err == nil || err.Error() != "Field: non zero value required;" {
+		t.Errorf("Got an unexpected result for invalid struct with custom and built-in validators: %t %s", valid, err)
+	}
+
+	mixedStruct.Field = 1
+	if valid, err := ValidateStruct(&mixedStruct); !valid || err != nil {
+		t.Errorf("Got an unexpected result for valid struct with custom and built-in validators: %t %s", valid, err)
+	}
 }
 
 type CustomByteArray [6]byte
