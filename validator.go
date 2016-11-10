@@ -685,6 +685,11 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value) (bool, e
 	}
 
 	options := parseTagIntoMap(tag)
+	if isEmptyValue(v) {
+		// an empty value is not validated, check only required
+		return checkRequired(v, t, options)
+	}
+
 	var customTypeErrors Errors
 	var customTypeValidatorsExist bool
 	for validatorName, customErrorMessage := range options {
@@ -704,11 +709,6 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value) (bool, e
 			return false, customTypeErrors
 		}
 		return true, nil
-	}
-
-	if isEmptyValue(v) {
-		// an empty value is not validated, check only required
-		return checkRequired(v, t, options)
 	}
 
 	switch v.Kind() {
