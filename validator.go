@@ -16,6 +16,9 @@ import (
 	"unicode/utf8"
 )
 
+const maxURLRuneCount = 2083
+const minURLRuneCount = 3
+
 var fieldsRequiredByDefault bool
 
 // SetFieldsRequiredByDefault causes validation to fail when struct fields
@@ -44,7 +47,9 @@ func IsEmail(str string) bool {
 
 // IsURL check if the string is an URL.
 func IsURL(str string) bool {
-	if str == "" || len(str) >= 2083 || len(str) <= 3 || strings.HasPrefix(str, ".") {
+	characterLength := utf8.RuneCountInString(str)
+
+	if str == "" || characterLength >= maxURLRuneCount || characterLength <= minURLRuneCount || strings.HasPrefix(str, ".") {
 		return false
 	}
 	u, err := url.Parse(str)
