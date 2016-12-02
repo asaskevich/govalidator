@@ -1787,6 +1787,30 @@ func TestStringLength(t *testing.T) {
 	}
 }
 
+func TestIsIn(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		value    string
+		params   []string
+		expected bool
+	}{
+		{"PRESENT", []string{"PRESENT"}, true},
+		{"PRESENT", []string{"PRESENT", "PRÉSENTE", "NOTABSENT"}, true},
+		{"PRÉSENTE", []string{"PRESENT", "PRÉSENTE", "NOTABSENT"}, true},
+		{"PRESENT", []string{}, false},
+		{"PRESENT", nil, false},
+		{"ABSENT", []string{"PRESENT", "PRÉSENTE", "NOTABSENT"}, false},
+		{"", []string{"PRESENT", "PRÉSENTE", "NOTABSENT"}, false},
+	}
+	for _, test := range tests {
+		actual := IsIn(test.value, test.params...)
+		if actual != test.expected {
+			t.Errorf("Expected IsIn(%s, %v) to be %v, got %v", test.value, test.params, test.expected, actual)
+		}
+	}
+}
+
 type Address struct {
 	Street string `valid:"-"`
 	Zip    string `json:"zip" valid:"numeric,required"`
@@ -1835,6 +1859,10 @@ type StringLengthStruct struct {
 
 type StringMatchesStruct struct {
 	StringMatches string `valid:"matches(^[0-9]{3}$)"`
+}
+
+type IsInStruct struct {
+	IsIn string `valid:"in(PRESENT|PRÉSENTE|NOTABSENT)"`
 }
 
 type Post struct {
@@ -2074,6 +2102,106 @@ func TestStringMatchesStruct(t *testing.T) {
 		{StringMatchesStruct{"123"}, true},
 		{StringMatchesStruct{"123456"}, false},
 		{StringMatchesStruct{"123abcd"}, false},
+	}
+
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			if err != nil {
+				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+			}
+		}
+	}
+}
+
+func TestIsInStruct(t *testing.T) {
+	var tests = []struct {
+		param    interface{}
+		expected bool
+	}{
+		{IsInStruct{"PRESENT"}, true},
+		{IsInStruct{""}, true},
+		{IsInStruct{" "}, false},
+		{IsInStruct{"ABSENT"}, false},
+	}
+
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			if err != nil {
+				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+			}
+		}
+	}
+}
+
+func TestRequiredIsInStruct(t *testing.T) {
+	type RequiredIsInStruct struct {
+		IsIn string `valid:"in(PRESENT|PRÉSENTE|NOTABSENT),required"`
+	}
+
+	var tests = []struct {
+		param    interface{}
+		expected bool
+	}{
+		{RequiredIsInStruct{"PRESENT"}, true},
+		{RequiredIsInStruct{""}, false},
+		{RequiredIsInStruct{" "}, false},
+		{RequiredIsInStruct{"ABSENT"}, false},
+	}
+
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			if err != nil {
+				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+			}
+		}
+	}
+}
+
+func TestEmptyRequiredIsInStruct(t *testing.T) {
+	type EmptyRequiredIsInStruct struct {
+		IsIn string `valid:"in(),required"`
+	}
+
+	var tests = []struct {
+		param    interface{}
+		expected bool
+	}{
+		{EmptyRequiredIsInStruct{"PRESENT"}, false},
+		{EmptyRequiredIsInStruct{""}, false},
+		{EmptyRequiredIsInStruct{" "}, false},
+		{EmptyRequiredIsInStruct{"ABSENT"}, false},
+	}
+
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			if err != nil {
+				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+			}
+		}
+	}
+}
+
+func TestFunkyIsInStruct(t *testing.T) {
+	type FunkyIsInStruct struct {
+		IsIn string `valid:"in(PRESENT|| |PRÉSENTE|NOTABSENT)"`
+	}
+
+	var tests = []struct {
+		param    interface{}
+		expected bool
+	}{
+		{FunkyIsInStruct{"PRESENT"}, true},
+		{FunkyIsInStruct{""}, true},
+		{FunkyIsInStruct{" "}, true},
+		{FunkyIsInStruct{"ABSENT"}, false},
 	}
 
 	for _, test := range tests {

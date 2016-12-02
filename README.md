@@ -135,6 +135,7 @@ func IsISBN13(str string) bool
 func IsISO3166Alpha2(str string) bool
 func IsISO3166Alpha3(str string) bool
 func IsInt(str string) bool
+func IsIn(str string, params ...string) bool
 func IsJSON(str string) bool
 func IsLatitude(str string) bool
 func IsLongitude(str string) bool
@@ -306,6 +307,7 @@ Validators with parameters
 ```go
 "length(min|max)": ByteLength,
 "matches(pattern)": StringMatches,
+"in(string1|string2|...|stringN)": IsIn,
 ```
 
 And here is small example of usage:
