@@ -558,7 +558,7 @@ func ValidateStruct(s interface{}) (bool, error) {
 		if typeField.PkgPath != "" {
 			continue // Private field
 		}
-		resultField, err2 := typeCheck(valueField, typeField, val)
+		resultField, err2 := typeCheck(valueField, typeField, val, validTagName)
 		if err2 != nil {
 			errs = append(errs, err2)
 		}
@@ -621,36 +621,94 @@ func IsSemver(str string) bool {
 }
 
 // ByteLength check string's length
-func ByteLength(str string, params ...string) bool {
-	if len(params) == 2 {
-		min, _ := ToInt(params[0])
-		max, _ := ToInt(params[1])
-		return len(str) >= int(min) && len(str) <= int(max)
+func ByteLength(v reflect.Value, ctx map[string]string, params ...string) (bool, error) {
+	if v.Kind() != reflect.String {
+		return false, unsupportedTypeError(v, ctx)
 	}
-
-	return false
+	min, max, err := extractRange(ctx, params)
+	if err != nil {
+		return false, nil
+	}
+	return compareRange(int64(len(v.String())), min, max), nil
 }
 
 // StringMatches checks if a string matches a given pattern.
-func StringMatches(s string, params ...string) bool {
+func StringMatches(v reflect.Value, ctx map[string]string, params ...string) (bool, error) {
+	if v.Kind() != reflect.String {
+		return false, unsupportedTypeError(v, ctx)
+	}
 	if len(params) == 1 {
 		pattern := params[0]
-		return Matches(s, pattern)
+		return Matches(v.String(), pattern), nil
 	}
-	return false
+	return false, nil
+}
+
+func RangeCheck(v reflect.Value, ctx map[string]string, params ...string) (bool, error) {
+	var val int64
+	switch v.Kind() {
+	default:
+		return false, unsupportedTypeError(v, ctx)
+	case reflect.Slice, reflect.Array, reflect.Map, reflect.String:
+		val = int64(v.Len())
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		val = v.Int()
+	}
+
+	min, max, err := extractRange(ctx, params)
+	if err != nil {
+		return false, nil
+	}
+	return compareRange(val, min, max), nil
 }
 
 // StringLength check string's length (including multi byte strings)
-func StringLength(str string, params ...string) bool {
-
-	if len(params) == 2 {
-		strLength := utf8.RuneCountInString(str)
-		min, _ := ToInt(params[0])
-		max, _ := ToInt(params[1])
-		return strLength >= int(min) && strLength <= int(max)
+func StringLength(v reflect.Value, ctx map[string]string, params ...string) (bool, error) {
+	if v.Kind() != reflect.String {
+		return false, unsupportedTypeError(v, ctx)
 	}
+	min, max, err := extractRange(ctx, params)
+	if err != nil {
+		return false, nil
+	}
+	strLength := utf8.RuneCountInString(v.String())
+	return compareRange(int64(strLength), min, max), nil
+}
 
-	return false
+func extractRange(ctx map[string]string, params []string) (*int64, *int64, error) {
+	if len(params) == 3 {
+		var min, max *int64
+		if params[0] != "" {
+			v, err := ToInt(params[0])
+			if err != nil {
+				return nil, nil, err
+			}
+			min = &v
+		}
+		if params[2] != "" {
+			v, err := ToInt(params[2])
+			if err != nil {
+				return nil, nil, err
+			}
+			max = &v
+		}
+		return min, max, nil
+	}
+	return nil, nil, Error{ctx["fieldName"], fmt.Errorf("Invalid validator %s", ctx["validator"]), false}
+}
+
+func compareRange(val int64, min *int64, max *int64) bool {
+	if min != nil && val < *min {
+		return false
+	}
+	if max != nil && val > *max {
+		return false
+	}
+	return true
+}
+
+func unsupportedTypeError(v reflect.Value, ctx map[string]string) error {
+	return Error{ctx["fieldName"], fmt.Errorf("Validator %s doesn't support kind %s", ctx["validator"], v.Kind()), false}
 }
 
 func checkRequired(v reflect.Value, t reflect.StructField, options tagOptionsMap) (bool, error) {
@@ -666,15 +724,14 @@ func checkRequired(v reflect.Value, t reflect.StructField, options tagOptionsMap
 	return true, nil
 }
 
-func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value) (bool, error) {
+func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, tagName string) (bool, error) {
 	if !v.IsValid() {
 		return false, nil
 	}
-
-	tag := t.Tag.Get(tagName)
+	validTag := t.Tag.Get(tagName)
 
 	// Check if the field should be ignored
-	switch tag {
+	switch validTag {
 	case "":
 		if !fieldsRequiredByDefault {
 			return true, nil
@@ -684,7 +741,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value) (bool, e
 		return true, nil
 	}
 
-	options := parseTagIntoMap(tag)
+	options := parseTagIntoMap(validTag)
 	var customTypeErrors Errors
 	var customTypeValidatorsExist bool
 	for validatorName, customErrorMessage := range options {
@@ -717,108 +774,53 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value) (bool, e
 		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
 		reflect.Float32, reflect.Float64,
 		reflect.String:
-		// for each tag option check the map of validator functions
-		for validator, customErrorMessage := range options {
-			var negate bool
-			customMsgExists := (len(customErrorMessage) > 0)
-			// Check wether the tag looks like '!something' or 'something'
-			if validator[0] == '!' {
-				validator = string(validator[1:])
-				negate = true
-			}
-
-			// Check for param validators
-			for key, value := range ParamTagRegexMap {
-				ps := value.FindStringSubmatch(validator)
-				if len(ps) > 0 {
-					if validatefunc, ok := ParamTagMap[key]; ok {
-						switch v.Kind() {
-						case reflect.String:
-							field := fmt.Sprint(v) // make value into string, then validate with regex
-							if result := validatefunc(field, ps[1:]...); (!result && !negate) || (result && negate) {
-								var err error
-								if !negate {
-									if customMsgExists {
-										err = fmt.Errorf(customErrorMessage)
-									} else {
-										err = fmt.Errorf("%s does not validate as %s", field, validator)
-									}
-
-								} else {
-									if customMsgExists {
-										err = fmt.Errorf(customErrorMessage)
-									} else {
-										err = fmt.Errorf("%s does validate as %s", field, validator)
-									}
-								}
-								return false, Error{t.Name, err, customMsgExists}
-							}
-						default:
-							// type not yet supported, fail
-							return false, Error{t.Name, fmt.Errorf("Validator %s doesn't support kind %s", validator, v.Kind()), false}
-						}
-					}
-				}
-			}
-
-			if validatefunc, ok := TagMap[validator]; ok {
-				switch v.Kind() {
-				case reflect.String:
-					field := fmt.Sprint(v) // make value into string, then validate with regex
-					if result := validatefunc(field); !result && !negate || result && negate {
-						var err error
-
-						if !negate {
-							if customMsgExists {
-								err = fmt.Errorf(customErrorMessage)
-							} else {
-								err = fmt.Errorf("%s does not validate as %s", field, validator)
-							}
-						} else {
-							if customMsgExists {
-								err = fmt.Errorf(customErrorMessage)
-							} else {
-								err = fmt.Errorf("%s does validate as %s", field, validator)
-							}
-						}
-						return false, Error{t.Name, err, customMsgExists}
-					}
-				default:
-					//Not Yet Supported Types (Fail here!)
-					err := fmt.Errorf("Validator %s doesn't support kind %s for value %v", validator, v.Kind(), v)
-					return false, Error{t.Name, err, false}
-				}
-			}
-		}
-		return true, nil
+		return ValidateField(v, t, options)
 	case reflect.Map:
 		if v.Type().Key().Kind() != reflect.String {
 			return false, &UnsupportedTypeError{v.Type()}
 		}
+		// first check the map itself
+		resultItem, err := ValidateField(v, t, options)
+		if err != nil {
+			return false, err
+		}
 		var sv stringValues
 		sv = v.MapKeys()
 		sort.Sort(sv)
-		result := true
+		result := resultItem
 		for _, k := range sv {
-			resultItem, err := ValidateStruct(v.MapIndex(k).Interface())
-			if err != nil {
-				return false, err
+			if v.MapIndex(k).Kind() != reflect.Struct {
+				resultItem, err = typeCheck(v.MapIndex(k), t, o, validItemTagName)
+				if err != nil {
+					return false, err
+				}
+			} else {
+				resultItem, err = typeCheck(v.MapIndex(k), t, o, validItemTagName)
+				if err != nil {
+					return false, err
+				}
 			}
 			result = result && resultItem
 		}
 		return result, nil
 	case reflect.Slice:
 		result := true
+		// first check the slice itself
+		resultItem, err := ValidateField(v, t, options)
+		if err != nil {
+			return false, err
+		}
+		result = result && resultItem
 		for i := 0; i < v.Len(); i++ {
 			var resultItem bool
 			var err error
 			if v.Index(i).Kind() != reflect.Struct {
-				resultItem, err = typeCheck(v.Index(i), t, o)
+				resultItem, err = typeCheck(v.Index(i), t, o, validItemTagName)
 				if err != nil {
 					return false, err
 				}
 			} else {
-				resultItem, err = ValidateStruct(v.Index(i).Interface())
+				resultItem, err = typeCheck(v.Index(i), t, o, validItemTagName)
 				if err != nil {
 					return false, err
 				}
@@ -828,16 +830,22 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value) (bool, e
 		return result, nil
 	case reflect.Array:
 		result := true
+		// first check the array itself
+		resultItem, err := ValidateField(v, t, options)
+		if err != nil {
+			return false, err
+		}
+		result = result && resultItem
 		for i := 0; i < v.Len(); i++ {
 			var resultItem bool
 			var err error
 			if v.Index(i).Kind() != reflect.Struct {
-				resultItem, err = typeCheck(v.Index(i), t, o)
+				resultItem, err = typeCheck(v.Index(i), t, o, validItemTagName)
 				if err != nil {
 					return false, err
 				}
 			} else {
-				resultItem, err = ValidateStruct(v.Index(i).Interface())
+				resultItem, err = typeCheck(v.Index(i), t, o, validItemTagName)
 				if err != nil {
 					return false, err
 				}
@@ -856,12 +864,89 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value) (bool, e
 		if v.IsNil() {
 			return true, nil
 		}
-		return typeCheck(v.Elem(), t, o)
+		return typeCheck(v.Elem(), t, o, validTagName)
 	case reflect.Struct:
 		return ValidateStruct(v.Interface())
 	default:
 		return false, &UnsupportedTypeError{v.Type()}
 	}
+}
+
+func ValidateField(v reflect.Value, t reflect.StructField, options tagOptionsMap) (bool, error) {
+	// for each tag option check the map of validator functions
+	for validator, customErrorMessage := range options {
+		var negate bool
+		customMsgExists := (len(customErrorMessage) > 0)
+		// Check wether the tag looks like '!something' or 'something'
+		if validator[0] == '!' {
+			validator = string(validator[1:])
+			negate = true
+		}
+
+		// Check for param validators
+		for key, value := range ParamTagRegexMap {
+			ps := value.FindStringSubmatch(validator)
+			if len(ps) > 0 {
+				if validatefunc, ok := ParamTagMap[key]; ok {
+					ctx := map[string]string{
+						"fieldName": t.Name,
+						"validator": validator,
+					}
+					// then validate with regex
+					if result, err := validatefunc(v, ctx, ps[1:]...); (!result && !negate) || (result && negate) {
+						if err != nil {
+							return false, err
+						}
+						if !negate {
+							if customMsgExists {
+								err = fmt.Errorf(customErrorMessage)
+							} else {
+								err = fmt.Errorf("%s does not validate as %v", v, validator)
+							}
+
+						} else {
+							if customMsgExists {
+								err = fmt.Errorf(customErrorMessage)
+							} else {
+								err = fmt.Errorf("%s does validate as %v", v, validator)
+							}
+						}
+						return false, Error{t.Name, err, customMsgExists}
+					}
+				}
+			}
+		}
+
+		if validatefunc, ok := TagMap[validator]; ok {
+			switch v.Kind() {
+			case reflect.String:
+				field := fmt.Sprint(v) // make value into string, then validate with regex
+				if result := validatefunc(field); !result && !negate || result && negate {
+					var err error
+
+					if !negate {
+						if customMsgExists {
+							err = fmt.Errorf(customErrorMessage)
+						} else {
+							err = fmt.Errorf("%s does not validate as %s", field, validator)
+						}
+					} else {
+						if customMsgExists {
+							err = fmt.Errorf(customErrorMessage)
+						} else {
+							err = fmt.Errorf("%s does validate as %s", field, validator)
+						}
+					}
+					return false, Error{t.Name, err, customMsgExists}
+				}
+			default:
+				//Not Yet Supported Types (Fail here!)
+				err := fmt.Errorf("Validator %s doesn't support kind %s for value %v", validator, v.Kind(), v)
+				return false, Error{t.Name, err, false}
+			}
+		}
+	}
+	return true, nil
 }
 
 func isEmptyValue(v reflect.Value) bool {

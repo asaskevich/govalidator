@@ -2,6 +2,7 @@ package govalidator
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -1754,7 +1755,7 @@ func TestByteLength(t *testing.T) {
 		{"1239999asdff29", "10", "30", true},
 	}
 	for _, test := range tests {
-		actual := ByteLength(test.value, test.min, test.max)
+		actual, _ := ByteLength(reflect.ValueOf(test.value), map[string]string{}, test.min, "|", test.max)
 		if actual != test.expected {
 			t.Errorf("Expected ByteLength(%s, %s, %s) to be %v, got %v", test.value, test.min, test.max, test.expected, actual)
 		}
@@ -1780,7 +1781,7 @@ func TestStringLength(t *testing.T) {
 		{"あいうえ", "5", "10", false},
 	}
 	for _, test := range tests {
-		actual := StringLength(test.value, test.min, test.max)
+		actual, _ := StringLength(reflect.ValueOf(test.value), map[string]string{}, test.min, "|", test.max)
 		if actual != test.expected {
 			t.Errorf("Expected StringLength(%s, %s, %s) to be %v, got %v", test.value, test.min, test.max, test.expected, actual)
 		}
@@ -1814,7 +1815,7 @@ type PrivateStruct struct {
 	privateField string `valid:"required,alpha,d_k"`
 	NonZero      int
 	ListInt      []int
-	ListString   []string `valid:"alpha"`
+	ListString   []string `validItem:"alpha"`
 	Work         [2]Address
 	Home         Address
 	Map          map[string]Address
@@ -1831,6 +1832,15 @@ type LengthStruct struct {
 
 type StringLengthStruct struct {
 	Length string `valid:"stringlength(10|20)"`
+}
+
+type RangeStruct struct {
+	String string            `valid:"range(10|20)"`
+	MinMax int               `valid:"range(10|20)"`
+	Min    int               `valid:"range(10|)"`
+	Max    int               `valid:"range(|20)"`
+	Array  []string          `valid:"range(2|4)" validItem:"-"`
+	Map    map[string]string `valid:"range(2|4)" validItem:"-"`
 }
 
 type StringMatchesStruct struct {
@@ -2066,6 +2076,51 @@ func TestStringLengthStruct(t *testing.T) {
 	}
 }
 
+func TestRange(t *testing.T) {
+	var tests = []struct {
+		param    interface{}
+		expected bool
+	}{
+		// valid struct
+		{RangeStruct{
+			String: "12345678910", MinMax: 13, Min: 11, Max: 4, Array: []string{"1", "2", "3"},
+			Map: map[string]string{"1": "1", "2": "2", "3": "3"}}, true},
+		// Range on string: `String` too short
+		{RangeStruct{
+			String: "123456", MinMax: 13, Min: 11, Max: 4, Array: []string{"1", "2", "3"},
+			Map: map[string]string{"1": "1", "2": "2", "3": "3"}}, false},
+		// Range on int: `MinMax` too big
+		{RangeStruct{
+			String: "12345678910", MinMax: 22, Min: 11, Max: 4, Array: []string{"1", "2", "3"},
+			Map: map[string]string{"1": "1", "2": "2", "3": "3"}}, false},
+		// Range on int: `Min` too small
+		{RangeStruct{
+			String: "12345678910", MinMax: 13, Min: 2, Max: 4, Array: []string{"1", "2", "3"},
+			Map: map[string]string{"1": "1", "2": "2", "3": "3"}}, false},
+		// Range on int: `Max` too big
+		{RangeStruct{
+			String: "12345678910", MinMax: 13, Min: 11, Max: 21, Array: []string{"1", "2", "3"},
+			Map: map[string]string{"1": "1", "2": "2", "3": "3"}}, false},
+		// Range on array: `Array` does not have enough elements
+		{RangeStruct{
+			String: "12345678910", MinMax: 13, Min: 11, Max: 4, Array: []string{"1"},
+			Map: map[string]string{"1": "1", "2": "2", "3": "3"}}, false},
+		// Range on map: `Map` does not have enough key-value pairs
+		{RangeStruct{
+			String: "12345678910", MinMax: 13, Min: 11, Max: 4, Array: []string{"1", "2", "3"},
+			Map: map[string]string{"1": "1", "2": "2", "3": "3", "4": "4", "5": "5"}}, false},
+	}
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			if err != nil {
+				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+			}
+		}
+	}
+}
+
 func TestStringMatchesStruct(t *testing.T) {
 	var tests = []struct {
 		param    interface{}
@@ -2181,13 +2236,13 @@ func TestRequired(t *testing.T) {
 		},
 		{
 			struct {
-				TestByteArray testByteArray `valid:"required"`
+				TestByteArray1 testByteArray `valid:"required" validItem:"required"`
 			}{},
 			false,
 		},
 		{
 			struct {
-				TestByteArray testByteArray `valid:"required"`
+				TestByteArray2 testByteArray `valid:"required" validItem:"required"`
 			}{
 				testByteArray{},
 			},
@@ -2195,7 +2250,7 @@ func TestRequired(t *testing.T) {
 		},
 		{
 			struct {
-				TestByteArray testByteArray `valid:"required"`
+				TestByteArray3 testByteArray `valid:"required" validItem:"required"`
 			}{
 				testByteArray{'1', '2', '3', '4', '5', '6', '7', 'A'},
 			},
@@ -2214,10 +2269,12 @@ func TestRequired(t *testing.T) {
 			false,
 		},
 	}
-	for _, test := range tests {
+	for i, test := range tests {
 		actual, err := ValidateStruct(test.param)
 		if actual != test.expected {
 			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("%v", test.param)
+			t.Errorf("%v", i)
 			if err != nil {
 				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
 			}
