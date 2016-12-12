@@ -1487,6 +1487,7 @@ func TestIsDNSName(t *testing.T) {
 		expected bool
 	}{
 		{"localhost", true},
+		{"a.bc", true},
 		{"localhost.local", true},
 		{"localhost.localdomain.intern", true},
 		{"-localhost", false},
