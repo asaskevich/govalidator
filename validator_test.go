@@ -2,6 +2,7 @@ package govalidator
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -2242,6 +2243,18 @@ func TestRequired(t *testing.T) {
 			}{},
 			false,
 		},
+		{
+			struct {
+				Boolean bool `valid:"required"`
+			}{},
+			true,
+		},
+		{
+			struct {
+				BoolPtr *bool `valid:"required"`
+			}{},
+			false,
+		},
 	}
 	for _, test := range tests {
 		actual, err := ValidateStruct(test.param)
@@ -2444,6 +2457,41 @@ func TestIsCIDR(t *testing.T) {
 		actual := IsCIDR(test.param)
 		if actual != test.expected {
 			t.Errorf("Expected IsCIDR(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+type customStringerType int64
+
+func (t customStringerType) String() string {
+	return strconv.FormatInt(int64(t), 10)
+}
+
+func TestCustomStringer(t *testing.T) {
+	t.Parallel()
+
+	type withCustomStringer struct {
+		Number customStringerType `valid:"numeric"`
+		URL    customStringerType `valid:"url"`
+	}
+
+	var tests = []struct {
+		param    string
+		expected string
+	}{
+		{"Number", ""},
+		{"URL", "456 does not validate as url"},
+	}
+
+	_, err := ValidateStruct(withCustomStringer{
+		Number: 123,
+		URL:    456,
+	})
+
+	for _, test := range tests {
+		actual := ErrorByField(err, test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ErrorByField(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }

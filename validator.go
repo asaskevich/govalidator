@@ -20,6 +20,7 @@ const maxURLRuneCount = 2083
 const minURLRuneCount = 3
 
 var fieldsRequiredByDefault bool
+var stringer = reflect.TypeOf((*fmt.Stringer)(nil)).Elem()
 
 // SetFieldsRequiredByDefault causes validation to fail when struct fields
 // do not include validations or are not explicitly marked as exempt (using `valid:"-"` or `valid:"email,optional"`).
@@ -659,6 +660,10 @@ func StringLength(str string, params ...string) bool {
 }
 
 func checkRequired(v reflect.Value, t reflect.StructField, options tagOptionsMap) (bool, error) {
+	// do not check bool type for required tag because bool only contains true/false
+	if reflect.Bool == t.Type.Kind() {
+		return true, nil
+	}
 	if requiredOption, isRequired := options["required"]; isRequired {
 		if len(requiredOption) > 0 {
 			return false, Error{t.Name, fmt.Errorf(requiredOption), true}
@@ -767,31 +772,36 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value) (bool, e
 			}
 
 			if validatefunc, ok := TagMap[validator]; ok {
-				switch v.Kind() {
-				case reflect.String:
-					field := fmt.Sprint(v) // make value into string, then validate with regex
-					if result := validatefunc(field); !result && !negate || result && negate {
-						var err error
-
-						if !negate {
-							if customMsgExists {
-								err = fmt.Errorf(customErrorMessage)
-							} else {
-								err = fmt.Errorf("%s does not validate as %s", field, validator)
-							}
-						} else {
-							if customMsgExists {
-								err = fmt.Errorf(customErrorMessage)
-							} else {
-								err = fmt.Errorf("%s does validate as %s", field, validator)
-							}
-						}
-						return false, Error{t.Name, err, customMsgExists}
+				field := ""
+				if v.Type().Implements(stringer) {
+					field = v.Interface().(fmt.Stringer).String()
+				} else {
+					switch v.Kind() {
+					case reflect.String:
+						field = fmt.Sprint(v) // make value into string, then validate with regex
+					default:
+						//Not Yet Supported Types (Fail here!)
+						err := fmt.Errorf("Validator %s doesn't support kind %s for value %v", validator, v.Kind(), v)
+						return false, Error{t.Name, err, false}
 					}
-				default:
-					//Not Yet Supported Types (Fail here!)
-					err := fmt.Errorf("Validator %s doesn't support kind %s for value %v", validator, v.Kind(), v)
-					return false, Error{t.Name, err, false}
+				}
+				if result := validatefunc(field); !result && !negate || result && negate {
+					var err error
+
+					if !negate {
+						if customMsgExists {
+							err = fmt.Errorf(customErrorMessage)
+						} else {
+							err = fmt.Errorf("%s does not validate as %s", field, validator)
+						}
+					} else {
+						if customMsgExists {
+							err = fmt.Errorf(customErrorMessage)
+						} else {
+							err = fmt.Errorf("%s does validate as %s", field, validator)
+						}
+					}
+					return false, Error{t.Name, err, customMsgExists}
 				}
 			}
 		}
