@@ -2447,3 +2447,26 @@ func TestIsCIDR(t *testing.T) {
 		}
 	}
 }
+
+func TestOptionalCustomValidators(t *testing.T) {
+
+	CustomTypeTagMap.Set("f2", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+		return false
+	}))
+
+	var val struct {
+		WithCustomError    string `valid:"f2~boom,optional"`
+		WithoutCustomError string `valid:"f2,optional"`
+		OptionalFirst      string `valid:"optional,f2"`
+	}
+
+	ok, err := ValidateStruct(val)
+
+	if err != nil {
+		t.Errorf("Expected nil err with optional validation, got %v", err)
+	}
+
+	if !ok {
+		t.Error("Expected validation to return true, got false")
+	}
+}
