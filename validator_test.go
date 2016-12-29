@@ -1740,6 +1740,31 @@ func TestIsSemver(t *testing.T) {
 	}
 }
 
+func TestIsRFC3339(t *testing.T) {
+	t.Parallel()
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"2016-12-31 11:00", false},
+		{"2016-12-31 11:00:00", false},
+		{"2016-12-31T11:00", false},
+		{"2016-12-31T11:00:00", false},
+		{"2016-12-31T11:00:00Z", true},
+		{"2016-12-31T11:00:00+01:00", true},
+		{"2016-12-31T11:00:00-01:00", true},
+		{"2016-12-31T11:00:00.05Z", true},
+		{"2016-12-31T11:00:00.05-01:00", true},
+		{"2016-12-31T11:00:00.05+01:00", true},
+	}
+	for _, test := range tests {
+		actual := IsRFC3339(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsRFC3339(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
 func TestByteLength(t *testing.T) {
 	t.Parallel()
 
