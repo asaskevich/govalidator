@@ -11,7 +11,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-
+	"time"
 	"unicode"
 	"unicode/utf8"
 )
@@ -626,7 +626,8 @@ func IsSemver(str string) bool {
 }
 
 func IsRFC3339(str string) bool {
-	return rxRFC3339.MatchString(str)
+	_, err := time.Parse(time.RFC3339, str)
+	return err == nil
 }
 
 // ByteLength check string's length
