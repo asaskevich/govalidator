@@ -18,6 +18,9 @@ import (
 
 var fieldsRequiredByDefault bool
 
+const maxURLRuneCount = 2083
+const minURLRuneCount = 3
+
 // SetFieldsRequiredByDefault causes validation to fail when struct fields
 // do not include validations or are not explicitly marked as exempt (using `valid:"-"` or `valid:"email,optional"`).
 // This struct definition will fail govalidator.ValidateStruct() (and the field values do not matter):
@@ -44,7 +47,7 @@ func IsEmail(str string) bool {
 
 // IsURL check if the string is an URL.
 func IsURL(str string) bool {
-	if str == "" || utf8.RuneCountInString(str) >= 2083 || len(str) <= 3 || strings.HasPrefix(str, ".") {
+	if str == "" || utf8.RuneCountInString(str) >= maxURLRuneCount || len(str) <= minURLRuneCount || strings.HasPrefix(str, ".") {
 		return false
 	}
 	u, err := url.Parse(str)

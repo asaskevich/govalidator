@@ -1487,6 +1487,7 @@ func TestIsDNSName(t *testing.T) {
 		expected bool
 	}{
 		{"localhost", true},
+		{"a.bc", true},
 		{"localhost.local", true},
 		{"localhost.localdomain.intern", true},
 		{"-localhost", false},
@@ -1868,6 +1869,10 @@ type StringMatchesStruct struct {
 	StringMatches string `valid:"matches(^[0-9]{3}$)"`
 }
 
+type StringMatchesComplexStruct struct {
+	StringMatches string `valid:"matches(^\\$\\([\"']\\w+[\"']\\)$)"`
+}
+
 type Post struct {
 	Title    string `valid:"alpha,required"`
 	Message  string `valid:"ascii"`
@@ -2105,6 +2110,30 @@ func TestStringMatchesStruct(t *testing.T) {
 		{StringMatchesStruct{"123"}, true},
 		{StringMatchesStruct{"123456"}, false},
 		{StringMatchesStruct{"123abcd"}, false},
+	}
+
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			if err != nil {
+				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+			}
+		}
+	}
+}
+
+func TestStringMatchesComplexStruct(t *testing.T) {
+	var tests = []struct {
+		param    interface{}
+		expected bool
+	}{
+		{StringMatchesComplexStruct{"$()"}, false},
+		{StringMatchesComplexStruct{"$('AZERTY')"}, true},
+		{StringMatchesComplexStruct{`$("AZERTY")`}, true},
+		{StringMatchesComplexStruct{`$("")`}, false},
+		{StringMatchesComplexStruct{"AZERTY"}, false},
+		{StringMatchesComplexStruct{"$AZERTY"}, false},
 	}
 
 	for _, test := range tests {
@@ -2447,5 +2476,28 @@ func TestIsCIDR(t *testing.T) {
 		if actual != test.expected {
 			t.Errorf("Expected IsCIDR(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
+	}
+}
+
+func TestOptionalCustomValidators(t *testing.T) {
+
+	CustomTypeTagMap.Set("f2", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+		return false
+	}))
+
+	var val struct {
+		WithCustomError    string `valid:"f2~boom,optional"`
+		WithoutCustomError string `valid:"f2,optional"`
+		OptionalFirst      string `valid:"optional,f2"`
+	}
+
+	ok, err := ValidateStruct(val)
+
+	if err != nil {
+		t.Errorf("Expected nil err with optional validation, got %v", err)
+	}
+
+	if !ok {
+		t.Error("Expected validation to return true, got false")
 	}
 }
