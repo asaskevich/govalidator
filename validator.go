@@ -623,6 +623,10 @@ func IsSemver(str string) bool {
 	return rxSemver.MatchString(str)
 }
 
+func IsRFC3339(str string) bool {
+	return rxRFC3339.MatchString(str)
+}
+
 // ByteLength check string's length
 func ByteLength(str string, params ...string) bool {
 	if len(params) == 2 {
