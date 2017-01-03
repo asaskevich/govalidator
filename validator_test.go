@@ -1752,11 +1752,35 @@ func TestByteLength(t *testing.T) {
 		{"1239999", "0", "0", false},
 		{"1239asdfasf99", "100", "200", false},
 		{"1239999asdff29", "10", "30", true},
+		{"你", "0", "1", false},
 	}
 	for _, test := range tests {
 		actual := ByteLength(test.value, test.min, test.max)
 		if actual != test.expected {
 			t.Errorf("Expected ByteLength(%s, %s, %s) to be %v, got %v", test.value, test.min, test.max, test.expected, actual)
+		}
+	}
+}
+
+func TestRuneLength(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		value    string
+		min      string
+		max      string
+		expected bool
+	}{
+		{"123456", "0", "100", true},
+		{"1239999", "0", "0", false},
+		{"1239asdfasf99", "100", "200", false},
+		{"1239999asdff29", "10", "30", true},
+		{"你", "0", "1", true},
+	}
+	for _, test := range tests {
+		actual := RuneLength(test.value, test.min, test.max)
+		if actual != test.expected {
+			t.Errorf("Expected RuneLength(%s, %s, %s) to be %v, got %v", test.value, test.min, test.max, test.expected, actual)
 		}
 	}
 }

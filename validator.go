@@ -631,6 +631,12 @@ func ByteLength(str string, params ...string) bool {
 	return false
 }
 
+// RuneLength check string's length
+// Alias for StringLength
+func RuneLength(str string, params ...string) bool {
+	return StringLength(str, params...)
+}
+
 // StringMatches checks if a string matches a given pattern.
 func StringMatches(s string, params ...string) bool {
 	if len(params) == 1 {
