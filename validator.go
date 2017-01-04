@@ -11,7 +11,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-
+	"time"
 	"unicode"
 	"unicode/utf8"
 )
@@ -621,6 +621,15 @@ func IsSSN(str string) bool {
 // IsSemver check if string is valid semantic version
 func IsSemver(str string) bool {
 	return rxSemver.MatchString(str)
+}
+
+func IsTime(str string, format string) bool {
+	_, err := time.Parse(format, str)
+	return err == nil
+}
+
+func IsRFC3339(str string) bool {
+	return IsTime(str, time.RFC3339)
 }
 
 // ByteLength check string's length
