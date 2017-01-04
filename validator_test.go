@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestIsAlpha(t *testing.T) {
@@ -1736,6 +1737,32 @@ func TestIsSemver(t *testing.T) {
 		actual := IsSemver(test.param)
 		if actual != test.expected {
 			t.Errorf("Expected IsSemver(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsTime(t *testing.T) {
+	t.Parallel()
+	var tests = []struct {
+		param    string
+		format   string
+		expected bool
+	}{
+		{"2016-12-31 11:00", time.RFC3339, false},
+		{"2016-12-31 11:00:00", time.RFC3339, false},
+		{"2016-12-31T11:00", time.RFC3339, false},
+		{"2016-12-31T11:00:00", time.RFC3339, false},
+		{"2016-12-31T11:00:00Z", time.RFC3339, true},
+		{"2016-12-31T11:00:00+01:00", time.RFC3339, true},
+		{"2016-12-31T11:00:00-01:00", time.RFC3339, true},
+		{"2016-12-31T11:00:00.05Z", time.RFC3339, true},
+		{"2016-12-31T11:00:00.05-01:00", time.RFC3339, true},
+		{"2016-12-31T11:00:00.05+01:00", time.RFC3339, true},
+	}
+	for _, test := range tests {
+		actual := IsTime(test.param, test.format)
+		if actual != test.expected {
+			t.Errorf("Expected IsTime(%q, time.RFC3339) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
