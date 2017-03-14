@@ -2553,3 +2553,25 @@ func TestOptionalCustomValidators(t *testing.T) {
 		t.Error("Expected validation to return true, got false")
 	}
 }
+
+func TestJSONValidator(t *testing.T) {
+
+	var val struct {
+		WithJSONName    string `json:"with_json_name" valid:"-,required"`
+		WithoutJSONName string `valid:"-,required"`
+	}
+
+	_, err := ValidateStruct(val)
+
+	if err == nil {
+		t.Error("Expected error but got no error")
+	}
+
+	if Contains(err.Error(), "WithJSONName") {
+		t.Errorf("Expected error message to contain with_json_name but actual error is: %s", err.Error())
+	}
+
+	if Contains(err.Error(), "WithoutJSONName") == false {
+		t.Errorf("Expected error message to contain WithoutJSONName but actual error is: %s", err.Error())
+	}
+}
