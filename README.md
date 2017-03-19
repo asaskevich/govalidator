@@ -172,6 +172,9 @@ func LeftTrim(str, chars string) string
 func Map(array []interface{}, iterator ResultIterator) []interface{}
 func Matches(str, pattern string) bool
 func NormalizeEmail(str string) (string, error)
+func PadBoth(str string, padStr string, padLen int) string
+func PadLeft(str string, padStr string, padLen int)  string
+func PadRight(str string, padStr string, padLen int) string
 func RemoveTags(s string) string
 func ReplacePattern(str, pattern, replace string) string
 func Reverse(s string) string

@@ -426,3 +426,75 @@ func TestTruncate(t *testing.T) {
 		}
 	}
 }
+
+func TestPadLeft(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param1   string
+		param2   string
+		param3   int
+		expected string
+	}{
+		{"こんにちは", "xyz", 12, "xyzxyzxこんにちは"},
+		{"こんにちは", "xyz", 11, "xyzxyzこんにちは"},
+		{"abc", "x", 5, "xxabc"},
+		{"abc", "xyz", 5, "xyabc"},
+		{"abcde", "xyz", 5, "abcde"},
+		{"abcde", "xyz", 4, "abcde"},
+	}
+	for _, test := range tests {
+		actual := PadLeft(test.param1, test.param2, test.param3)
+		if actual != test.expected {
+			t.Errorf("Expected PadLeft(%q,%q,%q) to be %v, got %v", test.param1, test.param2, test.param3, test.expected, actual)
+		}
+	}
+}
+
+func TestPadRight(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param1   string
+		param2   string
+		param3   int
+		expected string
+	}{
+		{"こんにちは", "xyz", 12, "こんにちはxyzxyzx"},
+		{"こんにちは", "xyz", 11, "こんにちはxyzxyz"},
+		{"abc", "x", 5, "abcxx"},
+		{"abc", "xyz", 5, "abcxy"},
+		{"abcde", "xyz", 5, "abcde"},
+		{"abcde", "xyz", 4, "abcde"},
+	}
+	for _, test := range tests {
+		actual := PadRight(test.param1, test.param2, test.param3)
+		if actual != test.expected {
+			t.Errorf("Expected PadRight(%q,%q,%q) to be %v, got %v", test.param1, test.param2, test.param3, test.expected, actual)
+		}
+	}
+}
+
+func TestPadBoth(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param1   string
+		param2   string
+		param3   int
+		expected string
+	}{
+		{"こんにちは", "xyz", 12, "xyzこんにちはxyzx"},
+		{"こんにちは", "xyz", 11, "xyzこんにちはxyz"},
+		{"abc", "x", 5, "xabcx"},
+		{"abc", "xyz", 5, "xabcx"},
+		{"abcde", "xyz", 5, "abcde"},
+		{"abcde", "xyz", 4, "abcde"},
+	}
+	for _, test := range tests {
+		actual := PadBoth(test.param1, test.param2, test.param3)
+		if actual != test.expected {
+			t.Errorf("Expected PadBoth(%q,%q,%q) to be %v, got %v", test.param1, test.param2, test.param3, test.expected, actual)
+		}
+	}
+}
