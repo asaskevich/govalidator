@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestIsAlpha(t *testing.T) {
@@ -1487,6 +1488,7 @@ func TestIsDNSName(t *testing.T) {
 		expected bool
 	}{
 		{"localhost", true},
+		{"a.bc", true},
 		{"localhost.local", true},
 		{"localhost.localdomain.intern", true},
 		{"-localhost", false},
@@ -1608,6 +1610,13 @@ func TestFilePath(t *testing.T) {
 		{"/path/file:SAMPLE/", true, Unix},
 		{"/path/file:/.txt", true, Unix},
 		{"/path", true, Unix},
+    {"/path/__bc/file.txt", true, Unix},
+  	{"/path/a--ac/file.txt", true, Unix},
+ 	  {"/_path/file.txt", true, Unix},
+ 		{"/path/__bc/file.txt", true, Unix},
+ 		{"/path/a--ac/file.txt", true, Unix},
+ 		{"/__path/--file.txt", true, Unix},
+ 		{"/path/a bc", true, Unix},
 	}
 	for _, test := range tests {
 		actual, osType := IsFilePath(test.param)
@@ -1739,6 +1748,57 @@ func TestIsSemver(t *testing.T) {
 	}
 }
 
+func TestIsTime(t *testing.T) {
+	t.Parallel()
+	var tests = []struct {
+		param    string
+		format   string
+		expected bool
+	}{
+		{"2016-12-31 11:00", time.RFC3339, false},
+		{"2016-12-31 11:00:00", time.RFC3339, false},
+		{"2016-12-31T11:00", time.RFC3339, false},
+		{"2016-12-31T11:00:00", time.RFC3339, false},
+		{"2016-12-31T11:00:00Z", time.RFC3339, true},
+		{"2016-12-31T11:00:00+01:00", time.RFC3339, true},
+		{"2016-12-31T11:00:00-01:00", time.RFC3339, true},
+		{"2016-12-31T11:00:00.05Z", time.RFC3339, true},
+		{"2016-12-31T11:00:00.05-01:00", time.RFC3339, true},
+		{"2016-12-31T11:00:00.05+01:00", time.RFC3339, true},
+	}
+	for _, test := range tests {
+		actual := IsTime(test.param, test.format)
+		if actual != test.expected {
+			t.Errorf("Expected IsTime(%q, time.RFC3339) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsRFC3339(t *testing.T) {
+	t.Parallel()
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"2016-12-31 11:00", false},
+		{"2016-12-31 11:00:00", false},
+		{"2016-12-31T11:00", false},
+		{"2016-12-31T11:00:00", false},
+		{"2016-12-31T11:00:00Z", true},
+		{"2016-12-31T11:00:00+01:00", true},
+		{"2016-12-31T11:00:00-01:00", true},
+		{"2016-12-31T11:00:00.05Z", true},
+		{"2016-12-31T11:00:00.05-01:00", true},
+		{"2016-12-31T11:00:00.05+01:00", true},
+	}
+	for _, test := range tests {
+		actual := IsRFC3339(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsRFC3339(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
 func TestByteLength(t *testing.T) {
 	t.Parallel()
 
@@ -1752,11 +1812,35 @@ func TestByteLength(t *testing.T) {
 		{"1239999", "0", "0", false},
 		{"1239asdfasf99", "100", "200", false},
 		{"1239999asdff29", "10", "30", true},
+		{"你", "0", "1", false},
 	}
 	for _, test := range tests {
 		actual := ByteLength(test.value, test.min, test.max)
 		if actual != test.expected {
 			t.Errorf("Expected ByteLength(%s, %s, %s) to be %v, got %v", test.value, test.min, test.max, test.expected, actual)
+		}
+	}
+}
+
+func TestRuneLength(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		value    string
+		min      string
+		max      string
+		expected bool
+	}{
+		{"123456", "0", "100", true},
+		{"1239999", "0", "0", false},
+		{"1239asdfasf99", "100", "200", false},
+		{"1239999asdff29", "10", "30", true},
+		{"你", "0", "1", true},
+	}
+	for _, test := range tests {
+		actual := RuneLength(test.value, test.min, test.max)
+		if actual != test.expected {
+			t.Errorf("Expected RuneLength(%s, %s, %s) to be %v, got %v", test.value, test.min, test.max, test.expected, actual)
 		}
 	}
 }
@@ -1860,6 +1944,10 @@ type StringLengthStruct struct {
 type StringMatchesStruct struct {
 	StringMatches string `valid:"matches(^[0-9]{3}$)"`
 }
+// TODO: this testcase should be fixed
+// type StringMatchesComplexStruct struct {
+// 	StringMatches string `valid:"matches(^\\$\\([\"']\\w+[\"']\\)$)"`
+// }
 
 type IsInStruct struct {
 	IsIn string `valid:"in(PRESENT|PRÉSENTE|NOTABSENT)"`
@@ -2215,6 +2303,32 @@ func TestFunkyIsInStruct(t *testing.T) {
 	}
 }
 
+// TODO: test case broken
+// func TestStringMatchesComplexStruct(t *testing.T) {
+// 	var tests = []struct {
+// 		param    interface{}
+// 		expected bool
+// 	}{
+// 		{StringMatchesComplexStruct{"$()"}, false},
+// 		{StringMatchesComplexStruct{"$('AZERTY')"}, true},
+// 		{StringMatchesComplexStruct{`$("AZERTY")`}, true},
+// 		{StringMatchesComplexStruct{`$("")`}, false},
+// 		{StringMatchesComplexStruct{"AZERTY"}, false},
+// 		{StringMatchesComplexStruct{"$AZERTY"}, false},
+// 	}
+
+// 	for _, test := range tests {
+// 		actual, err := ValidateStruct(test.param)
+// 		if actual != test.expected {
+// 			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+// 			if err != nil {
+// 				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+// 			}
+// 		}
+// 	}
+// }
+
+
 func TestValidateStruct(t *testing.T) {
 
 	var tests = []struct {
@@ -2544,5 +2658,50 @@ func TestIsCIDR(t *testing.T) {
 		if actual != test.expected {
 			t.Errorf("Expected IsCIDR(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
+	}
+}
+
+func TestOptionalCustomValidators(t *testing.T) {
+
+	CustomTypeTagMap.Set("f2", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+		return false
+	}))
+
+	var val struct {
+		WithCustomError    string `valid:"f2~boom,optional"`
+		WithoutCustomError string `valid:"f2,optional"`
+		OptionalFirst      string `valid:"optional,f2"`
+	}
+
+	ok, err := ValidateStruct(val)
+
+	if err != nil {
+		t.Errorf("Expected nil err with optional validation, got %v", err)
+	}
+
+	if !ok {
+		t.Error("Expected validation to return true, got false")
+	}
+}
+
+func TestJSONValidator(t *testing.T) {
+
+	var val struct {
+		WithJSONName    string `json:"with_json_name" valid:"-,required"`
+		WithoutJSONName string `valid:"-,required"`
+	}
+
+	_, err := ValidateStruct(val)
+
+	if err == nil {
+		t.Error("Expected error but got no error")
+	}
+
+	if Contains(err.Error(), "WithJSONName") {
+		t.Errorf("Expected error message to contain with_json_name but actual error is: %s", err.Error())
+	}
+
+	if Contains(err.Error(), "WithoutJSONName") == false {
+		t.Errorf("Expected error message to contain WithoutJSONName but actual error is: %s", err.Error())
 	}
 }
