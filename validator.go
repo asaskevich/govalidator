@@ -691,6 +691,29 @@ func StringLength(str string, params ...string) bool {
 	return false
 }
 
+func isInRaw(str string, params ...string) bool {
+	if len(params) == 1 {
+		rawParams := params[0]
+
+		parsedParams := strings.Split(rawParams, "|")
+
+		return IsIn(str, parsedParams...)
+	}
+
+	return false
+}
+
+// check if string str is a member of the set of strings params
+func IsIn(str string, params ...string) bool {
+	for _, param := range params {
+		if str == param {
+			return true
+		}
+	}
+
+	return false
+}
+
 func checkRequired(v reflect.Value, t reflect.StructField, options tagOptionsMap) (bool, error) {
 	if requiredOption, isRequired := options["required"]; isRequired {
 		if len(requiredOption) > 0 {
