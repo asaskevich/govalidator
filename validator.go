@@ -11,12 +11,15 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-
+	"time"
 	"unicode"
 	"unicode/utf8"
 )
 
 var fieldsRequiredByDefault bool
+
+const maxURLRuneCount = 2083
+const minURLRuneCount = 3
 
 // SetFieldsRequiredByDefault causes validation to fail when struct fields
 // do not include validations or are not explicitly marked as exempt (using `valid:"-"` or `valid:"email,optional"`).
@@ -44,7 +47,7 @@ func IsEmail(str string) bool {
 
 // IsURL check if the string is an URL.
 func IsURL(str string) bool {
-	if str == "" || len(str) >= 2083 || len(str) <= 3 || strings.HasPrefix(str, ".") {
+	if str == "" || utf8.RuneCountInString(str) >= maxURLRuneCount || len(str) <= minURLRuneCount || strings.HasPrefix(str, ".") {
 		return false
 	}
 	u, err := url.Parse(str)
@@ -560,6 +563,26 @@ func ValidateStruct(s interface{}) (bool, error) {
 		}
 		resultField, err2 := typeCheck(valueField, typeField, val, nil)
 		if err2 != nil {
+
+			// Replace structure name with JSON name if there is a tag on the variable
+			jsonTag := typeField.Tag.Get("json")
+			if jsonTag != "" {
+				switch jsonError := err2.(type) {
+				case Error:
+					jsonError.Name = jsonTag
+					err2 = jsonError
+				case Errors:
+					for _, e := range jsonError.Errors() {
+						switch tempErr := e.(type) {
+						case Error:
+							tempErr.Name = jsonTag
+							e = tempErr
+						}
+					}
+					err2 = jsonError
+				}
+			}
+
 			errs = append(errs, err2)
 		}
 		result = result && resultField
@@ -620,6 +643,15 @@ func IsSemver(str string) bool {
 	return rxSemver.MatchString(str)
 }
 
+func IsTime(str string, format string) bool {
+	_, err := time.Parse(format, str)
+	return err == nil
+}
+
+func IsRFC3339(str string) bool {
+	return IsTime(str, time.RFC3339)
+}
+
 // ByteLength check string's length
 func ByteLength(str string, params ...string) bool {
 	if len(params) == 2 {
@@ -629,6 +661,12 @@ func ByteLength(str string, params ...string) bool {
 	}
 
 	return false
+}
+
+// RuneLength check string's length
+// Alias for StringLength
+func RuneLength(str string, params ...string) bool {
+	return StringLength(str, params...)
 }
 
 // StringMatches checks if a string matches a given pattern.
@@ -648,6 +686,29 @@ func StringLength(str string, params ...string) bool {
 		min, _ := ToInt(params[0])
 		max, _ := ToInt(params[1])
 		return strLength >= int(min) && strLength <= int(max)
+	}
+
+	return false
+}
+
+func isInRaw(str string, params ...string) bool {
+	if len(params) == 1 {
+		rawParams := params[0]
+
+		parsedParams := strings.Split(rawParams, "|")
+
+		return IsIn(str, parsedParams...)
+	}
+
+	return false
+}
+
+// check if string str is a member of the set of strings params
+func IsIn(str string, params ...string) bool {
+	for _, param := range params {
+		if str == param {
+			return true
+		}
 	}
 
 	return false
@@ -688,6 +749,11 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 	if options == nil {
 		isRootType = true
 		options = parseTagIntoMap(tag)
+  }
+  
+	if isEmptyValue(v) {
+		// an empty value is not validated, check only required
+		return checkRequired(v, t, options)
 	}
 
 	var customTypeErrors Errors
@@ -707,11 +773,6 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 
 	if len(customTypeErrors.Errors()) > 0 {
 		return false, customTypeErrors
-	}
-
-	if isEmptyValue(v) {
-		// an empty value is not validated, check only required
-		return checkRequired(v, t, options)
 	}
 
 	if isRootType {
