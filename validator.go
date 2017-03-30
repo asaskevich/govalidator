@@ -754,6 +754,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value) (bool, e
 
 	var customTypeErrors Errors
 	var customTypeValidatorsExist bool
+	var builtinValidatorsExist bool
 	for validatorName, customErrorMessage := range options {
 		if validatefunc, ok := CustomTypeTagMap.Get(validatorName); ok {
 			customTypeValidatorsExist = true
@@ -764,13 +765,17 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value) (bool, e
 				}
 				customTypeErrors = append(customTypeErrors, Error{Name: t.Name, Err: fmt.Errorf("%s does not validate as %s", fmt.Sprint(v), validatorName), CustomErrorMessageExists: false})
 			}
+		} else {
+			builtinValidatorsExist = true
 		}
 	}
 	if customTypeValidatorsExist {
 		if len(customTypeErrors.Errors()) > 0 {
 			return false, customTypeErrors
 		}
-		return true, nil
+		if !builtinValidatorsExist {
+			return true, nil
+		}
 	}
 
 	switch v.Kind() {

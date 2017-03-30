@@ -2705,3 +2705,30 @@ func TestJSONValidator(t *testing.T) {
 		t.Errorf("Expected error message to contain WithoutJSONName but actual error is: %s", err.Error())
 	}
 }
+
+func TestCustomValidatorWithBuiltinValidator(t *testing.T) {
+
+	CustomTypeTagMap.Set("customvalidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+		return true
+	}))
+
+	type Post struct {
+		Title string `valid:"customvalidator,stringlength(5|10)"`
+	}
+
+	post := &Post{"Foo"}
+
+	_, err := ValidateStruct(post)
+
+	if err == nil {
+		t.Error("Expected error but got no error")
+	}
+
+	post2 := &Post{"FooBar"}
+
+	_, err = ValidateStruct(post2)
+
+	if err != nil {
+		t.Errorf("Expected nil but got %v", err)
+	}
+}
