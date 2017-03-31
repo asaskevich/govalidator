@@ -2081,11 +2081,11 @@ func TestCustomValidator(t *testing.T) {
 		Field int `valid:"customTrueValidator,required"`
 	}
 
-	if valid, err := ValidateStruct(&ValidStruct{}); !valid || err != nil {
+	if valid, err := ValidateStruct(&ValidStruct{Field: 1}); !valid || err != nil {
 		t.Errorf("Got an unexpected result for struct with custom always true validator: %t %s", valid, err)
 	}
 
-	if valid, err := ValidateStruct(&InvalidStruct{}); valid || err == nil || err.Error() != "Custom validator error;;" {
+	if valid, err := ValidateStruct(&InvalidStruct{Field: 1}); valid || err == nil || err.Error() != "Custom validator error;;" {
 		t.Errorf("Got an unexpected result for struct with custom always false validator: %t %s", valid, err)
 	}
 
@@ -2380,7 +2380,6 @@ func TestFunkyIsInStruct(t *testing.T) {
 // 		}
 // 	}
 // }
-
 
 func TestValidateStruct(t *testing.T) {
 
