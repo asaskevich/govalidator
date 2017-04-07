@@ -538,6 +538,17 @@ func IsLongitude(str string) bool {
 	return rxLongitude.MatchString(str)
 }
 
+func toJSONName(tag string) string {
+	if tag == "" {
+		return ""
+	}
+
+	// JSON name always comes first. If there's no options then split[0] is
+	// JSON name, if JSON name is not set, then split[0] is an empty string.
+	split := strings.SplitN(tag, ",", 2)
+	return split[0]
+}
+
 // ValidateStruct use tags for fields.
 // result will be equal to `false` if there are any errors.
 func ValidateStruct(s interface{}) (bool, error) {
@@ -565,7 +576,7 @@ func ValidateStruct(s interface{}) (bool, error) {
 		if err2 != nil {
 
 			// Replace structure name with JSON name if there is a tag on the variable
-			jsonTag := typeField.Tag.Get("json")
+			jsonTag := toJSONName(typeField.Tag.Get("json"))
 			if jsonTag != "" {
 				switch jsonError := err2.(type) {
 				case Error:

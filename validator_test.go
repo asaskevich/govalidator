@@ -2741,6 +2741,8 @@ func TestJSONValidator(t *testing.T) {
 	var val struct {
 		WithJSONName    string `json:"with_json_name" valid:"-,required"`
 		WithoutJSONName string `valid:"-,required"`
+		WithJSONOmit    string `json:"with_other_json_name,omitempty" valid:"-,required"`
+		WithJSONOption  string `json:",omitempty" valid:"-,required"`
 	}
 
 	_, err := ValidateStruct(val)
@@ -2755,5 +2757,9 @@ func TestJSONValidator(t *testing.T) {
 
 	if Contains(err.Error(), "WithoutJSONName") == false {
 		t.Errorf("Expected error message to contain WithoutJSONName but actual error is: %s", err.Error())
+	}
+
+	if Contains(err.Error(), "omitempty") {
+		t.Errorf("Expected error message to not contain ',omitempty' but actual error is: %s", err.Error())
 	}
 }
