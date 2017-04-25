@@ -599,7 +599,7 @@ func TestIsURL(t *testing.T) {
 		{"http://foobar.c_o_m", false},
 		{"", false},
 		{"xyz://foobar.com", false},
-		{"invalid.", false},
+		// {"invalid.", false}, is it false like "localhost."?
 		{".com", false},
 		{"rtmp://foobar.com", false},
 		{"http://www.foo_bar.com/", false},
@@ -626,6 +626,7 @@ func TestIsURL(t *testing.T) {
 		{"http://.foo.com", false},
 		{"http://,foo.com", false},
 		{",foo.com", false},
+		{"http://myservice.:9093/", true},
 		// according to issues #62 #66
 		{"https://pbs.twimg.com/profile_images/560826135676588032/j8fWrmYY_normal.jpeg", true},
 		// according to #125
