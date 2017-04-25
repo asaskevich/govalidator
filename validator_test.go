@@ -1619,13 +1619,13 @@ func TestFilePath(t *testing.T) {
 		{"/path/file:SAMPLE/", true, Unix},
 		{"/path/file:/.txt", true, Unix},
 		{"/path", true, Unix},
-    {"/path/__bc/file.txt", true, Unix},
-  	{"/path/a--ac/file.txt", true, Unix},
- 	  {"/_path/file.txt", true, Unix},
- 		{"/path/__bc/file.txt", true, Unix},
- 		{"/path/a--ac/file.txt", true, Unix},
- 		{"/__path/--file.txt", true, Unix},
- 		{"/path/a bc", true, Unix},
+		{"/path/__bc/file.txt", true, Unix},
+		{"/path/a--ac/file.txt", true, Unix},
+		{"/_path/file.txt", true, Unix},
+		{"/path/__bc/file.txt", true, Unix},
+		{"/path/a--ac/file.txt", true, Unix},
+		{"/__path/--file.txt", true, Unix},
+		{"/path/a bc", true, Unix},
 	}
 	for _, test := range tests {
 		actual, osType := IsFilePath(test.param)
@@ -1808,6 +1808,28 @@ func TestIsRFC3339(t *testing.T) {
 	}
 }
 
+func TestIsISO4217(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"", false},
+		{"ABCD", false},
+		{"A", false},
+		{"ZZZ", false},
+		{"usd", false},
+		{"USD", true},
+	}
+	for _, test := range tests {
+		actual := IsISO4217(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsISO4217(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
 func TestByteLength(t *testing.T) {
 	t.Parallel()
 
@@ -1953,6 +1975,7 @@ type StringLengthStruct struct {
 type StringMatchesStruct struct {
 	StringMatches string `valid:"matches(^[0-9]{3}$)"`
 }
+
 // TODO: this testcase should be fixed
 // type StringMatchesComplexStruct struct {
 // 	StringMatches string `valid:"matches(^\\$\\([\"']\\w+[\"']\\)$)"`

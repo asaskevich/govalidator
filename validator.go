@@ -652,6 +652,16 @@ func IsRFC3339(str string) bool {
 	return IsTime(str, time.RFC3339)
 }
 
+func IsISO4217(str string) bool {
+	for _, currency := range ISO4217List {
+		if str == currency {
+			return true
+		}
+	}
+
+	return false
+}
+
 // ByteLength check string's length
 func ByteLength(str string, params ...string) bool {
 	if len(params) == 2 {
@@ -749,8 +759,8 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 	if options == nil {
 		isRootType = true
 		options = parseTagIntoMap(tag)
-  }
-  
+	}
+
 	if isEmptyValue(v) {
 		// an empty value is not validated, check only required
 		return checkRequired(v, t, options)
