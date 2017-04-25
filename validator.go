@@ -461,7 +461,7 @@ func IsDNSName(str string) bool {
 		// constraints already violated
 		return false
 	}
-	return rxDNSName.MatchString(str)
+	return !IsIP(str) && rxDNSName.MatchString(str)
 }
 
 // IsDialString validates the given string for usage with the various Dial() functions
