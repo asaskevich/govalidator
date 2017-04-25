@@ -284,10 +284,10 @@ func TestIsNumeric(t *testing.T) {
 		{"\u0030", true},  //UTF-8(ASCII): 0
 		{"123", true},
 		{"0123", true},
-		{"-00123", true},
-		{"+00123", true},
+		{"-00123", false},
+		{"+00123", false},
 		{"0", true},
-		{"-0", true},
+		{"-0", false},
 		{"123.123", false},
 		{" ", false},
 		{".", false},
@@ -306,7 +306,7 @@ func TestIsNumeric(t *testing.T) {
 		{"1+1", false},
 		{"+", false},
 		{"++", false},
-		{"+1", true},
+		{"+1", false},
 	}
 	for _, test := range tests {
 		actual := IsNumeric(test.param)
