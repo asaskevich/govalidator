@@ -651,6 +651,13 @@ func TestIsURL(t *testing.T) {
 		{"http://[1200:0000:AB00:1234:0000:2552:7777:1313]", true},
 		{"http://user:pass@[::1]:9093/a/b/c/?a=v#abc", true},
 		{"https://127.0.0.1/a/b/c?a=v&c=11d", true},
+		{"https://foo_bar.example.com", true},
+		{"http://foo_bar.example.com", true},
+		{"http://foo_bar_fizz_buzz.example.com", true},
+		{"http://_cant_start_with_underescore", false},
+		{"http://cant_end_with_underescore_", false},
+		{"foo_bar.example.com", true},
+		{"foo_bar_fizz_buzz.example.com", true},
 	}
 	for _, test := range tests {
 		actual := IsURL(test.param)
