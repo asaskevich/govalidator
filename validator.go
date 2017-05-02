@@ -534,6 +534,11 @@ func IsLongitude(str string) bool {
 
 var originalStruct interface{}
 
+func Clear() bool {
+	originalStruct = nil
+	return true
+}
+
 func ValidateStruct(s interface{}) (bool, error) {
 	if s == nil {
 		return true, nil
