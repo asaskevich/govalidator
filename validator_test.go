@@ -1508,6 +1508,8 @@ func TestIsDNSName(t *testing.T) {
 		{"a.bc", true},
 		{"localhost.local", true},
 		{"localhost.localdomain.intern", true},
+		{"l.local.intern", true},
+		{"ru.link.n.svpncloud.com", true},
 		{"-localhost", false},
 		{"localhost.-localdomain", false},
 		{"localhost.localdomain.-int", false},
