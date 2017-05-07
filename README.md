@@ -96,6 +96,7 @@ govalidator.CustomTypeTagMap.Set("customByteArrayValidator", CustomTypeValidator
 func Abs(value float64) float64
 func BlackList(str, chars string) string
 func ByteLength(str string, params ...string) bool
+func Range(str string, params ...string) bool
 func StringLength(str string, params ...string) bool
 func StringMatches(s string, params ...string) bool
 func CamelCaseToUnderscore(str string) string
@@ -311,8 +312,9 @@ Here is a list of available validators for struct fields (validator - used funct
 Validators with parameters
 
 ```go
+"range(min|max)": Range,
 "length(min|max)": ByteLength,
-"runelength(min|max)": RuneLegth,
+"runelength(min|max)": RuneLength,
 "matches(pattern)": StringMatches,
 "in(string1|string2|...|stringN)": IsIn,
 ```
