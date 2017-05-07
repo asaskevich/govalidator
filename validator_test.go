@@ -549,6 +549,8 @@ func TestIsEmail(t *testing.T) {
 		{"foo@bar.com.au", true},
 		{"foo+bar@bar.com", true},
 		{"foo@bar.coffee", true},
+		{"foo@bar.coffee..coffee", false},
+		{"foo@bar.bar.coffee", true},
 		{"foo@bar.中文网", true},
 		{"invalidemail@", false},
 		{"invalid.com", false},
