@@ -572,6 +572,14 @@ func ValidateStruct(s interface{}) (bool, error) {
 		if typeField.PkgPath != "" {
 			continue // Private field
 		}
+		structResult := true
+		if valueField.Kind() == reflect.Struct {
+			var err error
+			structResult, err = ValidateStruct(valueField.Interface())
+			if err != nil {
+				errs = append(errs, err)
+			}
+		}
 		resultField, err2 := typeCheck(valueField, typeField, val, nil)
 		if err2 != nil {
 
@@ -596,7 +604,7 @@ func ValidateStruct(s interface{}) (bool, error) {
 
 			errs = append(errs, err2)
 		}
-		result = result && resultField
+		result = result && resultField && structResult
 	}
 	if len(errs) > 0 {
 		err = errs
