@@ -658,6 +658,7 @@ func TestIsURL(t *testing.T) {
 		{"http://cant_end_with_underescore_", false},
 		{"foo_bar.example.com", true},
 		{"foo_bar_fizz_buzz.example.com", true},
+		{"http://hello_world.example.com", true},
 	}
 	for _, test := range tests {
 		actual := IsURL(test.param)
