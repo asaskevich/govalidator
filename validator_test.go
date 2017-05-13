@@ -2628,10 +2628,10 @@ func TestErrorsByField(t *testing.T) {
 		param    string
 		expected string
 	}{
-		{"CustomField", "An error occured"},
+		{"CustomField", "An error occurred"},
 	}
 
-	err = Error{"CustomField", fmt.Errorf("An error occured"), false}
+	err = Error{"CustomField", fmt.Errorf("An error occurred"), false}
 	errs = ErrorsByField(err)
 
 	if len(errs) != 1 {

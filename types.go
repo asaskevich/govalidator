@@ -387,6 +387,7 @@ var ISO3166List = []ISO3166Entry{
 	{"Zambia", "Zambie (la)", "ZM", "ZMB", "894"},
 }
 
+// ISO4217List is the list of ISO currency codes
 var ISO4217List = []string{
 	"AED", "AFN", "ALL", "AMD", "ANG", "AOA", "ARS", "AUD", "AWG", "AZN",
 	"BAM", "BBD", "BDT", "BGN", "BHD", "BIF", "BMD", "BND", "BOB", "BOV", "BRL", "BSD", "BTN", "BWP", "BYN", "BZD",
