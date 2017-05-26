@@ -1525,6 +1525,7 @@ func TestIsDNSName(t *testing.T) {
 		{"localhost.lÖcaldomain", false},
 		{"localhost.localdomain.üntern", false},
 		{"__", true},
+		{"localhost/", false},
 		{"127.0.0.1", false},
 		{"[::1]", false},
 		{"50.50.50.50", false},
