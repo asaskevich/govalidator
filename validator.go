@@ -457,6 +457,26 @@ func IsISO3166Alpha3(str string) bool {
 	return false
 }
 
+// IsISO693Alpha2 checks if a string is valid two-letter language code
+func IsISO693Alpha2(str string) bool {
+	for _, entry := range ISO693List {
+		if str == entry.Alpha2Code {
+			return true
+		}
+	}
+	return false
+}
+
+// IsISO693Alpha3b checks if a string is valid three-letter language code
+func IsISO693Alpha3b(str string) bool {
+	for _, entry := range ISO693List {
+		if str == entry.Alpha3bCode {
+			return true
+		}
+	}
+	return false
+}
+
 // IsDNSName will validate the given string as a DNS name
 func IsDNSName(str string) bool {
 	if str == "" || len(strings.Replace(str, ".", "", -1)) > 255 {
