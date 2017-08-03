@@ -933,9 +933,18 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		sort.Sort(sv)
 		result := true
 		for _, k := range sv {
-			resultItem, err := ValidateStruct(v.MapIndex(k).Interface())
-			if err != nil {
-				return false, err
+			var resultItem bool
+			var err error
+			if v.MapIndex(k).Kind() != reflect.Struct {
+				resultItem, err = typeCheck(v.MapIndex(k), t, o, options)
+				if err != nil {
+					return false, err
+				}
+			} else {
+				resultItem, err = ValidateStruct(v.MapIndex(k).Interface())
+				if err != nil {
+					return false, err
+				}
 			}
 			result = result && resultItem
 		}
