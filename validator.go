@@ -595,7 +595,7 @@ func ValidateStruct(s interface{}) (bool, error) {
 			continue // Private field
 		}
 		structResult := true
-		if valueField.Kind() == reflect.Struct {
+		if valueField.Kind() == reflect.Struct && typeField.Tag.Get(tagName) != "-" {
 			var err error
 			structResult, err = ValidateStruct(valueField.Interface())
 			if err != nil {
