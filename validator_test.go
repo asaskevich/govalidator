@@ -2495,6 +2495,7 @@ func TestValidateStruct(t *testing.T) {
 		{UserValid{"John", "", "12345", 0, &Address{"Street", "123456789"}, []Address{{"Street", "ABC456D89"}, {"Street", "123456"}}}, false},
 		{nil, true},
 		{User{"John", "john@yahoo.com", "123G#678", 0, &Address{"Street", "123456"}, []Address{}}, false},
+		{PrivateStruct{"d_k", 0, []int{1, 2}, []string{"hi", "super2"}, [2]Address{}, Address{"Street", "123456"}, nil}, false},
 		{"im not a struct", false},
 	}
 	for _, test := range tests {
