@@ -602,7 +602,7 @@ func ValidateStruct(s interface{}) (bool, error) {
 				errs = append(errs, err)
 			}
 		}
-		resultField, err2 := typeCheck(valueField, typeField, val, nil)
+		resultField, err2 := typeCheck(valueField, typeField, val, nil, nil)
 		if err2 != nil {
 
 			// Replace structure name with JSON name if there is a tag on the variable
@@ -786,7 +786,7 @@ func checkRequired(v reflect.Value, t reflect.StructField, options tagOptionsMap
 	return true, nil
 }
 
-func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options tagOptionsMap) (isValid bool, resultErr error) {
+func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options, usedOptions tagOptionsMap) (isValid bool, resultErr error) {
 	if !v.IsValid() {
 		return false, nil
 	}
@@ -807,6 +807,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 	isRootType := false
 	if options == nil {
 		isRootType = true
+		usedOptions = tagOptionsMap{}
 		options = parseTagIntoMap(tag)
 	}
 
@@ -818,7 +819,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 	var customTypeErrors Errors
 	for validatorName, customErrorMessage := range options {
 		if validatefunc, ok := CustomTypeTagMap.Get(validatorName); ok {
-			delete(options, validatorName)
+			usedOptions[validatorName] = options[validatorName]
 
 			if result := validatefunc(v.Interface(), o.Interface()); !result {
 				if len(customErrorMessage) > 0 {
@@ -837,15 +838,21 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 	if isRootType {
 		// Ensure that we've checked the value by all specified validators before report that the value is valid
 		defer func() {
-			delete(options, "optional")
-			delete(options, "required")
+			for _, option := range []string{"optional", "required"} {
+				v, ok := options[option]
+				if ok {
+					usedOptions[option] = v
+				}
+			}
 
-			if isValid && resultErr == nil && len(options) != 0 {
+			if isValid && resultErr == nil && len(options) != len(usedOptions) {
 				for validator := range options {
-					isValid = false
-					resultErr = Error{t.Name, fmt.Errorf(
-						"The following validator is invalid or can't be applied to the field: %q", validator), false}
-					return
+					if _, ok := usedOptions[validator]; !ok {
+						isValid = false
+						resultErr = Error{t.Name, fmt.Errorf(
+							"The following validator is invalid or can't be applied to the field: %q", validator), false}
+						return
+					}
 				}
 			}
 		}()
@@ -881,7 +888,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 					continue
 				}
 
-				delete(options, validatorSpec)
+				usedOptions[validatorSpec] = options[validatorSpec]
 
 				switch v.Kind() {
 				case reflect.String:
@@ -902,7 +909,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 			}
 
 			if validatefunc, ok := TagMap[validator]; ok {
-				delete(options, validatorSpec)
+				usedOptions[validatorSpec] = options[validatorSpec]
 
 				switch v.Kind() {
 				case reflect.String:
@@ -936,7 +943,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 			var resultItem bool
 			var err error
 			if v.MapIndex(k).Kind() != reflect.Struct {
-				resultItem, err = typeCheck(v.MapIndex(k), t, o, options)
+				resultItem, err = typeCheck(v.MapIndex(k), t, o, options, usedOptions)
 				if err != nil {
 					return false, err
 				}
@@ -955,7 +962,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 			var resultItem bool
 			var err error
 			if v.Index(i).Kind() != reflect.Struct {
-				resultItem, err = typeCheck(v.Index(i), t, o, options)
+				resultItem, err = typeCheck(v.Index(i), t, o, options, usedOptions)
 				if err != nil {
 					return false, err
 				}
@@ -979,7 +986,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		if v.IsNil() {
 			return true, nil
 		}
-		return typeCheck(v.Elem(), t, o, options)
+		return typeCheck(v.Elem(), t, o, options, usedOptions)
 	case reflect.Struct:
 		return ValidateStruct(v.Interface())
 	default:
