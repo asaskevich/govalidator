@@ -2211,7 +2211,7 @@ func TestStructWithCustomByteArray(t *testing.T) {
 	t.Parallel()
 
 	// add our custom byte array validator that fails when the byte array is pristine (all zeroes)
-	CustomTypeTagMap.Set("customByteArrayValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+	CustomTypeTagMap.Set("customByteArrayValidator", CustomTypeValidator(func(i interface{}, o interface{}, original interface{}) bool {
 		switch v := o.(type) {
 		case StructWithCustomByteArray:
 			if len(v.Email) > 0 {
@@ -2233,7 +2233,7 @@ func TestStructWithCustomByteArray(t *testing.T) {
 		}
 		return false
 	}))
-	CustomTypeTagMap.Set("customMinLengthValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+	CustomTypeTagMap.Set("customMinLengthValidator", CustomTypeValidator(func(i interface{}, o interface{}, original interface{}) bool {
 		switch v := o.(type) {
 		case StructWithCustomByteArray:
 			return len(v.ID) >= v.CustomMinLength
@@ -2729,7 +2729,7 @@ func TestErrorsByField(t *testing.T) {
 		ID    string `valid:"falseValidation"`
 	}
 
-	CustomTypeTagMap.Set("falseValidation", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+	CustomTypeTagMap.Set("falseValidation", CustomTypeValidator(func(i interface{}, o interface{}, original interface{}) bool {
 		return false
 	}))
 

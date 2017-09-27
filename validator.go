@@ -573,9 +573,20 @@ func toJSONName(tag string) string {
 
 // ValidateStruct use tags for fields.
 // result will be equal to `false` if there are any errors.
+
+var originalStruct interface{}
+
+func Clear() bool {
+	originalStruct = nil
+	return true
+}
+
 func ValidateStruct(s interface{}) (bool, error) {
 	if s == nil {
 		return true, nil
+	}
+	if originalStruct == nil {
+		originalStruct = s
 	}
 	result := true
 	var err error
@@ -818,11 +829,14 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 	var customTypeErrors Errors
 	for validatorName, customErrorMessage := range options {
 		if validatefunc, ok := CustomTypeTagMap.Get(validatorName); ok {
-			delete(options, validatorName)
-
-			if result := validatefunc(v.Interface(), o.Interface()); !result {
+			if result := validatefunc(v.Interface(), o.Interface(), originalStruct); !result {
+				delete(options, validatorName)
 				if len(customErrorMessage) > 0 {
-					customTypeErrors = append(customTypeErrors, Error{Name: t.Name, Err: fmt.Errorf(customErrorMessage), CustomErrorMessageExists: true})
+					if strings.Contains(customErrorMessage, " %s ") {
+						customTypeErrors = append(customTypeErrors, Error{Name: t.Name, Err: fmt.Errorf(customErrorMessage, fmt.Sprint(v)), CustomErrorMessageExists: true})
+					} else {
+						customTypeErrors = append(customTypeErrors, Error{Name: t.Name, Err: fmt.Errorf(customErrorMessage), CustomErrorMessageExists: true})
+					}
 					continue
 				}
 				customTypeErrors = append(customTypeErrors, Error{Name: t.Name, Err: fmt.Errorf("%s does not validate as %s", fmt.Sprint(v), validatorName), CustomErrorMessageExists: false})
