@@ -2711,7 +2711,7 @@ func TestErrorsByField(t *testing.T) {
 		{"CustomField", "An error occurred"},
 	}
 
-	err = Error{"CustomField", fmt.Errorf("An error occurred"), false}
+	err = Error{"CustomField", fmt.Errorf("An error occurred"), false, "hello"}
 	errs = ErrorsByField(err)
 
 	if len(errs) != 1 {
@@ -2879,4 +2879,71 @@ func TestJSONValidator(t *testing.T) {
 	if Contains(err.Error(), "omitempty") {
 		t.Errorf("Expected error message to not contain ',omitempty' but actual error is: %s", err.Error())
 	}
+}
+
+func TestValidatorIncludedInError(t *testing.T) {
+	post := Post{
+		Title:    "",
+		Message:  "👍",
+		AuthorIP: "xyz",
+	}
+
+	validatorMap := map[string]string{
+		"Title":    "required",
+		"Message":  "ascii",
+		"AuthorIP": "ipv4",
+	}
+
+	ok, errors := ValidateStruct(post)
+	if ok {
+		t.Errorf("expected validation to fail %v", ok)
+	}
+
+	for _, e := range errors.(Errors) {
+		casted := e.(Error)
+		if validatorMap[casted.Name] != casted.Validator {
+			t.Errorf("expected validator for %s to be %s, but was %s", casted.Name, validatorMap[casted.Name], casted.Validator)
+		}
+	}
+
+	// check to make sure that validators with arguments (like length(1|10)) don't include the arguments
+	// in the validator name
+	message := MessageWithSeveralFieldsStruct{
+		Title: "",
+		Body:  "asdfasdfasdfasdfasdf",
+	}
+
+	validatorMap = map[string]string{
+		"Title": "length",
+		"Body":  "length",
+	}
+
+	ok, errors = ValidateStruct(message)
+	if ok {
+		t.Errorf("expected validation to fail, %v", ok)
+	}
+
+	for _, e := range errors.(Errors) {
+		casted := e.(Error)
+		if validatorMap[casted.Name] != casted.Validator {
+			t.Errorf("expected validator for %s to be %s, but was %s", casted.Name, validatorMap[casted.Name], casted.Validator)
+		}
+	}
+
+	// make sure validators with custom messages don't show up in the validator string
+	type CustomMessage struct {
+		Text string `valid:"length(1|10)~Custom message"`
+	}
+	cs := CustomMessage{Text: "asdfasdfasdfasdf"}
+
+	ok, errors = ValidateStruct(&cs)
+	if ok {
+		t.Errorf("expected validation to fail, %v", ok)
+	}
+
+	validator := errors.(Errors)[0].(Error).Validator
+	if validator != "length" {
+		t.Errorf("expected validator for Text to be length, but was %s", validator)
+	}
+
 }

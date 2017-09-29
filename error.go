@@ -23,6 +23,9 @@ type Error struct {
 	Name                     string
 	Err                      error
 	CustomErrorMessageExists bool
+
+	// Validator indicates the name of the validator that failed
+	Validator string
 }
 
 func (e Error) Error() string {
