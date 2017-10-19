@@ -631,8 +631,11 @@ func ValidateStruct(s interface{}) (bool, error) {
 // parseTagIntoMap parses a struct tag `valid:required~Some error message,length(2|3)` into map[string]string{"required": "Some error message", "length(2|3)": ""}
 func parseTagIntoMap(tag string) tagOptionsMap {
 	optionsMap := make(tagOptionsMap)
-	options := strings.SplitN(tag, ",", -1)
+	options := strings.Split(tag, ",")
+
 	for _, option := range options {
+		option = strings.TrimSpace(option)
+
 		validationOptions := strings.Split(option, "~")
 		if !isValidTag(validationOptions[0]) {
 			continue
