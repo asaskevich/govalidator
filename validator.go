@@ -614,6 +614,14 @@ func ValidateStruct(s interface{}) (bool, error) {
 					jsonError.Name = jsonTag
 					err2 = jsonError
 				case Errors:
+					for i2, err3 := range jsonError {
+						switch customErr := err3.(type) {
+						case Error:
+							customErr.Name = jsonTag
+							jsonError[i2] = customErr
+						}
+					}
+
 					err2 = jsonError
 				}
 			}
