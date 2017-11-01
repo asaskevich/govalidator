@@ -318,7 +318,7 @@ Here is a list of available validators for struct fields (validator - used funct
 "ssn":                IsSSN,
 "semver":             IsSemver,
 "rfc3339":            IsRFC3339,
-"rfc3339WithoutZone": IsRFC3339,
+"rfc3339WithoutZone": IsRFC3339WithoutZone,
 "ISO3166Alpha2":      IsISO3166Alpha2,
 "ISO3166Alpha3":      IsISO3166Alpha3,
 ```
