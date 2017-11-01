@@ -1850,6 +1850,13 @@ func TestIsTime(t *testing.T) {
 		{"2016-12-31T11:00:00.05Z", time.RFC3339, true},
 		{"2016-12-31T11:00:00.05-01:00", time.RFC3339, true},
 		{"2016-12-31T11:00:00.05+01:00", time.RFC3339, true},
+		{"2016-12-31T11:00:00", RF3339WithoutZone, true},
+		{"2016-12-31T11:00:00Z", RF3339WithoutZone, false},
+		{"2016-12-31T11:00:00+01:00", RF3339WithoutZone, false},
+		{"2016-12-31T11:00:00-01:00", RF3339WithoutZone, false},
+		{"2016-12-31T11:00:00.05Z", RF3339WithoutZone, false},
+		{"2016-12-31T11:00:00.05-01:00", RF3339WithoutZone, false},
+		{"2016-12-31T11:00:00.05+01:00", RF3339WithoutZone, false},
 	}
 	for _, test := range tests {
 		actual := IsTime(test.param, test.format)
