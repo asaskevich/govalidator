@@ -569,7 +569,16 @@ func toJSONName(tag string) string {
 	// JSON name always comes first. If there's no options then split[0] is
 	// JSON name, if JSON name is not set, then split[0] is an empty string.
 	split := strings.SplitN(tag, ",", 2)
-	return split[0]
+
+	name := split[0]
+
+	// However it is possible that the field is skipped when
+	// (de-)serializing from/to JSON, in which case assume that there is no
+	// tag name to use
+	if name == "-" {
+		return ""
+	}
+	return name
 }
 
 // ValidateStruct use tags for fields.
