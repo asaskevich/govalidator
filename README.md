@@ -409,7 +409,7 @@ Documentation is available here: [godoc.org](https://godoc.org/github.com/asaske
 Full information about code coverage is also available here: [govalidator on gocover.io](http://gocover.io/github.com/asaskevich/govalidator).
 
 #### Support
-If you do have a contribution for the package feel free to put up a Pull Request or open Issue.
+If you do have a contribution for the package, feel free to create a Pull Request or an Issue.
 
 #### Special thanks to [contributors](https://github.com/asaskevich/govalidator/graphs/contributors)
 * [Daniel Lohse](https://github.com/annismckenzie)
