@@ -25,6 +25,7 @@ var (
 
 const maxURLRuneCount = 2083
 const minURLRuneCount = 3
+const RF3339WithoutZone = "2006-01-02T15:04:05"
 
 // SetFieldsRequiredByDefault causes validation to fail when struct fields
 // do not include validations or are not explicitly marked as exempt (using `valid:"-"` or `valid:"email,optional"`).
@@ -707,6 +708,11 @@ func IsTime(str string, format string) bool {
 // IsRFC3339 check if string is valid timestamp value according to RFC3339
 func IsRFC3339(str string) bool {
 	return IsTime(str, time.RFC3339)
+}
+
+// IsRFC3339WithoutZone check if string is valid timestamp value according to RFC3339 which excludes the timezone.
+func IsRFC3339WithoutZone(str string) bool {
+	return IsTime(str, RF3339WithoutZone)
 }
 
 // IsISO4217 check if string is valid ISO currency code
