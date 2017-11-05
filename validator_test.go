@@ -1412,6 +1412,64 @@ func TestIsISO3166Alpha3(t *testing.T) {
 	}
 }
 
+func TestIsISO693Alpha2(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"", false},
+		{"abcd", false},
+		{"a", false},
+		{"ac", false},
+		{"ap", false},
+		{"de", true},
+		{"DE", false},
+		{"mk", true},
+		{"mac", false},
+		{"sw", true},
+		{"SW", false},
+		{"ger", false},
+		{"deu", false},
+	}
+	for _, test := range tests {
+		actual := IsISO693Alpha2(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsISO693Alpha2(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsISO693Alpha3b(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"", false},
+		{"abcd", false},
+		{"a", false},
+		{"ac", false},
+		{"ap", false},
+		{"de", false},
+		{"DE", false},
+		{"mkd", false},
+		{"mac", true},
+		{"sw", false},
+		{"SW", false},
+		{"ger", true},
+		{"deu", false},
+	}
+	for _, test := range tests {
+		actual := IsISO693Alpha3b(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsISO693Alpha3b(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
 func TestIsIP(t *testing.T) {
 	t.Parallel()
 
@@ -1510,6 +1568,8 @@ func TestIsDNSName(t *testing.T) {
 	}{
 		{"localhost", true},
 		{"a.bc", true},
+		{"a.b.", true},
+		{"a.b..", false},
 		{"localhost.local", true},
 		{"localhost.localdomain.intern", true},
 		{"l.local.intern", true},
@@ -1517,12 +1577,14 @@ func TestIsDNSName(t *testing.T) {
 		{"-localhost", false},
 		{"localhost.-localdomain", false},
 		{"localhost.localdomain.-int", false},
-		{"_localhost", false},
-		{"localhost._localdomain", false},
-		{"localhost.localdomain._int", false},
+		{"_localhost", true},
+		{"localhost._localdomain", true},
+		{"localhost.localdomain._int", true},
 		{"lÖcalhost", false},
 		{"localhost.lÖcaldomain", false},
 		{"localhost.localdomain.üntern", false},
+		{"__", true},
+		{"localhost/", false},
 		{"127.0.0.1", false},
 		{"[::1]", false},
 		{"50.50.50.50", false},
@@ -1789,6 +1851,13 @@ func TestIsTime(t *testing.T) {
 		{"2016-12-31T11:00:00.05Z", time.RFC3339, true},
 		{"2016-12-31T11:00:00.05-01:00", time.RFC3339, true},
 		{"2016-12-31T11:00:00.05+01:00", time.RFC3339, true},
+		{"2016-12-31T11:00:00", RF3339WithoutZone, true},
+		{"2016-12-31T11:00:00Z", RF3339WithoutZone, false},
+		{"2016-12-31T11:00:00+01:00", RF3339WithoutZone, false},
+		{"2016-12-31T11:00:00-01:00", RF3339WithoutZone, false},
+		{"2016-12-31T11:00:00.05Z", RF3339WithoutZone, false},
+		{"2016-12-31T11:00:00.05-01:00", RF3339WithoutZone, false},
+		{"2016-12-31T11:00:00.05+01:00", RF3339WithoutZone, false},
 	}
 	for _, test := range tests {
 		actual := IsTime(test.param, test.format)
@@ -2101,7 +2170,7 @@ func TestInvalidValidator(t *testing.T) {
 
 	invalidStruct := InvalidStruct{1}
 	if valid, err := ValidateStruct(&invalidStruct); valid || err == nil ||
-		err.Error() != `Field: The following validator is invalid or can't be applied to the field: "someInvalidValidator";` {
+		err.Error() != `Field: The following validator is invalid or can't be applied to the field: "someInvalidValidator"` {
 		t.Errorf("Got an unexpected result for struct with invalid validator: %t %s", valid, err)
 	}
 }
@@ -2123,12 +2192,12 @@ func TestCustomValidator(t *testing.T) {
 		t.Errorf("Got an unexpected result for struct with custom always true validator: %t %s", valid, err)
 	}
 
-	if valid, err := ValidateStruct(&InvalidStruct{Field: 1}); valid || err == nil || err.Error() != "Custom validator error;;" {
+	if valid, err := ValidateStruct(&InvalidStruct{Field: 1}); valid || err == nil || err.Error() != "Custom validator error" {
 		t.Errorf("Got an unexpected result for struct with custom always false validator: %t %s", valid, err)
 	}
 
 	mixedStruct := StructWithCustomAndBuiltinValidator{}
-	if valid, err := ValidateStruct(&mixedStruct); valid || err == nil || err.Error() != "Field: non zero value required;" {
+	if valid, err := ValidateStruct(&mixedStruct); valid || err == nil || err.Error() != "Field: non zero value required" {
 		t.Errorf("Got an unexpected result for invalid struct with custom and built-in validators: %t %s", valid, err)
 	}
 
@@ -2461,6 +2530,8 @@ func TestValidateStruct(t *testing.T) {
 type testByteArray [8]byte
 type testByteMap map[byte]byte
 type testByteSlice []byte
+type testStringStringMap map[string]string
+type testStringIntMap map[string]int
 
 func TestRequired(t *testing.T) {
 
@@ -2544,6 +2615,22 @@ func TestRequired(t *testing.T) {
 				TestByteSlice testByteSlice `valid:"required"`
 			}{},
 			false,
+		},
+		{
+			struct {
+				TestStringStringMap testStringStringMap `valid:"required"`
+			}{
+				testStringStringMap{"test": "test"},
+			},
+			true,
+		},
+		{
+			struct {
+				TestIntMap testStringIntMap `valid:"required"`
+			}{
+				testStringIntMap{"test": 42},
+			},
+			true,
 		},
 	}
 	for _, test := range tests {
@@ -2632,7 +2719,7 @@ func TestErrorsByField(t *testing.T) {
 		{"CustomField", "An error occurred"},
 	}
 
-	err = Error{"CustomField", fmt.Errorf("An error occurred"), false}
+	err = Error{"CustomField", fmt.Errorf("An error occurred"), false, "hello"}
 	errs = ErrorsByField(err)
 
 	if len(errs) != 1 {
@@ -2777,10 +2864,11 @@ func TestOptionalCustomValidators(t *testing.T) {
 func TestJSONValidator(t *testing.T) {
 
 	var val struct {
-		WithJSONName    string `json:"with_json_name" valid:"-,required"`
-		WithoutJSONName string `valid:"-,required"`
-		WithJSONOmit    string `json:"with_other_json_name,omitempty" valid:"-,required"`
-		WithJSONOption  string `json:",omitempty" valid:"-,required"`
+		WithJSONName      string `json:"with_json_name" valid:"-,required"`
+		WithoutJSONName   string `valid:"-,required"`
+		WithJSONOmit      string `json:"with_other_json_name,omitempty" valid:"-,required"`
+		WithJSONOption    string `json:",omitempty" valid:"-,required"`
+		WithEmptyJSONName string `json:"-" valid:"-,required"`
 	}
 
 	_, err := ValidateStruct(val)
@@ -2800,4 +2888,75 @@ func TestJSONValidator(t *testing.T) {
 	if Contains(err.Error(), "omitempty") {
 		t.Errorf("Expected error message to not contain ',omitempty' but actual error is: %s", err.Error())
 	}
+
+	if !Contains(err.Error(), "WithEmptyJSONName") {
+		t.Errorf("Expected error message to contain WithEmptyJSONName but actual error is: %s", err.Error())
+	}
+}
+
+func TestValidatorIncludedInError(t *testing.T) {
+	post := Post{
+		Title:    "",
+		Message:  "👍",
+		AuthorIP: "xyz",
+	}
+
+	validatorMap := map[string]string{
+		"Title":    "required",
+		"Message":  "ascii",
+		"AuthorIP": "ipv4",
+	}
+
+	ok, errors := ValidateStruct(post)
+	if ok {
+		t.Errorf("expected validation to fail %v", ok)
+	}
+
+	for _, e := range errors.(Errors) {
+		casted := e.(Error)
+		if validatorMap[casted.Name] != casted.Validator {
+			t.Errorf("expected validator for %s to be %s, but was %s", casted.Name, validatorMap[casted.Name], casted.Validator)
+		}
+	}
+
+	// check to make sure that validators with arguments (like length(1|10)) don't include the arguments
+	// in the validator name
+	message := MessageWithSeveralFieldsStruct{
+		Title: "",
+		Body:  "asdfasdfasdfasdfasdf",
+	}
+
+	validatorMap = map[string]string{
+		"Title": "length",
+		"Body":  "length",
+	}
+
+	ok, errors = ValidateStruct(message)
+	if ok {
+		t.Errorf("expected validation to fail, %v", ok)
+	}
+
+	for _, e := range errors.(Errors) {
+		casted := e.(Error)
+		if validatorMap[casted.Name] != casted.Validator {
+			t.Errorf("expected validator for %s to be %s, but was %s", casted.Name, validatorMap[casted.Name], casted.Validator)
+		}
+	}
+
+	// make sure validators with custom messages don't show up in the validator string
+	type CustomMessage struct {
+		Text string `valid:"length(1|10)~Custom message"`
+	}
+	cs := CustomMessage{Text: "asdfasdfasdfasdf"}
+
+	ok, errors = ValidateStruct(&cs)
+	if ok {
+		t.Errorf("expected validation to fail, %v", ok)
+	}
+
+	validator := errors.(Errors)[0].(Error).Validator
+	if validator != "length" {
+		t.Errorf("expected validator for Text to be length, but was %s", validator)
+	}
+
 }
