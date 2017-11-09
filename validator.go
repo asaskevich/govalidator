@@ -56,7 +56,13 @@ func IsURL(str string) bool {
 	if str == "" || utf8.RuneCountInString(str) >= maxURLRuneCount || len(str) <= minURLRuneCount || strings.HasPrefix(str, ".") {
 		return false
 	}
-	u, err := url.Parse(str)
+	strTemp := str
+	if strings.Index(str, ":") >= 0 && strings.Index(str, "://") == -1 {
+		// support no indicated urlscheme but with colon for port number
+		// http:// is appended so url.Parse will succeed, strTemp used so it does not impact rxURL.MatchString
+		strTemp = "http://" + str
+	}
+	u, err := url.Parse(strTemp)
 	if err != nil {
 		return false
 	}
@@ -67,7 +73,6 @@ func IsURL(str string) bool {
 		return false
 	}
 	return rxURL.MatchString(str)
-
 }
 
 // IsRequestURL check if the string rawurl, assuming
