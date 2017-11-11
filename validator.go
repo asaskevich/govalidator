@@ -2,8 +2,14 @@
 package govalidator
 
 import (
+	"bytes"
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/base64"
 	"encoding/json"
+	"encoding/pem"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/url"
 	"reflect"
@@ -493,6 +499,33 @@ func IsDNSName(str string) bool {
 	return !IsIP(str) && rxDNSName.MatchString(str)
 }
 
+// IsHash checks if a string is a hash of type algorithm.
+// Algorithm is one of ['md4', 'md5', 'sha1', 'sha256', 'sha384', 'sha512', 'ripemd128', 'ripemd160', 'tiger128', 'tiger160', 'tiger192', 'crc32', 'crc32b']
+func IsHash(str string, algorithm string) bool {
+	len := "0"
+	algo := strings.ToLower(algorithm)
+
+	if algo == "crc32" || algo == "crc32b" {
+		len = "8"
+	} else if algo == "md5" || algo == "md4" || algo == "ripemd128" || algo == "tiger128" {
+		len = "32"
+	} else if algo == "sha1" || algo == "ripemd160" || algo == "tiger160" {
+		len = "40"
+	} else if algo == "tiger192" {
+		len = "48"
+	} else if algo == "sha256" {
+		len = "64"
+	} else if algo == "sha384" {
+		len = "96"
+	} else if algo == "sha512" {
+		len = "128"
+	} else {
+		return false
+	}
+
+	return Matches(str, "^[a-f0-9]{" + len + "}$")
+}
+
 // IsDialString validates the given string for usage with the various Dial() functions
 func IsDialString(str string) bool {
 
@@ -565,6 +598,40 @@ func IsLatitude(str string) bool {
 // IsLongitude check if a string is valid longitude.
 func IsLongitude(str string) bool {
 	return rxLongitude.MatchString(str)
+}
+
+// IsRsaPublicKey check if a string is valid public key with provided length
+func IsRsaPublicKey(str string, keylen int) bool {
+	bb := bytes.NewBufferString(str)
+	pemBytes, err := ioutil.ReadAll(bb)
+	if err != nil {
+		return false
+	}
+	block, _ := pem.Decode(pemBytes)
+	if block != nil && block.Type != "PUBLIC KEY" {
+		return false
+	}
+	var der []byte
+
+	if block != nil {
+		der = block.Bytes
+	} else {
+		der, err = base64.StdEncoding.DecodeString(str)
+		if err != nil {
+			return false
+		}
+	}
+
+	key, err := x509.ParsePKIXPublicKey(der)
+	if err != nil {
+		return false
+	}
+	pubkey, ok := key.(*rsa.PublicKey)
+	if !ok {
+		return false
+	}
+	bitlen := len(pubkey.N.Bytes()) * 8
+	return bitlen == int(keylen)
 }
 
 func toJSONName(tag string) string {
@@ -746,6 +813,17 @@ func ByteLength(str string, params ...string) bool {
 // Alias for StringLength
 func RuneLength(str string, params ...string) bool {
 	return StringLength(str, params...)
+}
+
+// IsRsaPub check whether string is valid RSA key
+// Alias for IsRsaPublicKey
+func IsRsaPub(str string, params ...string) bool {
+	if len(params) == 1 {
+		len, _ := ToInt(params[0])
+		return IsRsaPublicKey(str, int(len))
+	}
+
+	return false
 }
 
 // StringMatches checks if a string matches a given pattern.
