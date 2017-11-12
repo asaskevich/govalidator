@@ -499,6 +499,75 @@ func TestIsUpperCase(t *testing.T) {
 	}
 }
 
+func TestHasLowerCase(t *testing.T) {
+    t.Parallel()
+
+    var tests = []struct {
+        param    string
+        expected bool
+    }{
+        {"", true},
+        {"abc123", true},
+        {"abc", true},
+        {"a b c", true},
+        {"abcß", true},
+        {"abcẞ", true},
+        {"ABCẞ", false},
+        {"tr竪s 端ber", true},
+        {"fooBar", true},
+        {"123ABC", false},
+        {"ABC123", false},
+        {"ABC", false},
+        {"S T R", false},
+        {"fooBar", true},
+        {"abacaba123", true},
+        {"FÒÔBÀŘ", false},
+        {"fòôbàř", true},
+        {"fÒÔBÀŘ", true},
+        
+    }
+    for _, test := range tests {
+        actual := HasLowerCase(test.param)
+        if actual != test.expected {
+            t.Errorf("Expected HasLowerCase(%q) to be %v, got %v", test.param, test.expected, actual)
+        }
+    }
+}
+
+func TestHasUpperCase(t *testing.T) {
+    t.Parallel()
+
+    var tests = []struct {
+        param    string
+        expected bool
+    }{
+        {"", true},
+        {"abc123", false},
+        {"abc", false},
+        {"a b c", false},
+        {"abcß", false},
+        {"abcẞ", false},
+        {"ABCẞ", true},
+        {"tr竪s 端ber", false},
+        {"fooBar", true},
+        {"123ABC", true},
+        {"ABC123", true},
+        {"ABC", true},
+        {"S T R", true},
+        {"fooBar", true},
+        {"abacaba123", false},
+        {"FÒÔBÀŘ", true},
+        {"fòôbàř", false},
+        {"Fòôbàř", true},
+    }
+    for _, test := range tests {
+        actual := HasUpperCase(test.param)
+        if actual != test.expected {
+            t.Errorf("Expected HasUpperCase(%q) to be %v, got %v", test.param, test.expected, actual)
+        }
+    }
+}
+
 func TestIsInt(t *testing.T) {
 	t.Parallel()
 
