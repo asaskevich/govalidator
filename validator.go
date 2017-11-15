@@ -890,7 +890,7 @@ func checkRequired(v reflect.Value, t reflect.StructField, options tagOptionsMap
 		}
 		return false, Error{t.Name, fmt.Errorf("non zero value required"), false, "required"}
 	} else if _, isOptional := options["optional"]; fieldsRequiredByDefault && !isOptional {
-		return false, Error{t.Name, fmt.Errorf("All fields are required to at least have one validation defined"), false, "required"}
+		return false, Error{t.Name, fmt.Errorf("Missing required field"), false, "required"}
 	}
 	// not required and empty is valid
 	return true, nil
