@@ -2116,6 +2116,15 @@ type MissingValidationDeclarationStruct struct {
 	Email string `valid:"required,email"`
 }
 
+type FieldRequiredByDefault struct {
+    Email string `valid:"email"`
+}
+
+type MultipleFieldsRequiredByDefault struct {
+    Url string `valid:"url"`
+    Email string `valid:"email"`
+}
+
 type FieldsRequiredByDefaultButExemptStruct struct {
 	Name  string `valid:"-"`
 	Email string `valid:"email"`
@@ -2150,6 +2159,46 @@ func TestValidateMissingValidationDeclarationStruct(t *testing.T) {
 		}
 	}
 	SetFieldsRequiredByDefault(false)
+}
+
+func TestFieldRequiredByDefault(t *testing.T) {
+    var tests = []struct {
+        param    FieldRequiredByDefault
+        expected bool
+    }{
+        {FieldRequiredByDefault{}, true},
+    }
+    SetFieldsRequiredByDefault(true)
+    for _, test := range tests {
+        actual, err := ValidateStruct(test.param)
+        if actual != test.expected {
+            t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+            if err != nil {
+                t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+            }
+        }
+    }
+    SetFieldsRequiredByDefault(false)
+}
+
+func TestMultipleFieldsRequiredByDefault(t *testing.T) {
+    var tests = []struct {
+        param    MultipleFieldsRequiredByDefault
+        expected bool
+    }{
+        {MultipleFieldsRequiredByDefault{}, true},
+    }
+    SetFieldsRequiredByDefault(true)
+    for _, test := range tests {
+        actual, err := ValidateStruct(test.param)
+        if actual != test.expected {
+            t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+            if err != nil {
+                t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+            }
+        }
+    }
+    SetFieldsRequiredByDefault(false)
 }
 
 func TestFieldsRequiredByDefaultButExemptStruct(t *testing.T) {
