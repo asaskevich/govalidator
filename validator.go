@@ -231,6 +231,22 @@ func IsUpperCase(str string) bool {
 	return str == strings.ToUpper(str)
 }
 
+// HasLowerCase check if the string contains at least 1 lowercase. Empty string is valid.
+func HasLowerCase(str string) bool {
+    if IsNull(str) {
+        return true
+    }
+    return rxHasLowerCase.MatchString(str)
+}
+
+// HasUpperCase check if the string contians as least 1 uppercase. Empty string is valid.
+func HasUpperCase(str string) bool {
+    if IsNull(str) {
+        return true
+    }
+    return rxHasUpperCase.MatchString(str)
+}
+
 // IsInt check if the string is an integer. Empty string is valid.
 func IsInt(str string) bool {
 	if IsNull(str) {
