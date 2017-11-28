@@ -2235,7 +2235,7 @@ func TestFieldRequiredByDefault(t *testing.T) {
         param    FieldRequiredByDefault
         expected bool
     }{
-        {FieldRequiredByDefault{}, true},
+        {FieldRequiredByDefault{}, false},
     }
     SetFieldsRequiredByDefault(true)
     for _, test := range tests {
@@ -2255,7 +2255,7 @@ func TestMultipleFieldsRequiredByDefault(t *testing.T) {
         param    MultipleFieldsRequiredByDefault
         expected bool
     }{
-        {MultipleFieldsRequiredByDefault{}, true},
+        {MultipleFieldsRequiredByDefault{}, false},
     }
     SetFieldsRequiredByDefault(true)
     for _, test := range tests {
