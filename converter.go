@@ -31,15 +31,6 @@ func ToFloat(str string) (float64, error) {
 	return res, err
 }
 
-// ToInt convert the input string to an integer, or 0 if the input is not an integer.
-func ToIntX(str string) (int64, error) {
-	res, err := strconv.ParseInt(str, 0, 64)
-	if err != nil {
-		res = 0
-	}
-	return res, err
-}
-
 func ToInt(value interface{}) (res int64, err error) {
 	val := reflect.ValueOf(value)
 
