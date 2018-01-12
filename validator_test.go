@@ -2660,6 +2660,9 @@ func TestValidateStruct(t *testing.T) {
 	}
 	for _, test := range tests {
 		actual, err := ValidateStruct(test.param)
+		//		if err != nil {
+		//			t.Errorf("%+v", err)
+		//		}
 		if actual != test.expected {
 			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
