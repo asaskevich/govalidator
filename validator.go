@@ -52,9 +52,33 @@ func SetFieldsRequiredByDefault(value bool) {
 }
 
 // IsEmail check if the string is an email.
-func IsEmail(str string) bool {
-	// TODO uppercase letters are not supported
-	return rxEmail.MatchString(str)
+func IsEmail(email string) bool {
+	if len(email) < 6 || len(email) > 254 {
+		return false
+	}
+	at := strings.LastIndex(email, "@")
+	if at <= 0 || at > len(email)-3 {
+		return false
+	}
+	user := email[:at]
+	host := email[at+1:]
+	if len(user) > 64 {
+		return false
+	}
+	if userDotRegexp.MatchString(user) || !userRegexp.MatchString(user) || !hostRegexp.MatchString(host) {
+		return false
+	}
+	switch host {
+	case "localhost", "example.com":
+		return true
+	}
+	if _, err := net.LookupMX(host); err != nil {
+		if _, err := net.LookupIP(host); err != nil {
+			return false
+		}
+	}
+
+	return true
 }
 
 // IsURL check if the string is an URL.
