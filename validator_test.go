@@ -2983,7 +2983,7 @@ func TestValidateStructParamValidatorInt(t *testing.T) {
 		Uint32 uint32 `valid:"range(1|10)"`
 		Uint64 uint64 `valid:"range(1|10)"`
 
-		Flaot32 float32 `valid:"range(1|10)"`
+		Float32 float32 `valid:"range(1|10)"`
 		Float64 float64 `valid:"range(1|10)"`
 	}
 	test1Ok := &Test1{5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5}
