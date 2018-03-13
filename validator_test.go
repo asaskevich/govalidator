@@ -811,7 +811,6 @@ func TestIsRequestURL(t *testing.T) {
 		{"http://www.foo---bar.com/", true},
 		{"mailto:someone@example.com", true},
 		{"irc://irc.server.org/channel", true},
-		{"irc://#channel@network", true},
 		{"/abs/test/dir", false},
 		{"./rel/test/dir", false},
 	}
@@ -860,7 +859,6 @@ func TestIsRequestURI(t *testing.T) {
 		{"http://www.foo---bar.com/", true},
 		{"mailto:someone@example.com", true},
 		{"irc://irc.server.org/channel", true},
-		{"irc://#channel@network", true},
 		{"/abs/test/dir", true},
 		{"./rel/test/dir", false},
 	}
