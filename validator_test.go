@@ -2967,6 +2967,73 @@ func ExampleValidateStruct() {
 	println(result)
 }
 
+func TestValidateStructParamValidatorInt(t *testing.T) {
+	type Test1 struct {
+		Int   int   `valid:"range(1|10)"`
+		Int8  int8  `valid:"range(1|10)"`
+		Int16 int16 `valid:"range(1|10)"`
+		Int32 int32 `valid:"range(1|10)"`
+		Int64 int64 `valid:"range(1|10)"`
+
+		Uint   uint   `valid:"range(1|10)"`
+		Uint8  uint8  `valid:"range(1|10)"`
+		Uint16 uint16 `valid:"range(1|10)"`
+		Uint32 uint32 `valid:"range(1|10)"`
+		Uint64 uint64 `valid:"range(1|10)"`
+
+		Float32 float32 `valid:"range(1|10)"`
+		Float64 float64 `valid:"range(1|10)"`
+	}
+	test1Ok := &Test1{5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5}
+	test1NotOk := &Test1{11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11}
+
+	_, err := ValidateStruct(test1Ok)
+	if err != nil {
+		t.Errorf("Test failed: %s", err)
+	}
+
+	_, err = ValidateStruct(test1NotOk)
+	if err == nil {
+		t.Errorf("Test failed: nil")
+	}
+
+	type Test2 struct {
+		Int   int   `valid:"in(1|10)"`
+		Int8  int8  `valid:"in(1|10)"`
+		Int16 int16 `valid:"in(1|10)"`
+		Int32 int32 `valid:"in(1|10)"`
+		Int64 int64 `valid:"in(1|10)"`
+
+		Uint   uint   `valid:"in(1|10)"`
+		Uint8  uint8  `valid:"in(1|10)"`
+		Uint16 uint16 `valid:"in(1|10)"`
+		Uint32 uint32 `valid:"in(1|10)"`
+		Uint64 uint64 `valid:"in(1|10)"`
+
+		Float32 float32 `valid:"in(1|10)"`
+		Float64 float64 `valid:"in(1|10)"`
+	}
+
+	test2Ok1 := &Test2{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+	test2Ok2 := &Test2{10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10}
+	test2NotOk := &Test2{2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
+
+	_, err = ValidateStruct(test2Ok1)
+	if err != nil {
+		t.Errorf("Test failed: %s", err)
+	}
+
+	_, err = ValidateStruct(test2Ok2)
+	if err != nil {
+		t.Errorf("Test failed: %s", err)
+	}
+
+	_, err = ValidateStruct(test2NotOk)
+	if err == nil {
+		t.Errorf("Test failed: nil")
+	}
+}
+
 func TestIsCIDR(t *testing.T) {
 	t.Parallel()
 
