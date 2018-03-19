@@ -634,7 +634,7 @@ func TestIsHash(t *testing.T) {
 	}
 }
 
-func TestIsEmail(t *testing.T) {
+func TestIsExistingEmail(t *testing.T) {
 	t.Parallel()
 
 	var tests = []struct {
@@ -650,6 +650,39 @@ func TestIsEmail(t *testing.T) {
 		{"invalidemail@", false},
 		{"invalid.com", false},
 		{"@invalid.com", false},
+		{"NathAn.daVIeS@DomaIn.cOM", true},
+		{"NATHAN.DAVIES@DOMAIN.CO.UK", true},
+	}
+	for _, test := range tests {
+		actual := IsExistingEmail(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsExistingEmail(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsEmail(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"", false},
+		{"foo@bar.com", true},
+		{"x@x.x", true},
+		{"foo@bar.com.au", true},
+		{"foo+bar@bar.com", true},
+		{"foo@bar.coffee", true},
+		{"foo@bar.coffee..coffee", false},
+		{"foo@bar.bar.coffee", true},
+		{"foo@bar.中文网", true},
+		{"invalidemail@", false},
+		{"invalid.com", false},
+		{"@invalid.com", false},
+		{"test|123@m端ller.com", true},
+		{"hans@m端ller.com", true},
+		{"hans.m端ller@test.com", true},
 		{"NathAn.daVIeS@DomaIn.cOM", true},
 		{"NATHAN.DAVIES@DOMAIN.CO.UK", true},
 	}
