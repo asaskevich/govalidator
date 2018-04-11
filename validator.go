@@ -725,41 +725,45 @@ func ValidateStruct(s interface{}) (bool, error) {
 			continue // Private field
 		}
 		structResult := true
+		fieldResult := true
+		var err error
 		if (valueField.Kind() == reflect.Struct ||
 			(valueField.Kind() == reflect.Ptr && valueField.Elem().Kind() == reflect.Struct)) &&
 			typeField.Tag.Get(tagName) != "-" {
-			var err error
 			structResult, err = ValidateStruct(valueField.Interface())
 			if err != nil {
 				errs = append(errs, err)
 			}
 		}
-		resultField, err2 := typeCheck(valueField, typeField, val, nil)
-		if err2 != nil {
+		// we only need to perform typeCheck if struct validation passes
+		if structResult {
+			fieldResult, err = typeCheck(valueField, typeField, val, nil)
+			if err != nil {
 
-			// Replace structure name with JSON name if there is a tag on the variable
-			jsonTag := toJSONName(typeField.Tag.Get("json"))
-			if jsonTag != "" {
-				switch jsonError := err2.(type) {
-				case Error:
-					jsonError.Name = jsonTag
-					err2 = jsonError
-				case Errors:
-					for i2, err3 := range jsonError {
-						switch customErr := err3.(type) {
-						case Error:
-							customErr.Name = jsonTag
-							jsonError[i2] = customErr
+				// Replace structure name with JSON name if there is a tag on the variable
+				jsonTag := toJSONName(typeField.Tag.Get("json"))
+				if jsonTag != "" {
+					switch jsonError := err.(type) {
+					case Error:
+						jsonError.Name = jsonTag
+						err = jsonError
+					case Errors:
+						for i2, err2 := range jsonError {
+							switch customErr := err2.(type) {
+							case Error:
+								customErr.Name = jsonTag
+								jsonError[i2] = customErr
+							}
 						}
+
+						err = jsonError
 					}
-
-					err2 = jsonError
 				}
-			}
 
-			errs = append(errs, err2)
+				errs = append(errs, err)
+			}
 		}
-		result = result && resultField && structResult
+		result = result && fieldResult && structResult
 	}
 	if len(errs) > 0 {
 		err = errs
