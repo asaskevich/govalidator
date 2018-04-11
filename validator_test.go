@@ -3247,3 +3247,41 @@ bQIDAQAB
 		}
 	}
 }
+
+func TestStructMultipleLevels(t *testing.T) {
+	type (
+		Inner struct {
+			Data string `valid:"in(a)"`
+		}
+
+		Outer1 struct {
+			Inner Inner
+		}
+
+		Outer2 struct {
+			Inner Inner `valid:"optional"`
+		}
+
+		Outer3 struct {
+			Inner Inner `valid:"required"`
+		}
+	)
+
+	var tests = []struct {
+		object   interface{}
+		expected string
+	}{
+		{Outer1{Inner{Data: "b"}}, "Data: b does not validate as in(a)"},
+		{Outer2{Inner{Data: "b"}}, "Data: b does not validate as in(a)"},
+		{Outer3{Inner{Data: "b"}}, "Data: b does not validate as in(a)"},
+	}
+
+	for _, test := range tests {
+		valid, err := ValidateStruct(test.object)
+		if valid {
+			t.Errorf("Expected ValidateStruct(%v) to be false got true", test.object)
+		} else if err.Error() != test.expected {
+			t.Errorf("Expected ValidateStruct(%v) to be %s got %s", test.object, test.expected, err.Error())
+		}
+	}
+}
