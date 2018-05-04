@@ -971,7 +971,11 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 
 	if isEmptyValue(v) {
 		// an empty value is not validated, check only required
-		return checkRequired(v, t, options)
+		isValid, resultErr = checkRequired(v, t, options)
+		for key := range options {
+			delete(options, key)
+		}
+		return
 	}
 
 	var customTypeErrors Errors
