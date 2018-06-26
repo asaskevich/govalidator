@@ -539,7 +539,7 @@ func IsISO693Alpha3b(str string) bool {
 
 // IsDNSName will validate the given string as a DNS name
 func IsDNSName(str string) bool {
-	if str == "" || len(strings.Replace(str, ".", "", -1)) > 255 {
+	if str == "" || len(strings.Replace(str, ".", "", -1)) > 255 || str[len(str)-1:] == "." {
 		// constraints already violated
 		return false
 	}
