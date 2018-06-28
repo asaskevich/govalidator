@@ -305,6 +305,8 @@ Here is a list of available validators for struct fields (validator - used funct
 "halfwidth":          IsHalfWidth,
 "variablewidth":      IsVariableWidth,
 "base64":             IsBase64,
+"base64string":       IsBase64String,
+"base64rawstring":    IsBase64RawString,
 "datauri":            IsDataURI,
 "ip":                 IsIP,
 "port":               IsPort,

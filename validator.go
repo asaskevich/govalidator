@@ -468,9 +468,35 @@ func IsVariableWidth(str string) bool {
 	return rxHalfWidth.MatchString(str) && rxFullWidth.MatchString(str)
 }
 
-// IsBase64 check if a string is base64 encoded.
+// IsBase64 check if a string is data:base64 encoded.
 func IsBase64(str string) bool {
 	return rxBase64.MatchString(str)
+}
+
+// IsBase64String check to see if the string raw inputted string is a valid base64
+func IsBase64String(str string) bool {
+	if len(str) == 0 {
+		return false
+	}
+
+	_, err := base64.URLEncoding.DecodeString(str)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+// IsBase64RawString check to see if the string raw inputted (no == at the end) string is a valid base64
+func IsBase64RawString(str string) bool {
+	if len(str) == 0 {
+		return false
+	}
+
+	_, err := base64.RawURLEncoding.DecodeString(str)
+	if err != nil {
+		return false
+	}
+	return true
 }
 
 // IsFilePath check is a string is Win or Unix file path and returns it's type.
