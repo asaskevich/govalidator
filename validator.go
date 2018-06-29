@@ -1139,6 +1139,42 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		}
 		return result, nil
 	case reflect.Slice, reflect.Array:
+		for validatorSpec, customErrorMessage := range options {
+			var negate bool
+			validator := validatorSpec
+			customMsgExists := len(customErrorMessage) > 0
+
+			// Check whether the tag looks like '!something' or 'something'
+			if validator[0] == '!' {
+				validator = validator[1:]
+				negate = true
+			}
+
+			for key, value := range ArrayTagRegexMap {
+				ps := value.FindStringSubmatch(validator)
+				if len(ps) == 0 {
+					continue
+				}
+
+				validatefunc, ok := ArrayTagMap[key]
+				if !ok {
+					continue
+				}
+
+				delete(options, validatorSpec)
+
+				if result := validatefunc(v.Interface(), ps[1:]...); (!result && !negate) || (result && negate) {
+					if customMsgExists {
+						return false, Error{t.Name, fmt.Errorf(customErrorMessage), customMsgExists, stripParams(validatorSpec)}
+					}
+					if negate {
+						return false, Error{t.Name, fmt.Errorf("%v does validate as %v", v.Interface(), validator), customMsgExists, stripParams(validatorSpec)}
+					}
+					return false, Error{t.Name, fmt.Errorf("%v does not validate as %v", v.Interface(), validator), customMsgExists, stripParams(validatorSpec)}
+				}
+			}
+		}
+
 		result := true
 		for i := 0; i < v.Len(); i++ {
 			var resultItem bool
@@ -1233,6 +1269,41 @@ func ErrorsByField(e error) map[string]string {
 	}
 
 	return m
+}
+
+// InIntArr loops over the structs []int and checks if the params passed in
+// are inside that array
+func InIntArr(i interface{}, params ...string) bool {
+	switch i.(type) {
+	case []int:
+		arr := i.([]int)
+		for _, a := range arr {
+			var valid bool
+			for _, p := range params {
+				value, err := strconv.Atoi(p)
+				if err != nil {
+					return false
+				}
+				if value == a {
+					valid = true
+					break
+				}
+			}
+			if !valid {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func isInIntRaw(i interface{}, params ...string) bool {
+	if len(params) == 1 {
+		rawParams := params[0]
+		parsedParams := strings.Split(rawParams, "|")
+		return InIntArr(i, parsedParams...)
+	}
+	return false
 }
 
 // Error returns string equivalent for reflect.Type

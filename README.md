@@ -332,6 +332,7 @@ Validators with parameters
 "runelength(min|max)": RuneLength,
 "matches(pattern)": StringMatches,
 "in(string1|string2|...|stringN)": IsIn,
+"inintarr(string1|string2|...|stringN)": InIntArr,
 ```
 
 And here is small example of usage:

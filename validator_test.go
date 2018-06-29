@@ -1041,7 +1041,7 @@ func TestIsDivisibleBy(t *testing.T) {
 
 // This small example illustrate how to work with IsDivisibleBy function.
 func ExampleIsDivisibleBy() {
-	println("1024 is divisible by 64: ", IsDivisibleBy("1024", "64"))
+	fmt.Println("1024 is divisible by 64: ", IsDivisibleBy("1024", "64"))
 }
 
 func TestIsByteLength(t *testing.T) {
@@ -3045,9 +3045,9 @@ func ExampleValidateStruct() {
 
 	result, err := ValidateStruct(post)
 	if err != nil {
-		println("error: " + err.Error())
+		fmt.Println("error: " + err.Error())
 	}
-	println(result)
+	fmt.Println(result)
 }
 
 func TestValidateStructParamValidatorInt(t *testing.T) {
@@ -3301,5 +3301,41 @@ bQIDAQAB
 		if actual != test.expected {
 			t.Errorf("Expected TestIsRsaPublicKey(%d, %d) to be %v, got %v", i, test.keylen, test.expected, actual)
 		}
+	}
+}
+
+func TestInIntArr(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		arr      []int
+		expected bool
+		wantErr  bool
+	}{
+		{arr: []int{1, 2, 3}, expected: true, wantErr: false},
+		{arr: []int{6}, expected: true, wantErr: false},
+		{arr: []int{1, 2, 3, 4, 5, 6}, expected: true, wantErr: false},
+		{arr: []int{1, 2, 3, 4, 5, 6, 7}, expected: false, wantErr: true},
+		{arr: []int{0, 2, 3, 4, 5, 6}, expected: false, wantErr: true},
+		{arr: []int{1, 2, 3, 8, 5, 6}, expected: false, wantErr: true},
+		{arr: []int{1, 2, 6}, expected: true, wantErr: false},
+	}
+
+	type mockStruct struct {
+		Arr []int `valid:"inintarr(1|2|3|4|5|6)"`
+	}
+
+	for _, tt := range tests {
+
+		m := mockStruct{tt.arr}
+		ok, err := ValidateStruct(m)
+		if tt.wantErr && err == nil {
+			t.Error("Expected err with optional validation, got nil")
+		}
+
+		if tt.expected != ok {
+			t.Errorf("Expected validation to return %v, got %v", tt.expected, ok)
+		}
+
 	}
 }
