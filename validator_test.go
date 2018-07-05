@@ -2653,6 +2653,86 @@ func TestEmptyStringPtr(t *testing.T) {
 	SetNilPtrAllowedByRequired(false)
 }
 
+func TestNestedStruct(t *testing.T) {
+	type EvenMoreNestedStruct struct {
+		Bar string `valid:"length(3|5)"`
+	}
+	type NestedStruct struct {
+		Foo                 string `valid:"length(3|5),required"`
+		EvenMoreNested      EvenMoreNestedStruct
+		SliceEvenMoreNested []EvenMoreNestedStruct
+		MapEvenMoreNested   map[string]EvenMoreNestedStruct
+	}
+	type OuterStruct struct {
+		Nested NestedStruct
+	}
+
+	var tests = []struct {
+		param       interface{}
+		expected    bool
+		expectedErr string
+	}{
+		{OuterStruct{
+			Nested: NestedStruct{
+				Foo: "",
+			},
+		}, false, "Nested.Foo: non zero value required"},
+		{OuterStruct{
+			Nested: NestedStruct{
+				Foo: "123",
+			},
+		}, true, ""},
+		{OuterStruct{
+			Nested: NestedStruct{
+				Foo: "123456",
+			},
+		}, false, "Nested.Foo: 123456 does not validate as length(3|5)"},
+		{OuterStruct{
+			Nested: NestedStruct{
+				Foo: "123",
+				EvenMoreNested: EvenMoreNestedStruct{
+					Bar: "123456",
+				},
+			},
+		}, false, "Nested.EvenMoreNested.Bar: 123456 does not validate as length(3|5)"},
+		{OuterStruct{
+			Nested: NestedStruct{
+				Foo: "123",
+				SliceEvenMoreNested: []EvenMoreNestedStruct{
+					EvenMoreNestedStruct{
+						Bar: "123456",
+					},
+				},
+			},
+		}, false, "Nested.SliceEvenMoreNested.0.Bar: 123456 does not validate as length(3|5)"},
+		{OuterStruct{
+			Nested: NestedStruct{
+				Foo: "123",
+				MapEvenMoreNested: map[string]EvenMoreNestedStruct{
+					"Foo": EvenMoreNestedStruct{
+						Bar: "123456",
+					},
+				},
+			},
+		}, false, "Nested.MapEvenMoreNested.Foo.Bar: 123456 does not validate as length(3|5)"},
+	}
+
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+		if err != nil {
+			if err.Error() != test.expectedErr {
+				t.Errorf("Got Error on ValidateStruct(%q). Expected: %s Actual: %s", test.param, test.expectedErr, err)
+			}
+		} else if test.expectedErr != "" {
+			t.Errorf("Expected error on ValidateStruct(%q).", test.param)
+		}
+	}
+}
+
 func TestFunkyIsInStruct(t *testing.T) {
 	type FunkyIsInStruct struct {
 		IsIn string `valid:"in(PRESENT|| |PRÉSENTE|NOTABSENT)"`
@@ -2945,7 +3025,7 @@ func TestErrorsByField(t *testing.T) {
 		{"CustomField", "An error occurred"},
 	}
 
-	err = Error{"CustomField", fmt.Errorf("An error occurred"), false, "hello"}
+	err = Error{"CustomField", fmt.Errorf("An error occurred"), false, "hello", []string{}}
 	errs = ErrorsByField(err)
 
 	if len(errs) != 1 {
