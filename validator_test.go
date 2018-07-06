@@ -2734,6 +2734,50 @@ func TestNestedStruct(t *testing.T) {
 	}
 }
 
+func TestSliceStruct(t *testing.T) {
+
+	type SliceStruct struct {
+		SliceStr []string `valid:"uuidv4"`
+	}
+
+	type MapStruct struct {
+		MapStr map[string]string `valid:"uuidv4"`
+	}
+
+	uuid := "8b24bd0f-607e-4d4f-a706-a786e95ed821"
+
+	var tests = []struct {
+		param       interface{}
+		expected    bool
+		expectedErr string
+	}{
+		{SliceStruct{
+			SliceStr: []string{uuid, uuid + "1"},
+		}, false, "SliceStr.1: 8b24bd0f-607e-4d4f-a706-a786e95ed8211 does not validate as uuidv4"},
+		{MapStruct{
+			MapStr: map[string]string{"a": uuid, "b": uuid + "1"},
+		}, false, "MapStr.b: 8b24bd0f-607e-4d4f-a706-a786e95ed8211 does not validate as uuidv4"},
+		{SliceStruct{
+			SliceStr: []string{},
+		}, true, ""},
+	}
+
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+		if err != nil {
+			if err.Error() != test.expectedErr {
+				t.Errorf("Got Error on ValidateStruct(%q). Expected: %s Actual: %s", test.param, test.expectedErr, err)
+			}
+		} else if test.expectedErr != "" {
+			t.Errorf("Expected error on ValidateStruct(%q).", test.param)
+		}
+	}
+}
+
 func TestFunkyIsInStruct(t *testing.T) {
 	type FunkyIsInStruct struct {
 		IsIn string `valid:"in(PRESENT|| |PRÉSENTE|NOTABSENT)"`
@@ -3026,7 +3070,7 @@ func TestErrorsByField(t *testing.T) {
 		{"CustomField", "An error occurred"},
 	}
 
-	err = Error{"CustomField", fmt.Errorf("An error occurred"), false, "hello", []string{}}
+	err = Error{fmt.Errorf("An error occurred"), false, "hello", []string{"CustomField"}}
 	errs = ErrorsByField(err)
 
 	if len(errs) != 1 {
@@ -3237,12 +3281,17 @@ func TestOptionalCustomValidators(t *testing.T) {
 
 func TestJSONValidator(t *testing.T) {
 
+	type Complex struct {
+		WithJSONName string `json:"with_json_name" valid:"-,required"`
+	}
+
 	var val struct {
-		WithJSONName      string `json:"with_json_name" valid:"-,required"`
-		WithoutJSONName   string `valid:"-,required"`
-		WithJSONOmit      string `json:"with_other_json_name,omitempty" valid:"-,required"`
-		WithJSONOption    string `json:",omitempty" valid:"-,required"`
-		WithEmptyJSONName string `json:"-" valid:"-,required"`
+		WithJSONName      string  `json:"with_json_name" valid:"-,required"`
+		WithoutJSONName   string  `valid:"-,required"`
+		WithJSONOmit      string  `json:"with_other_json_name,omitempty" valid:"-,required"`
+		WithJSONOption    string  `json:",omitempty" valid:"-,required"`
+		WithEmptyJSONName string  `json:"-" valid:"-,required"`
+		Complex           Complex `json:"complex"`
 	}
 
 	_, err := ValidateStruct(val)
@@ -3266,6 +3315,10 @@ func TestJSONValidator(t *testing.T) {
 	if !Contains(err.Error(), "WithEmptyJSONName") {
 		t.Errorf("Expected error message to contain WithEmptyJSONName but actual error is: %s", err.Error())
 	}
+
+	if Contains(err.Error(), "Complex") {
+		t.Errorf("Expected error message to not contain 'Complex' but actual error is: %s", err.Error())
+	}
 }
 
 func TestValidatorIncludedInError(t *testing.T) {
@@ -3288,8 +3341,8 @@ func TestValidatorIncludedInError(t *testing.T) {
 
 	for _, e := range errors.(Errors) {
 		casted := e.(Error)
-		if validatorMap[casted.Name] != casted.Validator {
-			t.Errorf("expected validator for %s to be %s, but was %s", casted.Name, validatorMap[casted.Name], casted.Validator)
+		if validatorMap[casted.Name()] != casted.Validator {
+			t.Errorf("expected validator for %s to be %s, but was %s", casted.Name(), validatorMap[casted.Name()], casted.Validator)
 		}
 	}
 
@@ -3312,8 +3365,8 @@ func TestValidatorIncludedInError(t *testing.T) {
 
 	for _, e := range errors.(Errors) {
 		casted := e.(Error)
-		if validatorMap[casted.Name] != casted.Validator {
-			t.Errorf("expected validator for %s to be %s, but was %s", casted.Name, validatorMap[casted.Name], casted.Validator)
+		if validatorMap[casted.Name()] != casted.Validator {
+			t.Errorf("expected validator for %s to be %s, but was %s", casted.Name(), validatorMap[casted.Name()], casted.Validator)
 		}
 	}
 
