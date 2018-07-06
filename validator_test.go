@@ -2542,6 +2542,33 @@ func TestStringMatchesStruct(t *testing.T) {
 	}
 }
 
+func TestStringMatchesComplexStruct(t *testing.T) {
+	type ComplexMatcherStruct struct {
+		Field string `valid:"matches(^[A-Za-z0-9\\-_&!\\,\\.]+$)"`
+	}
+
+	var tests = []struct {
+		param    interface{}
+		expected bool
+	}{
+		{ComplexMatcherStruct{"12345"}, true},
+		{ComplexMatcherStruct{"12345,!"}, true},
+		{ComplexMatcherStruct{"12345*"}, false},
+		{ComplexMatcherStruct{`12345"*`}, false},
+		{ComplexMatcherStruct{"12345,*"}, false},
+	}
+
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			if err != nil {
+				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+			}
+		}
+	}
+}
+
 func TestIsInStruct(t *testing.T) {
 	var tests = []struct {
 		param    interface{}
