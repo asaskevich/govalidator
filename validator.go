@@ -13,13 +13,14 @@ import (
 	"net"
 	"net/url"
 	"reflect"
-	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/h2so5/goback/regexp"
 )
 
 var (
@@ -779,10 +780,15 @@ func ValidateStruct(s interface{}) (bool, error) {
 	return result, err
 }
 
+// splitTag will split a tag on unescaped commas
+func splitTag(tag string) []string {
+	return regexp.MustCompile("(?<!\\\\),").Split(tag, -1)
+}
+
 // parseTagIntoMap parses a struct tag `valid:required~Some error message,length(2|3)` into map[string]string{"required": "Some error message", "length(2|3)": ""}
 func parseTagIntoMap(tag string) tagOptionsMap {
 	optionsMap := make(tagOptionsMap)
-	options := strings.Split(tag, ",")
+	options := splitTag(tag)
 
 	for i, option := range options {
 		option = strings.TrimSpace(option)
