@@ -2,6 +2,7 @@ package govalidator
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -3374,4 +3375,22 @@ bQIDAQAB
 			t.Errorf("Expected TestIsRsaPublicKey(%d, %d) to be %v, got %v", i, test.keylen, test.expected, actual)
 		}
 	}
+}
+
+func TestSplitTag(t *testing.T) {
+
+	tag := "split here -->,don't split \\,<--there,thanks"
+
+	expected := []string{
+		"split here -->",
+		"don't split \\,<--there",
+		"thanks",
+	}
+
+	actual := splitTag(tag)
+
+	if !reflect.DeepEqual(actual, expected) {
+		t.Errorf("tag not split correctly. Want %v have %v", expected, actual)
+	}
+
 }
