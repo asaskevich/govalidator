@@ -1111,6 +1111,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		result := true
 
 		var optionsCopy tagOptionsMap
+		var errs Errors
 		for i, k := range sv {
 			var resultItem bool
 			var err error
@@ -1119,22 +1120,23 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 				resultItem, err = typeCheck(v.MapIndex(k), t, o, optionsCopy)
 				if err != nil {
 					err = AppendPathToErrors(err, sv[i].Interface().(string))
-					return false, err
+					errs = append(errs, err)
 				}
 			} else {
 				resultItem, err = ValidateStruct(v.MapIndex(k).Interface())
 				if err != nil {
 					err = PrependPathToErrors(err, getTypeName(t), sv[i].Interface().(string))
-					return false, err
+					errs = append(errs, err)
 				}
 			}
 			result = result && resultItem
 		}
 		options = optionsCopy
-		return result, nil
+		return result, errs
 	case reflect.Slice, reflect.Array:
 		result := true
 		var optionsCopy tagOptionsMap
+		var errs Errors
 		for i := 0; i < v.Len(); i++ {
 			var resultItem bool
 			var err error
@@ -1143,19 +1145,19 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 				resultItem, err = typeCheck(v.Index(i), t, o, optionsCopy)
 				if err != nil {
 					err = AppendPathToErrors(err, strconv.Itoa(i))
-					return false, err
+					errs = append(errs, err)
 				}
 			} else {
 				resultItem, err = ValidateStruct(v.Index(i).Interface())
 				if err != nil {
 					err = PrependPathToErrors(err, getTypeName(t), strconv.Itoa(i))
-					return false, err
+					errs = append(errs, err)
 				}
 			}
 			result = result && resultItem
 		}
 		options = optionsCopy
-		return result, nil
+		return result, errs
 	case reflect.Interface:
 		// If the value is an interface then encode its element
 		if v.IsNil() {

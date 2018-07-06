@@ -2752,11 +2752,17 @@ func TestSliceStruct(t *testing.T) {
 		expectedErr string
 	}{
 		{SliceStruct{
-			SliceStr: []string{uuid, uuid + "1"},
-		}, false, "SliceStr.1: 8b24bd0f-607e-4d4f-a706-a786e95ed8211 does not validate as uuidv4"},
+			SliceStr: []string{uuid, uuid + "1", uuid + "2"},
+		}, false, "SliceStr.1: 8b24bd0f-607e-4d4f-a706-a786e95ed8211 does not validate as uuidv4;SliceStr.2: 8b24bd0f-607e-4d4f-a706-a786e95ed8212 does not validate as uuidv4"},
+		{SliceStruct{
+			SliceStr: []string{uuid, uuid, uuid},
+		}, true, ""},
 		{MapStruct{
-			MapStr: map[string]string{"a": uuid, "b": uuid + "1"},
-		}, false, "MapStr.b: 8b24bd0f-607e-4d4f-a706-a786e95ed8211 does not validate as uuidv4"},
+			MapStr: map[string]string{"a": uuid, "b": uuid + "b", "c": uuid + "c"},
+		}, false, "MapStr.b: 8b24bd0f-607e-4d4f-a706-a786e95ed821b does not validate as uuidv4;MapStr.c: 8b24bd0f-607e-4d4f-a706-a786e95ed821c does not validate as uuidv4"},
+		{MapStruct{
+			MapStr: map[string]string{"a": uuid, "b": uuid, "c": uuid},
+		}, true, ""},
 		{SliceStruct{
 			SliceStr: []string{},
 		}, true, ""},
