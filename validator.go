@@ -725,8 +725,11 @@ func ValidateStruct(s interface{}) (bool, error) {
 			continue // Private field
 		}
 		structResult := true
-		if (valueField.Kind() == reflect.Struct || ((valueField.Kind() == reflect.Interface ||
-			valueField.Kind() == reflect.Ptr) && valueField.Elem().Kind() == reflect.Struct)) &&
+		if valueField.Kind() == reflect.Interface {
+			valueField = valueField.Elem()
+		}
+		if (valueField.Kind() == reflect.Struct ||
+			(valueField.Kind() == reflect.Ptr && valueField.Elem().Kind() == reflect.Struct)) &&
 			typeField.Tag.Get(tagName) != "-" {
 			var err error
 			structResult, err = ValidateStruct(valueField.Interface())
