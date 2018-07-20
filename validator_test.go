@@ -724,12 +724,14 @@ func TestIsURL(t *testing.T) {
 		{"http://foobar.com/a-", true},
 		{"http://foobar.پاکستان/", true},
 		{"http://foobar.c_o_m", false},
+		{"http://_foobar.com", false},
+		{"http://foo_bar.com", true},
+		{"http://user:pass@foo_bar_bar.bar_foo.com", true},
 		{"", false},
 		{"xyz://foobar.com", false},
 		// {"invalid.", false}, is it false like "localhost."?
 		{".com", false},
 		{"rtmp://foobar.com", false},
-		{"http://www.foo_bar.com/", false},
 		{"http://localhost:3000/", true},
 		{"http://foobar.com#baz=qux", true},
 		{"http://foobar.com/t$-_.+!*\\'(),", true},
@@ -1015,6 +1017,56 @@ func TestIsNull(t *testing.T) {
 			t.Errorf("Expected IsNull(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
+}
+
+func TestHasWhitespaceOnly(t *testing.T) {
+    t.Parallel()
+
+    var tests = []struct {
+        param    string
+        expected bool
+    }{
+        {"abacaba", false},
+        {"", false},
+        {"    ", true},
+        {"  \r\n  ", true},
+        {"\014\012\011\013\015", true},
+        {"\014\012\011\013 abc  \015", false},
+        {"\f\n\t\v\r\f", true},
+        {"x\n\t\t\t\t", false},
+        {"\f\n\t  \n\n\n   \v\r\f", true},
+    }
+    for _, test := range tests {
+        actual := HasWhitespaceOnly(test.param)
+        if actual != test.expected {
+            t.Errorf("Expected HasWhitespaceOnly(%q) to be %v, got %v", test.param, test.expected, actual)
+        }
+    }
+}
+
+func TestHasWhitespace(t *testing.T) {
+    t.Parallel()
+
+    var tests = []struct {
+        param    string
+        expected bool
+    }{
+        {"abacaba", false},
+        {"", false},
+        {"    ", true},
+        {"  \r\n  ", true},
+        {"\014\012\011\013\015", true},
+        {"\014\012\011\013 abc  \015", true},
+        {"\f\n\t\v\r\f", true},
+        {"x\n\t\t\t\t", true},
+        {"\f\n\t  \n\n\n   \v\r\f", true},
+    }
+    for _, test := range tests {
+        actual := HasWhitespace(test.param)
+        if actual != test.expected {
+            t.Errorf("Expected HasWhitespace(%q) to be %v, got %v", test.param, test.expected, actual)
+        }
+    }
 }
 
 func TestIsDivisibleBy(t *testing.T) {
@@ -2817,7 +2869,7 @@ func TestValidateStruct(t *testing.T) {
 	})
 	result, err := ValidateStruct(PrivateStruct{"d_k", 0, []int{1, 2}, []string{"hi", "super"}, [2]Address{{"Street", "123456"},
 		{"Street", "123456"}}, Address{"Street", "123456"}, map[string]Address{"address": {"Street", "123456"}}})
-	if result != true {
+	if !result {
 		t.Log("Case ", 6, ": expected ", true, " when result is ", result)
 		t.Error(err)
 		t.FailNow()
@@ -3254,7 +3306,7 @@ func TestJSONValidator(t *testing.T) {
 		t.Errorf("Expected error message to contain with_json_name but actual error is: %s", err.Error())
 	}
 
-	if Contains(err.Error(), "WithoutJSONName") == false {
+	if !Contains(err.Error(), "WithoutJSONName") {
 		t.Errorf("Expected error message to contain WithoutJSONName but actual error is: %s", err.Error())
 	}
 

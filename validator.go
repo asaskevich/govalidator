@@ -26,8 +26,8 @@ var (
 	fieldsRequiredByDefault bool
 	nilPtrAllowedByRequired = false
 	notNumberRegexp         = regexp.MustCompile("[^0-9]+")
-	whiteSpacesAndMinus     = regexp.MustCompile("[\\s-]+")
-	paramsRegexp            = regexp.MustCompile("\\(.*\\)$")
+	whiteSpacesAndMinus     = regexp.MustCompile(`[\s-]+`)
+	paramsRegexp            = regexp.MustCompile(`\(.*\)$`)
 )
 
 const maxURLRuneCount = 2083
@@ -106,7 +106,7 @@ func IsURL(str string) bool {
 		return false
 	}
 	strTemp := str
-	if strings.Index(str, ":") >= 0 && strings.Index(str, "://") == -1 {
+	if strings.Contains(str, ":") && !strings.Contains(str, "://") {
 		// support no indicated urlscheme but with colon for port number
 		// http:// is appended so url.Parse will succeed, strTemp used so it does not impact rxURL.MatchString
 		strTemp = "http://" + str
@@ -214,7 +214,7 @@ func IsUTFNumeric(str string) bool {
 		str = strings.TrimPrefix(str, "+")
 	}
 	for _, c := range str {
-		if unicode.IsNumber(c) == false { //numbers && minus sign are ok
+		if !unicode.IsNumber(c) { //numbers && minus sign are ok
 			return false
 		}
 	}
@@ -321,6 +321,16 @@ func IsNull(str string) bool {
 	return len(str) == 0
 }
 
+// HasWhitespaceOnly checks the string only contains whitespace
+func HasWhitespaceOnly(str string) bool {
+    return len(str) > 0 && rxHasWhitespaceOnly.MatchString(str)
+}
+
+// HasWhitespace checks if the string contains any whitespace
+func HasWhitespace(str string) bool {
+    return len(str) > 0 && rxHasWhitespace.MatchString(str)
+}
+
 // IsByteLength check if the string's length (in bytes) falls in a range.
 func IsByteLength(str string, min, max int) bool {
 	return len(str) >= min && len(str) <= max
@@ -372,10 +382,7 @@ func IsCreditCard(str string) bool {
 		shouldDouble = !shouldDouble
 	}
 
-	if sum%10 == 0 {
-		return true
-	}
-	return false
+	return sum%10 == 0
 }
 
 // IsISBN10 check if the string is an ISBN version 10.
@@ -418,10 +425,7 @@ func IsISBN(str string, version int) bool {
 		for i = 0; i < 12; i++ {
 			checksum += factor[i%2] * int32(sanitized[i]-'0')
 		}
-		if (int32(sanitized[12]-'0'))-((10-(checksum%10))%10) == 0 {
-			return true
-		}
-		return false
+		return (int32(sanitized[12]-'0'))-((10-(checksum%10))%10) == 0
 	}
 	return IsISBN(str, 10) || IsISBN(str, 13)
 }
@@ -753,6 +757,9 @@ func ValidateStruct(s interface{}) (bool, error) {
 			continue // Private field
 		}
 		structResult := true
+		if valueField.Kind() == reflect.Interface {
+			valueField = valueField.Elem()
+		}
 		if (valueField.Kind() == reflect.Struct ||
 			(valueField.Kind() == reflect.Ptr && valueField.Elem().Kind() == reflect.Struct)) &&
 			typeField.Tag.Get(tagName) != "-" {
