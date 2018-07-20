@@ -940,12 +940,12 @@ func checkRequired(v reflect.Value, t reflect.StructField, options tagOptionsMap
 }
 
 func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options tagOptionsMap) (isValid bool, resultErr error) {
+
 	if !v.IsValid() {
 		return false, nil
 	}
 
 	tag := t.Tag.Get(tagName)
-
 	// Check if the field should be ignored
 	switch tag {
 	case "":
@@ -972,7 +972,6 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 	for validatorName, customErrorMessage := range options {
 		if validatefunc, ok := CustomTypeTagMap.Get(validatorName); ok {
 			delete(options, validatorName)
-
 			if result := validatefunc(v.Interface(), o.Interface()); !result {
 				if len(customErrorMessage) > 0 {
 					customTypeErrors = append(customTypeErrors, Error{Name: t.Name, Err: fmt.Errorf(customErrorMessage), CustomErrorMessageExists: true, Validator: stripParams(validatorName)})
@@ -1012,6 +1011,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		reflect.String:
 		// for each tag option check the map of validator functions
 		for validatorSpec, customErrorMessage := range options {
+
 			var negate bool
 			validator := validatorSpec
 			customMsgExists := len(customErrorMessage) > 0
@@ -1035,7 +1035,6 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 				}
 
 				delete(options, validatorSpec)
-
 				switch v.Kind() {
 				case reflect.String,
 					reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
@@ -1059,10 +1058,15 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 			}
 
 			if validatefunc, ok := TagMap[validator]; ok {
+
 				delete(options, validatorSpec)
 
 				switch v.Kind() {
-				case reflect.String:
+				case reflect.Bool,
+					reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+					reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
+					reflect.Float32, reflect.Float64,
+					reflect.String:
 					field := fmt.Sprint(v) // make value into string, then validate with regex
 					if result := validatefunc(field); !result && !negate || result && negate {
 						if customMsgExists {
