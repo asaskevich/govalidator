@@ -1093,7 +1093,7 @@ func TestIsDivisibleBy(t *testing.T) {
 
 // This small example illustrate how to work with IsDivisibleBy function.
 func ExampleIsDivisibleBy() {
-	fmt.Println("1024 is divisible by 64: ", IsDivisibleBy("1024", "64"))
+	println("1024 is divisible by 64: ", IsDivisibleBy("1024", "64"))
 }
 
 func TestIsByteLength(t *testing.T) {
@@ -1529,62 +1529,6 @@ func TestIsBase64(t *testing.T) {
 	}
 	for _, test := range tests {
 		actual := IsBase64(test.param)
-		if actual != test.expected {
-			t.Errorf("Expected IsBase64(%q) to be %v, got %v", test.param, test.expected, actual)
-		}
-	}
-}
-
-func TestIsBase64String(t *testing.T) {
-	t.Parallel()
-
-	var tests = []struct {
-		param    string
-		expected bool
-	}{
-		{"TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4=", true},
-		{"Vml2YW11cyBmZXJtZW50dW0gc2VtcGVyIHBvcnRhLg==", true},
-		{"U3VzcGVuZGlzc2UgbGVjdHVzIGxlbw==", true},
-		{"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuMPNS1Ufof9EW/M98FNw" +
-			"UAKrwflsqVxaxQjBQnHQmiI7Vac40t8x7pIb8gLGV6wL7sBTJiPovJ0V7y7oc0Ye" +
-			"rhKh0Rm4skP2z/jHwwZICgGzBvA0rH8xlhUiTvcwDCJ0kc+fh35hNt8srZQM4619" +
-			"FTgB66Xmp4EtVyhpQV+t02g6NzK72oZI0vnAvqhpkxLeLiMCyrI416wHm5Tkukhx" +
-			"QmcL2a6hNOyu0ixX/x2kSFXApEnVrJ+/IxGyfyw8kf4N2IZpW5nEP847lpfj0SZZ" +
-			"Fwrd1mnfnDbYohX2zRptLy2ZUn06Qo9pkG5ntvFEPo9bfZeULtjYzIl6K8gJ2uGZ" + "HQIDAQAB", false},
-		{"12345", false},
-		{"", false},
-		{"Vml2YW11cyBmZXJtZtesting123", false},
-	}
-	for _, test := range tests {
-		actual := IsBase64String(test.param)
-		if actual != test.expected {
-			t.Errorf("Expected IsBase64(%q) to be %v, got %v", test.param, test.expected, actual)
-		}
-	}
-}
-
-func TestIsBase64RawString(t *testing.T) {
-	t.Parallel()
-
-	var tests = []struct {
-		param    string
-		expected bool
-	}{
-		{"TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4", true},
-		{"Vml2YW11cyBmZXJtZW50dW0gc2VtcGVyIHBvcnRhLg", true},
-		{"U3VzcGVuZGlzc2UgbGVjdHVzIGxlbw", true},
-		{"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuMPNS1Ufof9EW/M98FNw" +
-			"UAKrwflsqVxaxQjBQnHQmiI7Vac40t8x7pIb8gLGV6wL7sBTJiPovJ0V7y7oc0Ye" +
-			"rhKh0Rm4skP2z/jHwwZICgGzBvA0rH8xlhUiTvcwDCJ0kc+fh35hNt8srZQM4619" +
-			"FTgB66Xmp4EtVyhpQV+t02g6NzK72oZI0vnAvqhpkxLeLiMCyrI416wHm5Tkukhx" +
-			"QmcL2a6hNOyu0ixX/x2kSFXApEnVrJ+/IxGyfyw8kf4N2IZpW5nEP847lpfj0SZZ" +
-			"Fwrd1mnfnDbYohX2zRptLy2ZUn06Qo9pkG5ntvFEPo9bfZeULtjYzIl6K8gJ2uGZ" + "HQIDAQAB", false},
-		{"12345", false},
-		{"", false},
-		{"Vml2YW11cyBmZXJtZtesting123", true},
-	}
-	for _, test := range tests {
-		actual := IsBase64RawString(test.param)
 		if actual != test.expected {
 			t.Errorf("Expected IsBase64(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
@@ -3225,9 +3169,9 @@ func ExampleValidateStruct() {
 
 	result, err := ValidateStruct(post)
 	if err != nil {
-		fmt.Println("error: " + err.Error())
+		println("error: " + err.Error())
 	}
-	fmt.Println(result)
+	println(result)
 }
 
 func TestValidateStructParamValidatorInt(t *testing.T) {
@@ -3542,41 +3486,5 @@ bQIDAQAB
 		if actual != test.expected {
 			t.Errorf("Expected TestIsRsaPublicKey(%d, %d) to be %v, got %v", i, test.keylen, test.expected, actual)
 		}
-	}
-}
-
-func TestInIntArr(t *testing.T) {
-	t.Parallel()
-
-	var tests = []struct {
-		arr      []int
-		expected bool
-		wantErr  bool
-	}{
-		{arr: []int{1, 2, 3}, expected: true, wantErr: false},
-		{arr: []int{6}, expected: true, wantErr: false},
-		{arr: []int{1, 2, 3, 4, 5, 6}, expected: true, wantErr: false},
-		{arr: []int{1, 2, 3, 4, 5, 6, 7}, expected: false, wantErr: true},
-		{arr: []int{0, 2, 3, 4, 5, 6}, expected: false, wantErr: true},
-		{arr: []int{1, 2, 3, 8, 5, 6}, expected: false, wantErr: true},
-		{arr: []int{1, 2, 6}, expected: true, wantErr: false},
-	}
-
-	type mockStruct struct {
-		Arr []int `valid:"inintarr(1|2|3|4|5|6)"`
-	}
-
-	for _, tt := range tests {
-
-		m := mockStruct{tt.arr}
-		ok, err := ValidateStruct(m)
-		if tt.wantErr && err == nil {
-			t.Error("Expected err with optional validation, got nil")
-		}
-
-		if tt.expected != ok {
-			t.Errorf("Expected validation to return %v, got %v", tt.expected, ok)
-		}
-
 	}
 }

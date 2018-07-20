@@ -484,35 +484,9 @@ func IsVariableWidth(str string) bool {
 	return rxHalfWidth.MatchString(str) && rxFullWidth.MatchString(str)
 }
 
-// IsBase64 check if a string is data:base64 encoded.
+// IsBase64 check if a string is base64 encoded.
 func IsBase64(str string) bool {
 	return rxBase64.MatchString(str)
-}
-
-// IsBase64String check to see if the string raw inputted string is a valid base64
-func IsBase64String(str string) bool {
-	if len(str) == 0 {
-		return false
-	}
-
-	_, err := base64.URLEncoding.DecodeString(str)
-	if err != nil {
-		return false
-	}
-	return true
-}
-
-// IsBase64RawString check to see if the string raw inputted (no == at the end) string is a valid base64
-func IsBase64RawString(str string) bool {
-	if len(str) == 0 {
-		return false
-	}
-
-	_, err := base64.RawURLEncoding.DecodeString(str)
-	if err != nil {
-		return false
-	}
-	return true
 }
 
 // IsFilePath check is a string is Win or Unix file path and returns it's type.
@@ -1196,42 +1170,6 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		}
 		return result, nil
 	case reflect.Slice, reflect.Array:
-		for validatorSpec, customErrorMessage := range options {
-			var negate bool
-			validator := validatorSpec
-			customMsgExists := len(customErrorMessage) > 0
-
-			// Check whether the tag looks like '!something' or 'something'
-			if validator[0] == '!' {
-				validator = validator[1:]
-				negate = true
-			}
-
-			for key, value := range ArrayTagRegexMap {
-				ps := value.FindStringSubmatch(validator)
-				if len(ps) == 0 {
-					continue
-				}
-
-				validatefunc, ok := ArrayTagMap[key]
-				if !ok {
-					continue
-				}
-
-				delete(options, validatorSpec)
-
-				if result := validatefunc(v.Interface(), ps[1:]...); (!result && !negate) || (result && negate) {
-					if customMsgExists {
-						return false, Error{t.Name, fmt.Errorf(customErrorMessage), customMsgExists, stripParams(validatorSpec)}
-					}
-					if negate {
-						return false, Error{t.Name, fmt.Errorf("%v does validate as %v", v.Interface(), validator), customMsgExists, stripParams(validatorSpec)}
-					}
-					return false, Error{t.Name, fmt.Errorf("%v does not validate as %v", v.Interface(), validator), customMsgExists, stripParams(validatorSpec)}
-				}
-			}
-		}
-
 		result := true
 		for i := 0; i < v.Len(); i++ {
 			var resultItem bool
@@ -1327,41 +1265,6 @@ func ErrorsByField(e error) map[string]string {
 	}
 
 	return m
-}
-
-// InIntArr loops over the structs []int and checks if the params passed in
-// are inside that array
-func InIntArr(i interface{}, params ...string) bool {
-	switch i.(type) {
-	case []int:
-		arr := i.([]int)
-		for _, a := range arr {
-			var valid bool
-			for _, p := range params {
-				value, err := strconv.Atoi(p)
-				if err != nil {
-					return false
-				}
-				if value == a {
-					valid = true
-					break
-				}
-			}
-			if !valid {
-				return false
-			}
-		}
-	}
-	return true
-}
-
-func isInIntRaw(i interface{}, params ...string) bool {
-	if len(params) == 1 {
-		rawParams := params[0]
-		parsedParams := strings.Split(rawParams, "|")
-		return InIntArr(i, parsedParams...)
-	}
-	return false
 }
 
 // Error returns string equivalent for reflect.Type

@@ -307,8 +307,6 @@ Here is a list of available validators for struct fields (validator - used funct
 "halfwidth":          IsHalfWidth,
 "variablewidth":      IsVariableWidth,
 "base64":             IsBase64,
-"base64string":       IsBase64String,
-"base64rawstring":    IsBase64RawString,
 "datauri":            IsDataURI,
 "ip":                 IsIP,
 "port":               IsPort,
@@ -334,7 +332,6 @@ Validators with parameters
 "runelength(min|max)": RuneLength,
 "matches(pattern)": StringMatches,
 "in(string1|string2|...|stringN)": IsIn,
-"inintarr(string1|string2|...|stringN)": InIntArr,
 ```
 
 And here is small example of usage:
