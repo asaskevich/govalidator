@@ -1132,7 +1132,10 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 			result = result && resultItem
 		}
 		options = optionsCopy
-		return result, errs
+		if len(errs) > 0 {
+			return result, errs
+		}
+		return result, nil
 	case reflect.Slice, reflect.Array:
 		result := true
 		var optionsCopy tagOptionsMap
@@ -1157,7 +1160,10 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 			result = result && resultItem
 		}
 		options = optionsCopy
-		return result, errs
+		if len(errs) > 0 {
+			return result, errs
+		}
+		return result, nil
 	case reflect.Interface:
 		// If the value is an interface then encode its element
 		if v.IsNil() {
