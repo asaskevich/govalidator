@@ -7,8 +7,8 @@ import (
 
 func TestErrorsToString(t *testing.T) {
 	t.Parallel()
-	customErr := &Error{Name: "Custom Error Name", Err: fmt.Errorf("stdlib error")}
-	customErrWithCustomErrorMessage := &Error{Name: "Custom Error Name 2", Err: fmt.Errorf("Bad stuff happened"), CustomErrorMessageExists: true}
+	customErr := &Error{Path: []string{"Custom Error Name"}, Err: fmt.Errorf("stdlib error")}
+	customErrWithCustomErrorMessage := &Error{Path: []string{"Custom Error Name 2"}, Err: fmt.Errorf("Bad stuff happened"), CustomErrorMessageExists: true}
 
 	var tests = []struct {
 		param1   Errors
@@ -24,6 +24,38 @@ func TestErrorsToString(t *testing.T) {
 		actual := test.param1.Error()
 		if actual != test.expected {
 			t.Errorf("Expected Error() to return '%v', got '%v'", test.expected, actual)
+		}
+	}
+}
+
+func TestPrependPathToErrors(t *testing.T) {
+	var tests = []struct {
+		err      Errors
+		expected Errors
+	}{
+		{Errors{&Error{Err: fmt.Errorf("Some Error Occured"), Path: []string{"Field"}}}, Errors{&Error{Err: fmt.Errorf("Some Error Occured"), Path: []string{"foo", "bar", "Field"}}}},
+	}
+	for _, test := range tests {
+		prependedErrors := PrependPathToErrors(test.err, "foo", "bar")
+
+		if prependedErrors.Error() != test.expected.Error() {
+			t.Errorf("Expected Error() to return '%v', got '%v'", test.expected.Error(), prependedErrors.Error())
+		}
+	}
+}
+
+func TestAppendPathToErrors(t *testing.T) {
+	var tests = []struct {
+		err      Errors
+		expected Errors
+	}{
+		{Errors{&Error{Err: fmt.Errorf("Some Error Occured"), Path: []string{"Field"}}}, Errors{&Error{Err: fmt.Errorf("Some Error Occured"), Path: []string{"Field", "foo", "bar"}}}},
+	}
+	for _, test := range tests {
+		appendedErrors := AppendPathToErrors(test.err, "foo", "bar")
+
+		if appendedErrors.Error() != test.expected.Error() {
+			t.Errorf("Expected Error() to return '%v', got '%v'", test.expected.Error(), appendedErrors.Error())
 		}
 	}
 }

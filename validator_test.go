@@ -2,6 +2,7 @@ package govalidator
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -2358,7 +2359,7 @@ func TestCustomValidator(t *testing.T) {
 	}
 
 	type InvalidStruct struct {
-		Field int `valid:"customFalseValidator~Custom validator error"`
+		Field int `valid:"customFalseValidator~Value: %s Custom validator error: %s"`
 	}
 
 	type StructWithCustomAndBuiltinValidator struct {
@@ -2369,7 +2370,8 @@ func TestCustomValidator(t *testing.T) {
 		t.Errorf("Got an unexpected result for struct with custom always true validator: %t %s", valid, err)
 	}
 
-	if valid, err := ValidateStruct(&InvalidStruct{Field: 1}); valid || err == nil || err.Error() != "Custom validator error" {
+	if valid, err := ValidateStruct(&InvalidStruct{Field: 1}); valid || err == nil || err.Error() != "Value: 1 Custom validator error: customFalseValidator" {
+		fmt.Println(err)
 		t.Errorf("Got an unexpected result for struct with custom always false validator: %t %s", valid, err)
 	}
 
@@ -2540,6 +2542,33 @@ func TestStringMatchesStruct(t *testing.T) {
 	}
 }
 
+func TestStringMatchesComplexStruct(t *testing.T) {
+	type ComplexMatcherStruct struct {
+		Field string `valid:"matches(^[A-Za-z0-9\\-_&!\\,\\.]+$)"`
+	}
+
+	var tests = []struct {
+		param    interface{}
+		expected bool
+	}{
+		{ComplexMatcherStruct{"12345"}, true},
+		{ComplexMatcherStruct{"12345,!"}, true},
+		{ComplexMatcherStruct{"12345*"}, false},
+		{ComplexMatcherStruct{`12345"*`}, false},
+		{ComplexMatcherStruct{"12345,*"}, false},
+	}
+
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			if err != nil {
+				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+			}
+		}
+	}
+}
+
 func TestIsInStruct(t *testing.T) {
 	var tests = []struct {
 		param    interface{}
@@ -2610,6 +2639,194 @@ func TestEmptyRequiredIsInStruct(t *testing.T) {
 			if err != nil {
 				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
 			}
+		}
+	}
+}
+
+func TestEmptyStringPtr(t *testing.T) {
+	type EmptyIsInStruct struct {
+		IsIn *string `valid:"length(3|5),required"`
+	}
+
+	var empty = ""
+	var valid = "123"
+	var invalid = "123456"
+
+	var tests = []struct {
+		param       interface{}
+		expected    bool
+		expectedErr string
+	}{
+		{EmptyIsInStruct{&empty}, false, "IsIn: non zero value required"},
+		{EmptyIsInStruct{nil}, true, ""},
+		{EmptyIsInStruct{&valid}, true, ""},
+		{EmptyIsInStruct{&invalid}, false, "IsIn: 123456 does not validate as length(3|5)"},
+	}
+
+	SetNilPtrAllowedByRequired(true)
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+		if err != nil {
+			if err.Error() != test.expectedErr {
+				t.Errorf("Got Error on ValidateStruct(%q). Expected: %s Actual: %s", test.param, test.expectedErr, err)
+			}
+		} else if test.expectedErr != "" {
+			t.Errorf("Expected error on ValidateStruct(%q).", test.param)
+		}
+	}
+	SetNilPtrAllowedByRequired(false)
+}
+
+func TestNestedStruct(t *testing.T) {
+	type EvenMoreNestedStruct struct {
+		Bar string `valid:"length(3|5)"`
+	}
+	type NestedStruct struct {
+		Foo                 string `valid:"length(3|5),required"`
+		EvenMoreNested      EvenMoreNestedStruct
+		SliceEvenMoreNested []EvenMoreNestedStruct
+		MapEvenMoreNested   map[string]EvenMoreNestedStruct
+	}
+	type OuterStruct struct {
+		Nested NestedStruct
+	}
+
+	var tests = []struct {
+		param       interface{}
+		expected    bool
+		expectedErr string
+	}{
+		{OuterStruct{
+			Nested: NestedStruct{
+				Foo: "",
+			},
+		}, false, "Nested.Foo: non zero value required"},
+		{OuterStruct{
+			Nested: NestedStruct{
+				Foo: "123",
+			},
+		}, true, ""},
+		{OuterStruct{
+			Nested: NestedStruct{
+				Foo: "123456",
+			},
+		}, false, "Nested.Foo: 123456 does not validate as length(3|5)"},
+		{OuterStruct{
+			Nested: NestedStruct{
+				Foo: "123",
+				EvenMoreNested: EvenMoreNestedStruct{
+					Bar: "123456",
+				},
+			},
+		}, false, "Nested.EvenMoreNested.Bar: 123456 does not validate as length(3|5)"},
+		{OuterStruct{
+			Nested: NestedStruct{
+				Foo: "123",
+				SliceEvenMoreNested: []EvenMoreNestedStruct{
+					EvenMoreNestedStruct{
+						Bar: "123456",
+					},
+				},
+			},
+		}, false, "Nested.SliceEvenMoreNested.0.Bar: 123456 does not validate as length(3|5)"},
+		{OuterStruct{
+			Nested: NestedStruct{
+				Foo: "123",
+				MapEvenMoreNested: map[string]EvenMoreNestedStruct{
+					"Foo": EvenMoreNestedStruct{
+						Bar: "123456",
+					},
+				},
+			},
+		}, false, "Nested.MapEvenMoreNested.Foo.Bar: 123456 does not validate as length(3|5)"},
+		{OuterStruct{
+			Nested: NestedStruct{
+				Foo: "123",
+				SliceEvenMoreNested: []EvenMoreNestedStruct{
+					EvenMoreNestedStruct{
+						Bar: "12345",
+					},
+				},
+			},
+		}, true, ""},
+		{OuterStruct{
+			Nested: NestedStruct{
+				Foo: "123",
+				MapEvenMoreNested: map[string]EvenMoreNestedStruct{
+					"Foo": EvenMoreNestedStruct{
+						Bar: "12345",
+					},
+				},
+			},
+		}, true, ""},
+	}
+
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+		if err != nil {
+			if err.Error() != test.expectedErr {
+				t.Errorf("Got Error on ValidateStruct(%q). Expected: %s Actual: %s", test.param, test.expectedErr, err)
+			}
+		} else if test.expectedErr != "" {
+			t.Errorf("Expected error on ValidateStruct(%q).", test.param)
+		}
+	}
+}
+
+func TestSliceStruct(t *testing.T) {
+
+	type SliceStruct struct {
+		SliceStr []string `valid:"uuidv4"`
+	}
+
+	type MapStruct struct {
+		MapStr map[string]string `valid:"uuidv4"`
+	}
+
+	uuid := "8b24bd0f-607e-4d4f-a706-a786e95ed821"
+
+	var tests = []struct {
+		param       interface{}
+		expected    bool
+		expectedErr string
+	}{
+		{SliceStruct{
+			SliceStr: []string{uuid, uuid + "1", uuid + "2"},
+		}, false, "SliceStr.1: 8b24bd0f-607e-4d4f-a706-a786e95ed8211 does not validate as uuidv4;SliceStr.2: 8b24bd0f-607e-4d4f-a706-a786e95ed8212 does not validate as uuidv4"},
+		{SliceStruct{
+			SliceStr: []string{uuid, uuid, uuid},
+		}, true, ""},
+		{MapStruct{
+			MapStr: map[string]string{"a": uuid, "b": uuid + "b", "c": uuid + "c"},
+		}, false, "MapStr.b: 8b24bd0f-607e-4d4f-a706-a786e95ed821b does not validate as uuidv4;MapStr.c: 8b24bd0f-607e-4d4f-a706-a786e95ed821c does not validate as uuidv4"},
+		{MapStruct{
+			MapStr: map[string]string{"a": uuid, "b": uuid, "c": uuid},
+		}, true, ""},
+		{SliceStruct{
+			SliceStr: []string{},
+		}, true, ""},
+	}
+
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+		if err != nil {
+			if err.Error() != test.expectedErr {
+				t.Errorf("Got Error on ValidateStruct(%q). Expected: %s Actual: %s", test.param, test.expectedErr, err)
+			}
+		} else if test.expectedErr != "" {
+			t.Errorf("Expected error on ValidateStruct(%q).", test.param)
 		}
 	}
 }
@@ -2714,6 +2931,7 @@ type testStringIntMap map[string]int
 func TestRequired(t *testing.T) {
 
 	testString := "foobar"
+	testEmptyString := ""
 	var tests = []struct {
 		param    interface{}
 		expected bool
@@ -2722,6 +2940,14 @@ func TestRequired(t *testing.T) {
 			struct {
 				Pointer *string `valid:"required"`
 			}{},
+			false,
+		},
+		{
+			struct {
+				Pointer *string `valid:"required"`
+			}{
+				Pointer: &testEmptyString,
+			},
 			false,
 		},
 		{
@@ -2897,7 +3123,7 @@ func TestErrorsByField(t *testing.T) {
 		{"CustomField", "An error occurred"},
 	}
 
-	err = Error{"CustomField", fmt.Errorf("An error occurred"), false, "hello"}
+	err = Error{fmt.Errorf("An error occurred"), false, "hello", []string{"CustomField"}}
 	errs = ErrorsByField(err)
 
 	if len(errs) != 1 {
@@ -3108,12 +3334,17 @@ func TestOptionalCustomValidators(t *testing.T) {
 
 func TestJSONValidator(t *testing.T) {
 
+	type Complex struct {
+		WithJSONName string `json:"with_json_name" valid:"-,required"`
+	}
+
 	var val struct {
-		WithJSONName      string `json:"with_json_name" valid:"-,required"`
-		WithoutJSONName   string `valid:"-,required"`
-		WithJSONOmit      string `json:"with_other_json_name,omitempty" valid:"-,required"`
-		WithJSONOption    string `json:",omitempty" valid:"-,required"`
-		WithEmptyJSONName string `json:"-" valid:"-,required"`
+		WithJSONName      string  `json:"with_json_name" valid:"-,required"`
+		WithoutJSONName   string  `valid:"-,required"`
+		WithJSONOmit      string  `json:"with_other_json_name,omitempty" valid:"-,required"`
+		WithJSONOption    string  `json:",omitempty" valid:"-,required"`
+		WithEmptyJSONName string  `json:"-" valid:"-,required"`
+		Complex           Complex `json:"complex"`
 	}
 
 	_, err := ValidateStruct(val)
@@ -3137,6 +3368,10 @@ func TestJSONValidator(t *testing.T) {
 	if !Contains(err.Error(), "WithEmptyJSONName") {
 		t.Errorf("Expected error message to contain WithEmptyJSONName but actual error is: %s", err.Error())
 	}
+
+	if Contains(err.Error(), "Complex") {
+		t.Errorf("Expected error message to not contain 'Complex' but actual error is: %s", err.Error())
+	}
 }
 
 func TestValidatorIncludedInError(t *testing.T) {
@@ -3159,8 +3394,8 @@ func TestValidatorIncludedInError(t *testing.T) {
 
 	for _, e := range errors.(Errors) {
 		casted := e.(Error)
-		if validatorMap[casted.Name] != casted.Validator {
-			t.Errorf("expected validator for %s to be %s, but was %s", casted.Name, validatorMap[casted.Name], casted.Validator)
+		if validatorMap[casted.Name()] != casted.Validator {
+			t.Errorf("expected validator for %s to be %s, but was %s", casted.Name(), validatorMap[casted.Name()], casted.Validator)
 		}
 	}
 
@@ -3183,8 +3418,8 @@ func TestValidatorIncludedInError(t *testing.T) {
 
 	for _, e := range errors.(Errors) {
 		casted := e.(Error)
-		if validatorMap[casted.Name] != casted.Validator {
-			t.Errorf("expected validator for %s to be %s, but was %s", casted.Name, validatorMap[casted.Name], casted.Validator)
+		if validatorMap[casted.Name()] != casted.Validator {
+			t.Errorf("expected validator for %s to be %s, but was %s", casted.Name(), validatorMap[casted.Name()], casted.Validator)
 		}
 	}
 
@@ -3246,4 +3481,22 @@ bQIDAQAB
 			t.Errorf("Expected TestIsRsaPublicKey(%d, %d) to be %v, got %v", i, test.keylen, test.expected, actual)
 		}
 	}
+}
+
+func TestSplitTag(t *testing.T) {
+
+	tag := "split here -->,don't split \\,<--there,thanks"
+
+	expected := []string{
+		"split here -->",
+		"don't split \\,<--there",
+		"thanks",
+	}
+
+	actual := splitTag(tag)
+
+	if !reflect.DeepEqual(actual, expected) {
+		t.Errorf("tag not split correctly. Want %v have %v", expected, actual)
+	}
+
 }
