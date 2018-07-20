@@ -1019,6 +1019,56 @@ func TestIsNull(t *testing.T) {
 	}
 }
 
+func TestHasWhitespaceOnly(t *testing.T) {
+    t.Parallel()
+
+    var tests = []struct {
+        param    string
+        expected bool
+    }{
+        {"abacaba", false},
+        {"", false},
+        {"    ", true},
+        {"  \r\n  ", true},
+        {"\014\012\011\013\015", true},
+        {"\014\012\011\013 abc  \015", false},
+        {"\f\n\t\v\r\f", true},
+        {"x\n\t\t\t\t", false},
+        {"\f\n\t  \n\n\n   \v\r\f", true},
+    }
+    for _, test := range tests {
+        actual := HasWhitespaceOnly(test.param)
+        if actual != test.expected {
+            t.Errorf("Expected HasWhitespaceOnly(%q) to be %v, got %v", test.param, test.expected, actual)
+        }
+    }
+}
+
+func TestHasWhitespace(t *testing.T) {
+    t.Parallel()
+
+    var tests = []struct {
+        param    string
+        expected bool
+    }{
+        {"abacaba", false},
+        {"", false},
+        {"    ", true},
+        {"  \r\n  ", true},
+        {"\014\012\011\013\015", true},
+        {"\014\012\011\013 abc  \015", true},
+        {"\f\n\t\v\r\f", true},
+        {"x\n\t\t\t\t", true},
+        {"\f\n\t  \n\n\n   \v\r\f", true},
+    }
+    for _, test := range tests {
+        actual := HasWhitespace(test.param)
+        if actual != test.expected {
+            t.Errorf("Expected HasWhitespace(%q) to be %v, got %v", test.param, test.expected, actual)
+        }
+    }
+}
+
 func TestIsDivisibleBy(t *testing.T) {
 	t.Parallel()
 
@@ -2700,7 +2750,7 @@ func TestValidateStruct(t *testing.T) {
 	})
 	result, err := ValidateStruct(PrivateStruct{"d_k", 0, []int{1, 2}, []string{"hi", "super"}, [2]Address{{"Street", "123456"},
 		{"Street", "123456"}}, Address{"Street", "123456"}, map[string]Address{"address": {"Street", "123456"}}})
-	if result != true {
+	if !result {
 		t.Log("Case ", 6, ": expected ", true, " when result is ", result)
 		t.Error(err)
 		t.FailNow()
@@ -3128,7 +3178,7 @@ func TestJSONValidator(t *testing.T) {
 		t.Errorf("Expected error message to contain with_json_name but actual error is: %s", err.Error())
 	}
 
-	if Contains(err.Error(), "WithoutJSONName") == false {
+	if !Contains(err.Error(), "WithoutJSONName") {
 		t.Errorf("Expected error message to contain WithoutJSONName but actual error is: %s", err.Error())
 	}
 
