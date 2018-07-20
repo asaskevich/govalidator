@@ -14,6 +14,10 @@ type Validator func(str string) bool
 // The second parameter should be the context (in the case of validating a struct: the whole object being validated).
 type CustomTypeValidator func(i interface{}, o interface{}) bool
 
+// ArrayValidator is a wrapper for validator functions that returns bool and accepts any type.
+// The second parameter functions like the ParamValidator function where one can provide values to check against the array.
+type ArrayValidator func(i interface{}, params ...string) bool
+
 // ParamValidator is a wrapper for validator functions that accepts additional parameters.
 type ParamValidator func(str string, params ...string) bool
 type tagOptionsMap map[string]tagOption
@@ -66,6 +70,16 @@ var ParamTagRegexMap = map[string]*regexp.Regexp{
 	"in":           regexp.MustCompile(`^in\((.*)\)`),
 	"matches":      regexp.MustCompile(`^matches\((.+)\)$`),
 	"rsapub":       regexp.MustCompile("^rsapub\\((\\d+)\\)$"),
+}
+
+// ArrayTagMap is a map of functions accept variants parameters
+var ArrayTagMap = map[string]ArrayValidator{
+	"inintarr": isInIntRaw,
+}
+
+// ArrayTagRegexMap maps param tags to their respective regexes.
+var ArrayTagRegexMap = map[string]*regexp.Regexp{
+	"inintarr": regexp.MustCompile(`^inintarr\((.*)\)`),
 }
 
 type customTypeTagMap struct {
@@ -129,6 +143,8 @@ var TagMap = map[string]Validator{
 	"halfwidth":          IsHalfWidth,
 	"variablewidth":      IsVariableWidth,
 	"base64":             IsBase64,
+	"base64string":       IsBase64String,
+	"base64rawstring":    IsBase64RawString,
 	"datauri":            IsDataURI,
 	"ip":                 IsIP,
 	"port":               IsPort,
