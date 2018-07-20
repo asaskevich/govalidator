@@ -309,6 +309,16 @@ func IsNull(str string) bool {
 	return len(str) == 0
 }
 
+// HasWhitespaceOnly checks the string only contains whitespace
+func HasWhitespaceOnly(str string) bool {
+    return len(str) > 0 && rxHasWhitespaceOnly.MatchString(str)
+}
+
+// HasWhitespace checks if the string contains any whitespace
+func HasWhitespace(str string) bool {
+    return len(str) > 0 && rxHasWhitespace.MatchString(str)
+}
+
 // IsByteLength check if the string's length (in bytes) falls in a range.
 func IsByteLength(str string, min, max int) bool {
 	return len(str) >= min && len(str) <= max

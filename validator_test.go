@@ -1017,6 +1017,56 @@ func TestIsNull(t *testing.T) {
 	}
 }
 
+func TestHasWhitespaceOnly(t *testing.T) {
+    t.Parallel()
+
+    var tests = []struct {
+        param    string
+        expected bool
+    }{
+        {"abacaba", false},
+        {"", false},
+        {"    ", true},
+        {"  \r\n  ", true},
+        {"\014\012\011\013\015", true},
+        {"\014\012\011\013 abc  \015", false},
+        {"\f\n\t\v\r\f", true},
+        {"x\n\t\t\t\t", false},
+        {"\f\n\t  \n\n\n   \v\r\f", true},
+    }
+    for _, test := range tests {
+        actual := HasWhitespaceOnly(test.param)
+        if actual != test.expected {
+            t.Errorf("Expected HasWhitespaceOnly(%q) to be %v, got %v", test.param, test.expected, actual)
+        }
+    }
+}
+
+func TestHasWhitespace(t *testing.T) {
+    t.Parallel()
+
+    var tests = []struct {
+        param    string
+        expected bool
+    }{
+        {"abacaba", false},
+        {"", false},
+        {"    ", true},
+        {"  \r\n  ", true},
+        {"\014\012\011\013\015", true},
+        {"\014\012\011\013 abc  \015", true},
+        {"\f\n\t\v\r\f", true},
+        {"x\n\t\t\t\t", true},
+        {"\f\n\t  \n\n\n   \v\r\f", true},
+    }
+    for _, test := range tests {
+        actual := HasWhitespace(test.param)
+        if actual != test.expected {
+            t.Errorf("Expected HasWhitespace(%q) to be %v, got %v", test.param, test.expected, actual)
+        }
+    }
+}
+
 func TestIsDivisibleBy(t *testing.T) {
 	t.Parallel()
 
