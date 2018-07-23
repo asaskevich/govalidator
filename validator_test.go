@@ -3312,6 +3312,25 @@ func TestOptionalCustomValidators(t *testing.T) {
 	}
 }
 
+func TestCustomErrorMessageRemovalOfEscapeSlashes(t *testing.T) {
+	var val struct {
+		WithCustomErrorWithCommaUnescaped  string `valid:"required~boom1,unescapedcomma"`
+		WithCustomErrorWithComma           string `valid:"required~boom2\\,escapedcomma"`
+		WithCustomErrorWithExclamationMark string `valid:"required~boom3\\!escapedexclamationmark"`
+		WithCustomErrorWith1Slash          string `valid:"required~boom4\,1slash"`
+		WithCustomErrorWith3Slashes        string `valid:"required~boom5\\\,3slashes"`
+		WithCustomErrorWith4Slashes        string `valid:"required~boom6\\\\,escapedcomma"`
+	}
+
+	expected := fmt.Errorf("boom1;boom2,escapedcomma;boom3!escapedexclamationmark;boom6,escapedcomma")
+	_, err := ValidateStruct(val)
+	if err != nil {
+		if err.Error() != expected.Error() {
+			t.Errorf("unexpected error\nwant\n%s\nhave\n%s", expected.Error(), err.Error())
+		}
+	}
+}
+
 func TestJSONValidator(t *testing.T) {
 
 	type Complex struct {
