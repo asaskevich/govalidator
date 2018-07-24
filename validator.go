@@ -939,7 +939,8 @@ func checkRequired(v reflect.Value, t reflect.StructField, options tagOptionsMap
 
 	if requiredOption, isRequired := options["required"]; isRequired {
 		if len(requiredOption.customErrorMessage) > 0 {
-			return false, Error{fmt.Errorf(requiredOption.customErrorMessage), true, "required", []string{getTypeName(t)}}
+			escaped := strings.Replace(requiredOption.customErrorMessage, "\\", "", -1)
+			return false, Error{fmt.Errorf(escaped), true, "required", []string{getTypeName(t)}}
 		}
 		return false, Error{fmt.Errorf("non zero value required"), false, "required", []string{getTypeName(t)}}
 	} else if _, isOptional := options["optional"]; fieldsRequiredByDefault && !isOptional {
@@ -993,7 +994,8 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 
 			if result := validatefunc(v.Interface(), o.Interface()); !result {
 				if len(validatorStruct.customErrorMessage) > 0 {
-					customTypeErrors = append(customTypeErrors, Error{Err: TruncatingErrorf(validatorStruct.customErrorMessage, fmt.Sprint(v), validatorName), CustomErrorMessageExists: true, Validator: stripParams(validatorName), Path: []string{getTypeName(t)}})
+					escaped := strings.Replace(validatorStruct.customErrorMessage, "\\", "", -1)
+					customTypeErrors = append(customTypeErrors, Error{Err: TruncatingErrorf(escaped, fmt.Sprint(v), validatorName), CustomErrorMessageExists: true, Validator: stripParams(validatorName), Path: []string{getTypeName(t)}})
 					continue
 				}
 				customTypeErrors = append(customTypeErrors, Error{Err: fmt.Errorf("%s does not validate as %s", fmt.Sprint(v), validatorName), CustomErrorMessageExists: false, Validator: stripParams(validatorName), Path: []string{getTypeName(t)}})
@@ -1065,7 +1067,8 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 					field := fmt.Sprint(v) // make value into string, then validate with regex
 					if result := validatefunc(field, ps[1:]...); (!result && !negate) || (result && negate) {
 						if customMsgExists {
-							return false, Error{TruncatingErrorf(validatorStruct.customErrorMessage, field, validator), customMsgExists, stripParams(validatorSpec), []string{getTypeName(t)}}
+							escaped := strings.Replace(validatorStruct.customErrorMessage, "\\", "", -1)
+							return false, Error{TruncatingErrorf(escaped, field, validator), customMsgExists, stripParams(validatorSpec), []string{getTypeName(t)}}
 						}
 						if negate {
 							return false, Error{fmt.Errorf("%s does validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{getTypeName(t)}}
@@ -1086,7 +1089,8 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 					field := fmt.Sprint(v) // make value into string, then validate with regex
 					if result := validatefunc(field); !result && !negate || result && negate {
 						if customMsgExists {
-							return false, Error{TruncatingErrorf(validatorStruct.customErrorMessage, field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+							escaped := strings.Replace(validatorStruct.customErrorMessage, "\\", "", -1)
+							return false, Error{TruncatingErrorf(escaped, field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
 						}
 						if negate {
 							return false, Error{fmt.Errorf("%s does validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{getTypeName(t)}}
