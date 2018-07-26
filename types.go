@@ -31,6 +31,16 @@ func (t tagOptionsMap) orderedKeys() []string {
 	return keys
 }
 
+func (t tagOptionsMap) copy() tagOptionsMap {
+	new := map[string]tagOption{}
+
+	for k, v := range t {
+		new[k] = v
+	}
+
+	return new
+}
+
 type tagOption struct {
 	name               string
 	customErrorMessage string
@@ -59,7 +69,7 @@ var ParamTagMap = map[string]ParamValidator{
 
 // ParamTagRegexMap maps param tags to their respective regexes.
 var ParamTagRegexMap = map[string]*regexp.Regexp{
-	"range":        regexp.MustCompile("^range\\((\\d+)\\|(\\d+)\\)$"),
+	"range":        regexp.MustCompile("^range\\((\\d*\\.?\\d*)\\|(\\d*\\.?\\d*)\\)$"),
 	"length":       regexp.MustCompile("^length\\((\\d+)\\|(\\d+)\\)$"),
 	"runelength":   regexp.MustCompile("^runelength\\((\\d+)\\|(\\d+)\\)$"),
 	"stringlength": regexp.MustCompile("^stringlength\\((\\d+)\\|(\\d+)\\)$"),

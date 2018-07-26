@@ -13,13 +13,14 @@ import (
 	"net"
 	"net/url"
 	"reflect"
-	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/h2so5/goback/regexp"
 )
 
 var (
@@ -697,40 +698,23 @@ func IsRsaPublicKey(str string, keylen int) bool {
 	return bitlen == int(keylen)
 }
 
-func toJSONName(tag string) string {
-	if tag == "" {
-		return ""
-	}
+func getTypeName(t reflect.StructField) string {
+	name := t.Name
+	jsonTag := t.Tag.Get("json")
 
-	// JSON name always comes first. If there's no options then split[0] is
-	// JSON name, if JSON name is not set, then split[0] is an empty string.
-	split := strings.SplitN(tag, ",", 2)
+	if jsonTag != "" {
+		// JSON name always comes first. If there's no options then split[0] is
+		// JSON name, if JSON name is not set, then split[0] is an empty string.
+		split := strings.SplitN(jsonTag, ",", 2)
 
-	name := split[0]
-
-	// However it is possible that the field is skipped when
-	// (de-)serializing from/to JSON, in which case assume that there is no
-	// tag name to use
-	if name == "-" {
-		return ""
+		// However it is possible that the field is skipped when
+		// (de-)serializing from/to JSON, in which case assume that there is no
+		// tag name to use
+		if split[0] != "-" {
+			name = split[0]
+		}
 	}
 	return name
-}
-
-func PrependPathToErrors(err error, path string) error {
-	switch err2 := err.(type) {
-	case Error:
-		err2.Path = append([]string{path}, err2.Path...)
-		return err2
-	case Errors:
-		errors := err2.Errors()
-		for i, err3 := range errors {
-			errors[i] = PrependPathToErrors(err3, path)
-		}
-		return err2
-	}
-	fmt.Println(err)
-	return err
 }
 
 // ValidateStruct use tags for fields.
@@ -766,33 +750,12 @@ func ValidateStruct(s interface{}) (bool, error) {
 			var err error
 			structResult, err = ValidateStruct(valueField.Interface())
 			if err != nil {
-				err = PrependPathToErrors(err, typeField.Name)
+				err = PrependPathToErrors(err, getTypeName(typeField))
 				errs = append(errs, err)
 			}
 		}
 		resultField, err2 := typeCheck(valueField, typeField, val, nil)
 		if err2 != nil {
-
-			// Replace structure name with JSON name if there is a tag on the variable
-			jsonTag := toJSONName(typeField.Tag.Get("json"))
-			if jsonTag != "" {
-				switch jsonError := err2.(type) {
-				case Error:
-					jsonError.Name = jsonTag
-					err2 = jsonError
-				case Errors:
-					for i2, err3 := range jsonError {
-						switch customErr := err3.(type) {
-						case Error:
-							customErr.Name = jsonTag
-							jsonError[i2] = customErr
-						}
-					}
-
-					err2 = jsonError
-				}
-			}
-
 			errs = append(errs, err2)
 		}
 		result = result && resultField && structResult
@@ -803,10 +766,15 @@ func ValidateStruct(s interface{}) (bool, error) {
 	return result, err
 }
 
+// splitTag will split a tag on unescaped commas
+func splitTag(tag string) []string {
+	return regexp.MustCompile("(?<!\\\\),").Split(tag, -1)
+}
+
 // parseTagIntoMap parses a struct tag `valid:required~Some error message,length(2|3)` into map[string]string{"required": "Some error message", "length(2|3)": ""}
 func parseTagIntoMap(tag string) tagOptionsMap {
 	optionsMap := make(tagOptionsMap)
-	options := strings.Split(tag, ",")
+	options := splitTag(tag)
 
 	for i, option := range options {
 		option = strings.TrimSpace(option)
@@ -830,7 +798,7 @@ func isValidTag(s string) bool {
 	}
 	for _, c := range s {
 		switch {
-		case strings.ContainsRune("\\'\"!#$%&()*+-./:<=>?@[]^_{|}~ ", c):
+		case strings.ContainsRune("\\'\"!#$%&()*+-./:<=>?@[]^_{|}~, ", c):
 			// Backslash and quote chars are reserved, but
 			// otherwise any punctuation chars are allowed
 			// in a tag name.
@@ -978,11 +946,12 @@ func checkRequired(v reflect.Value, t reflect.StructField, options tagOptionsMap
 
 	if requiredOption, isRequired := options["required"]; isRequired {
 		if len(requiredOption.customErrorMessage) > 0 {
-			return false, Error{t.Name, fmt.Errorf(requiredOption.customErrorMessage), true, "required", []string{}}
+			escaped := strings.Replace(requiredOption.customErrorMessage, "\\", "", -1)
+			return false, Error{fmt.Errorf(escaped), true, "required", []string{getTypeName(t)}}
 		}
-		return false, Error{t.Name, fmt.Errorf("non zero value required"), false, "required", []string{}}
+		return false, Error{fmt.Errorf("non zero value required"), false, "required", []string{getTypeName(t)}}
 	} else if _, isOptional := options["optional"]; fieldsRequiredByDefault && !isOptional {
-		return false, Error{t.Name, fmt.Errorf("Missing required field"), false, "required", []string{}}
+		return false, Error{fmt.Errorf("Missing required field"), false, "required", []string{getTypeName(t)}}
 	}
 	// not required and empty is valid
 	return true, nil
@@ -1002,7 +971,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 			if !fieldsRequiredByDefault {
 				return true, nil
 			}
-			return false, Error{t.Name, fmt.Errorf("All fields are required to at least have one validation defined"), false, "required", []string{}}
+			return false, Error{fmt.Errorf("All fields are required to at least have one validation defined"), false, "required", []string{getTypeName(t)}}
 		}
 	case "-":
 		return true, nil
@@ -1032,10 +1001,11 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 
 			if result := validatefunc(v.Interface(), o.Interface()); !result {
 				if len(validatorStruct.customErrorMessage) > 0 {
-					customTypeErrors = append(customTypeErrors, Error{Name: t.Name, Err: TruncatingErrorf(validatorStruct.customErrorMessage, fmt.Sprint(v), validatorName), CustomErrorMessageExists: true, Validator: stripParams(validatorName)})
+					escaped := strings.Replace(validatorStruct.customErrorMessage, "\\", "", -1)
+					customTypeErrors = append(customTypeErrors, Error{Err: TruncatingErrorf(escaped, fmt.Sprint(v), validatorName), CustomErrorMessageExists: true, Validator: stripParams(validatorName), Path: []string{getTypeName(t)}})
 					continue
 				}
-				customTypeErrors = append(customTypeErrors, Error{Name: t.Name, Err: fmt.Errorf("%s does not validate as %s", fmt.Sprint(v), validatorName), CustomErrorMessageExists: false, Validator: stripParams(validatorName)})
+				customTypeErrors = append(customTypeErrors, Error{Err: fmt.Errorf("%s does not validate as %s", fmt.Sprint(v), validatorName), CustomErrorMessageExists: false, Validator: stripParams(validatorName), Path: []string{getTypeName(t)}})
 			}
 		}
 	}
@@ -1054,8 +1024,8 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 				optionsOrder := options.orderedKeys()
 				for _, validator := range optionsOrder {
 					isValid = false
-					resultErr = Error{t.Name, fmt.Errorf(
-						"The following validator is invalid or can't be applied to the field: %q", validator), false, stripParams(validator), []string{}}
+					resultErr = Error{fmt.Errorf(
+						"The following validator is invalid or can't be applied to the field: %q", validator), false, stripParams(validator), []string{getTypeName(t)}}
 					return
 				}
 			}
@@ -1104,16 +1074,17 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 					field := fmt.Sprint(v) // make value into string, then validate with regex
 					if result := validatefunc(field, ps[1:]...); (!result && !negate) || (result && negate) {
 						if customMsgExists {
-							return false, Error{t.Name, TruncatingErrorf(validatorStruct.customErrorMessage, field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+							escaped := strings.Replace(validatorStruct.customErrorMessage, "\\", "", -1)
+							return false, Error{TruncatingErrorf(escaped, field, validator), customMsgExists, stripParams(validatorSpec), []string{getTypeName(t)}}
 						}
 						if negate {
-							return false, Error{t.Name, fmt.Errorf("%s does validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+							return false, Error{fmt.Errorf("%s does validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{getTypeName(t)}}
 						}
-						return false, Error{t.Name, fmt.Errorf("%s does not validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+						return false, Error{fmt.Errorf("%s does not validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{getTypeName(t)}}
 					}
 				default:
 					// type not yet supported, fail
-					return false, Error{t.Name, fmt.Errorf("Validator %s doesn't support kind %s", validator, v.Kind()), false, stripParams(validatorSpec), []string{}}
+					return false, Error{fmt.Errorf("Validator %s doesn't support kind %s", validator, v.Kind()), false, stripParams(validatorSpec), []string{getTypeName(t)}}
 				}
 			}
 
@@ -1128,17 +1099,18 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 					field := fmt.Sprint(v) // make value into string, then validate with regex
 					if result := validatefunc(field); !result && !negate || result && negate {
 						if customMsgExists {
-							return false, Error{t.Name, TruncatingErrorf(validatorStruct.customErrorMessage, field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+							escaped := strings.Replace(validatorStruct.customErrorMessage, "\\", "", -1)
+							return false, Error{TruncatingErrorf(escaped, field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
 						}
 						if negate {
-							return false, Error{t.Name, fmt.Errorf("%s does validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+							return false, Error{fmt.Errorf("%s does validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{getTypeName(t)}}
 						}
-						return false, Error{t.Name, fmt.Errorf("%s does not validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+						return false, Error{fmt.Errorf("%s does not validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{getTypeName(t)}}
 					}
 				default:
 					//Not Yet Supported Types (Fail here!)
 					err := fmt.Errorf("Validator %s doesn't support kind %s for value %v", validator, v.Kind(), v)
-					return false, Error{t.Name, err, false, stripParams(validatorSpec), []string{}}
+					return false, Error{err, false, stripParams(validatorSpec), []string{getTypeName(t)}}
 				}
 			}
 		}
@@ -1151,44 +1123,55 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		sv = v.MapKeys()
 		sort.Sort(sv)
 		result := true
+
+		var optionsCopy tagOptionsMap
+		var errs Errors
 		for i, k := range sv {
 			var resultItem bool
 			var err error
+			optionsCopy = options.copy()
 			if v.MapIndex(k).Kind() != reflect.Struct {
-				resultItem, err = typeCheck(v.MapIndex(k), t, o, options)
+				resultItem, err = typeCheck(v.MapIndex(k), t, o, optionsCopy)
 				if err != nil {
-					return false, err
+					err = AppendPathToErrors(err, sv[i].Interface().(string))
+					errs = append(errs, err)
 				}
 			} else {
 				resultItem, err = ValidateStruct(v.MapIndex(k).Interface())
 				if err != nil {
-					err = PrependPathToErrors(err, t.Name+"."+sv[i].Interface().(string))
-					return false, err
+					err = PrependPathToErrors(err, getTypeName(t), sv[i].Interface().(string))
+					errs = append(errs, err)
 				}
 			}
 			result = result && resultItem
 		}
-		return result, nil
+		options = optionsCopy
+		return result, errs
 	case reflect.Slice, reflect.Array:
 		result := true
+		var optionsCopy tagOptionsMap
+		var errs Errors
 		for i := 0; i < v.Len(); i++ {
 			var resultItem bool
 			var err error
+			optionsCopy = options.copy()
 			if v.Index(i).Kind() != reflect.Struct {
-				resultItem, err = typeCheck(v.Index(i), t, o, options)
+				resultItem, err = typeCheck(v.Index(i), t, o, optionsCopy)
 				if err != nil {
-					return false, err
+					err = AppendPathToErrors(err, strconv.Itoa(i))
+					errs = append(errs, err)
 				}
 			} else {
 				resultItem, err = ValidateStruct(v.Index(i).Interface())
 				if err != nil {
-					err = PrependPathToErrors(err, t.Name+"."+strconv.Itoa(i))
-					return false, err
+					err = PrependPathToErrors(err, getTypeName(t), strconv.Itoa(i))
+					errs = append(errs, err)
 				}
 			}
 			result = result && resultItem
 		}
-		return result, nil
+		options = optionsCopy
+		return result, errs
 	case reflect.Interface:
 		// If the value is an interface then encode its element
 		if v.IsNil() {
@@ -1254,7 +1237,7 @@ func ErrorsByField(e error) map[string]string {
 
 	switch e.(type) {
 	case Error:
-		m[e.(Error).Name] = e.(Error).Err.Error()
+		m[e.(Error).Name()] = e.(Error).Err.Error()
 	case Errors:
 		for _, item := range e.(Errors).Errors() {
 			n := ErrorsByField(item)
