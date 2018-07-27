@@ -933,6 +933,30 @@ func StringLength(str string, params ...string) bool {
 	return false
 }
 
+// MinStringLength check string's minimum length (including multi byte strings)
+func MinStringLength(str string, params ...string) bool {
+
+	if len(params) == 1 {
+		strLength := utf8.RuneCountInString(str)
+		min, _ := ToInt(params[0])
+		return strLength >= int(min)
+	}
+
+	return false
+}
+
+// MaxStringLength check string's maximum length (including multi byte strings)
+func MaxStringLength(str string, params ...string) bool {
+
+	if len(params) == 1 {
+		strLength := utf8.RuneCountInString(str)
+		max, _ := ToInt(params[0])
+		return strLength <= int(max)
+	}
+
+	return false
+}
+
 // Range check string's length
 func Range(str string, params ...string) bool {
 	if len(params) == 2 {

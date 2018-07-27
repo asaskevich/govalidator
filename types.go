@@ -55,6 +55,8 @@ var ParamTagMap = map[string]ParamValidator{
 	"matches":      StringMatches,
 	"in":           isInRaw,
 	"rsapub":       IsRsaPub,
+	"minstringlength": MinStringLength,
+	"maxstringlength": MaxStringLength,
 }
 
 // ParamTagRegexMap maps param tags to their respective regexes.
@@ -66,6 +68,8 @@ var ParamTagRegexMap = map[string]*regexp.Regexp{
 	"in":           regexp.MustCompile(`^in\((.*)\)`),
 	"matches":      regexp.MustCompile(`^matches\((.+)\)$`),
 	"rsapub":       regexp.MustCompile("^rsapub\\((\\d+)\\)$"),
+	"minstringlength": regexp.MustCompile("^minstringlength\\((\\d+)\\)$"),
+	"maxstringlength": regexp.MustCompile("^maxstringlength\\((\\d+)\\)$"),
 }
 
 type customTypeTagMap struct {
