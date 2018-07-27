@@ -969,7 +969,7 @@ func Range(str string, params ...string) bool {
 	return false
 }
 
-func isInRaw(str string, params ...string) bool {
+func IsInRaw(str string, params ...string) bool {
 	if len(params) == 1 {
 		rawParams := params[0]
 

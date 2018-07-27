@@ -48,13 +48,13 @@ type stringValues []reflect.Value
 
 // ParamTagMap is a map of functions accept variants parameters
 var ParamTagMap = map[string]ParamValidator{
-	"length":       ByteLength,
-	"range":        Range,
-	"runelength":   RuneLength,
-	"stringlength": StringLength,
-	"matches":      StringMatches,
-	"in":           isInRaw,
-	"rsapub":       IsRsaPub,
+	"length":          ByteLength,
+	"range":           Range,
+	"runelength":      RuneLength,
+	"stringlength":    StringLength,
+	"matches":         StringMatches,
+	"in":              IsInRaw,
+	"rsapub":          IsRsaPub,
 	"minstringlength": MinStringLength,
 	"maxstringlength": MaxStringLength,
 }
