@@ -330,8 +330,10 @@ Validators with parameters
 "range(min|max)": Range,
 "length(min|max)": ByteLength,
 "runelength(min|max)": RuneLength,
+"stringlength(min|max)": StringLength,
 "matches(pattern)": StringMatches,
 "in(string1|string2|...|stringN)": IsIn,
+"rsapub(keylength)" : IsRsaPub,
 ```
 
 And here is small example of usage:
