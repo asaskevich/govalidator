@@ -6,10 +6,11 @@ import (
 	"html"
 	"math"
 	"path"
-	"regexp"
 	"strings"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/h2so5/goback/regexp"
 )
 
 // Contains check if the string contains the substring.
