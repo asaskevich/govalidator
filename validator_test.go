@@ -1796,6 +1796,7 @@ func TestIsHost(t *testing.T) {
 		{"-[::1]", false},
 		{"-localhost", false},
 		{".localhost", false},
+		{"_localhost", false},
 	}
 	for _, test := range tests {
 		actual := IsHost(test.param)

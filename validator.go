@@ -554,11 +554,21 @@ func IsISO693Alpha3b(str string) bool {
 }
 
 // IsDNSName will validate the given string as a DNS name
+// "The full domain name may not exceed the length of 253 characters in its textual representation."
+// https://en.wikipedia.org/wiki/Domain_Name_Syste://en.wikipedia.org/wiki/Domain_Name_System
 func IsDNSName(str string) bool {
-	if str == "" || len(strings.Replace(str, ".", "", -1)) > 255 {
+	return isDNSBuilder(253, true, str)
+}
+
+func isDNSBuilder(length int, allowUnderscore bool, str string) bool {
+	if str == "" || len(str) > length {
 		// constraints already violated
 		return false
 	}
+	if !allowUnderscore && strings.Contains(str, "_") {
+		return false
+	}
+
 	return !IsIP(str) && rxDNSName.MatchString(str)
 }
 
@@ -644,8 +654,12 @@ func IsMAC(str string) bool {
 }
 
 // IsHost checks if the string is a valid IP (both v4 and v6) or a valid DNS name
+// Max length of 255.
+// https://stackoverflow.com/a/28918017/1861724
+// Don't allow underscores.
+// https://en.wikipedia.org/wiki/Hostname
 func IsHost(str string) bool {
-	return IsIP(str) || IsDNSName(str)
+	return IsIP(str) || isDNSBuilder(255, false, str)
 }
 
 // IsMongoID check if the string is a valid hex-encoded representation of a MongoDB ObjectId.
