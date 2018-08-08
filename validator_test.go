@@ -3236,9 +3236,12 @@ func TestValidateStructParamValidatorInt(t *testing.T) {
 
 		Float32 float32 `valid:"range(1|10)"`
 		Float64 float64 `valid:"range(1|10)"`
+
+		Float32Decimal float32 `valid:"range(1.1|10)"`
+		Float64Decimal float64 `valid:"range(0.1|10)"`
 	}
-	test1Ok := &Test1{5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5}
-	test1NotOk := &Test1{11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11}
+	test1Ok := &Test1{5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 1.2, 9.9}
+	test1NotOk := &Test1{11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 0.01, 10.01}
 
 	_, err := ValidateStruct(test1Ok)
 	if err != nil {
@@ -3284,6 +3287,19 @@ func TestValidateStructParamValidatorInt(t *testing.T) {
 	_, err = ValidateStruct(test2NotOk)
 	if err == nil {
 		t.Errorf("Test failed: nil")
+	}
+
+	type Test3 struct {
+		Float32NoDigits        float32 `valid:"range(.|10)"`
+		Float64NoDecimalDigit  float64 `valid:"range(1.|10)"`
+		Float64NoWholeDigit    float64 `valid:"range(.1|10)"`
+		Float64MutipleDecimals float64 `valid:"range(.1.|10)"`
+	}
+
+	test3Ok := &Test3{.1, 1., .1, .1}
+	_, err = ValidateStruct(test3Ok)
+	if err == nil {
+		t.Errorf("Test failed: %s", err)
 	}
 }
 
