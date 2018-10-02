@@ -6,5 +6,6 @@ jobs:
     working_directory: /go/src/github.com/asaskevich/govalidator
     steps:
       - checkout
+      - run: diff -u /dev/null <(gofmt -d .)
       - run: go get -v -t -d ./...
       - run: go test -v ./...
