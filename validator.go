@@ -862,6 +862,14 @@ func IsTime(str string, format string) bool {
 	return err == nil
 }
 
+// IsUnixTime check if string is valid unix timestamp value
+func IsUnixTime(str string) bool {
+	if _, err := strconv.Atoi(str); err == nil {
+		return true
+	}
+	return false
+}
+
 // IsRFC3339 check if string is valid timestamp value according to RFC3339
 func IsRFC3339(str string) bool {
 	return IsTime(str, time.RFC3339)
