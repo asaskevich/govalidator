@@ -165,6 +165,7 @@ func IsRequestURL(rawurl string) bool
 func IsSSN(str string) bool
 func IsSemver(str string) bool
 func IsTime(str string, format string) bool
+func IsUnixTime(str string) bool
 func IsURL(str string) bool
 func IsUTFDigit(str string) bool
 func IsUTFLetter(str string) bool
