@@ -128,12 +128,12 @@ func IsURL(str string) bool {
 // it was received in an HTTP request, is a valid
 // URL confirm to RFC 3986
 func IsRequestURL(rawurl string) bool {
-	url, err := url.ParseRequestURI(rawurl)
+	u, err := url.ParseRequestURI(rawurl)
 	if err != nil {
-		return false //Couldn't even parse the rawurl
+		return false // Couldn't even parse the rawurl
 	}
-	if len(url.Scheme) == 0 {
-		return false //No Scheme found
+	if len(u.Scheme) == 0 {
+		return false // No Scheme found
 	}
 	return true
 }
@@ -154,8 +154,8 @@ func IsAlpha(str string) bool {
 	return rxAlpha.MatchString(str)
 }
 
-//IsUTFLetter check if the string contains only unicode letter characters.
-//Similar to IsAlpha but for all languages. Empty string is valid.
+// IsUTFLetter check if the string contains only unicode letter characters.
+// Similar to IsAlpha but for all languages. Empty string is valid.
 func IsUTFLetter(str string) bool {
 	if IsNull(str) {
 		return true
@@ -184,7 +184,7 @@ func IsUTFLetterNumeric(str string) bool {
 		return true
 	}
 	for _, c := range str {
-		if !unicode.IsLetter(c) && !unicode.IsNumber(c) { //letters && numbers are ok
+		if !unicode.IsLetter(c) && !unicode.IsNumber(c) { // letters && numbers are ok
 			return false
 		}
 	}
@@ -214,7 +214,7 @@ func IsUTFNumeric(str string) bool {
 		str = strings.TrimPrefix(str, "+")
 	}
 	for _, c := range str {
-		if !unicode.IsNumber(c) { //numbers && minus sign are ok
+		if !unicode.IsNumber(c) { // numbers && minus sign are ok
 			return false
 		}
 	}
@@ -235,7 +235,7 @@ func IsUTFDigit(str string) bool {
 		str = strings.TrimPrefix(str, "+")
 	}
 	for _, c := range str {
-		if !unicode.IsDigit(c) { //digits && minus sign are ok
+		if !unicode.IsDigit(c) { // digits && minus sign are ok
 			return false
 		}
 	}
@@ -372,7 +372,7 @@ func IsCreditCard(str string) bool {
 		if shouldDouble {
 			tmpNum *= 2
 			if tmpNum >= 10 {
-				sum += ((tmpNum % 10) + 1)
+				sum += (tmpNum % 10) + 1
 			} else {
 				sum += tmpNum
 			}
@@ -492,7 +492,7 @@ func IsBase64(str string) bool {
 // IsFilePath check is a string is Win or Unix file path and returns it's type.
 func IsFilePath(str string) (bool, int) {
 	if rxWinPath.MatchString(str) {
-		//check windows path limit see:
+		// check windows path limit see:
 		//  http://msdn.microsoft.com/en-us/library/aa365247(VS.85).aspx#maxpath
 		if len(str[3:]) > 32767 {
 			return false, Win
@@ -565,28 +565,28 @@ func IsDNSName(str string) bool {
 // IsHash checks if a string is a hash of type algorithm.
 // Algorithm is one of ['md4', 'md5', 'sha1', 'sha256', 'sha384', 'sha512', 'ripemd128', 'ripemd160', 'tiger128', 'tiger160', 'tiger192', 'crc32', 'crc32b']
 func IsHash(str string, algorithm string) bool {
-	len := "0"
+	length := "0"
 	algo := strings.ToLower(algorithm)
 
 	if algo == "crc32" || algo == "crc32b" {
-		len = "8"
+		length = "8"
 	} else if algo == "md5" || algo == "md4" || algo == "ripemd128" || algo == "tiger128" {
-		len = "32"
+		length = "32"
 	} else if algo == "sha1" || algo == "ripemd160" || algo == "tiger160" {
-		len = "40"
+		length = "40"
 	} else if algo == "tiger192" {
-		len = "48"
+		length = "48"
 	} else if algo == "sha256" {
-		len = "64"
+		length = "64"
 	} else if algo == "sha384" {
-		len = "96"
+		length = "96"
 	} else if algo == "sha512" {
-		len = "128"
+		length = "128"
 	} else {
 		return false
 	}
 
-	return Matches(str, "^[a-f0-9]{"+len+"}$")
+	return Matches(str, "^[a-f0-9]{"+length+"}$")
 }
 
 // IsDialString validates the given string for usage with the various Dial() functions
@@ -904,8 +904,8 @@ func RuneLength(str string, params ...string) bool {
 // Alias for IsRsaPublicKey
 func IsRsaPub(str string, params ...string) bool {
 	if len(params) == 1 {
-		len, _ := ToInt(params[0])
-		return IsRsaPublicKey(str, int(len))
+		length, _ := ToInt(params[0])
+		return IsRsaPublicKey(str, int(length))
 	}
 
 	return false
@@ -982,7 +982,7 @@ func checkRequired(v reflect.Value, t reflect.StructField, options tagOptionsMap
 		}
 		return false, Error{t.Name, fmt.Errorf("non zero value required"), false, "required", []string{}}
 	} else if _, isOptional := options["optional"]; fieldsRequiredByDefault && !isOptional {
-		return false, Error{t.Name, fmt.Errorf("Missing required field"), false, "required", []string{}}
+		return false, Error{t.Name, fmt.Errorf("missing required field"), false, "required", []string{}}
 	}
 	// not required and empty is valid
 	return true, nil
@@ -1002,7 +1002,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 			if !fieldsRequiredByDefault {
 				return true, nil
 			}
-			return false, Error{t.Name, fmt.Errorf("All fields are required to at least have one validation defined"), false, "required", []string{}}
+			return false, Error{t.Name, fmt.Errorf("all fields are required to at least have one validation defined"), false, "required", []string{}}
 		}
 	case "-":
 		return true, nil
@@ -1055,7 +1055,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 				for _, validator := range optionsOrder {
 					isValid = false
 					resultErr = Error{t.Name, fmt.Errorf(
-						"The following validator is invalid or can't be applied to the field: %q", validator), false, stripParams(validator), []string{}}
+						"the following validator is invalid or can't be applied to the field: %q", validator), false, stripParams(validator), []string{}}
 					return
 				}
 			}
@@ -1113,7 +1113,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 					}
 				default:
 					// type not yet supported, fail
-					return false, Error{t.Name, fmt.Errorf("Validator %s doesn't support kind %s", validator, v.Kind()), false, stripParams(validatorSpec), []string{}}
+					return false, Error{t.Name, fmt.Errorf("validator %s doesn't support kind %s", validator, v.Kind()), false, stripParams(validatorSpec), []string{}}
 				}
 			}
 
@@ -1136,8 +1136,8 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 						return false, Error{t.Name, fmt.Errorf("%s does not validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
 					}
 				default:
-					//Not Yet Supported Types (Fail here!)
-					err := fmt.Errorf("Validator %s doesn't support kind %s for value %v", validator, v.Kind(), v)
+					// Not Yet Supported Types (Fail here!)
+					err := fmt.Errorf("validator %s doesn't support kind %s for value %v", validator, v.Kind(), v)
 					return false, Error{t.Name, err, false, stripParams(validatorSpec), []string{}}
 				}
 			}

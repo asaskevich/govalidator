@@ -7,18 +7,18 @@ import (
 
 func TestErrorsToString(t *testing.T) {
 	t.Parallel()
-	customErr := &Error{Name: "Custom Error Name", Err: fmt.Errorf("stdlib error")}
-	customErrWithCustomErrorMessage := &Error{Name: "Custom Error Name 2", Err: fmt.Errorf("Bad stuff happened"), CustomErrorMessageExists: true}
+	customErr := &Error{Name: "custom error name", Err: fmt.Errorf("stdlib error")}
+	customErrWithCustomErrorMessage := &Error{Name: "custom error name 2", Err: fmt.Errorf("bad stuff happened"), CustomErrorMessageExists: true}
 
 	var tests = []struct {
 		param1   Errors
 		expected string
 	}{
 		{Errors{}, ""},
-		{Errors{fmt.Errorf("Error 1")}, "Error 1"},
-		{Errors{fmt.Errorf("Error 1"), fmt.Errorf("Error 2")}, "Error 1;Error 2"},
-		{Errors{customErr, fmt.Errorf("Error 2")}, "Custom Error Name: stdlib error;Error 2"},
-		{Errors{fmt.Errorf("Error 123"), customErrWithCustomErrorMessage}, "Error 123;Bad stuff happened"},
+		{Errors{fmt.Errorf("error 1")}, "error 1"},
+		{Errors{fmt.Errorf("error 1"), fmt.Errorf("error 2")}, "error 1;error 2"},
+		{Errors{customErr, fmt.Errorf("error 2")}, "custom error name: stdlib error;error 2"},
+		{Errors{fmt.Errorf("error 123"), customErrWithCustomErrorMessage}, "error 123;bad stuff happened"},
 	}
 	for _, test := range tests {
 		actual := test.param1.Error()

@@ -44,7 +44,7 @@ func TestToString(t *testing.T) {
 	toString(t, true, "true")
 	toString(t, 1.5+10i, "(1.5+10i)")
 	// Sprintf function not guarantee that maps with equal keys always will be equal in string  representation
-	//toString(t, struct{ Keys map[int]int }{Keys: map[int]int{1: 2, 3: 4}}, "{map[1:2 3:4]}")
+	// toString(t, struct{ Keys map[int]int }{Keys: map[int]int{1: 2, 3: 4}}, "{map[1:2 3:4]}")
 }
 
 func TestToFloat(t *testing.T) {
@@ -60,7 +60,7 @@ func TestToFloat(t *testing.T) {
 }
 
 func TestToJSON(t *testing.T) {
-	tests := []interface{}{"test", map[string]string{"a": "b", "b": "c"}, func() error { return fmt.Errorf("Error") }}
+	tests := []interface{}{"test", map[string]string{"a": "b", "b": "c"}, func() error { return fmt.Errorf("error") }}
 	expected := [][]string{
 		{"\"test\"", "<nil>"},
 		{"{\"a\":\"b\",\"b\":\"c\"}", "<nil>"},
