@@ -2787,7 +2787,7 @@ func TestNestedStruct(t *testing.T) {
 
 func TestNestedStructWithJsonTag(t *testing.T) {
 	type EvenMoreNestedStruct struct {
-		Bar string `json:"bar" valid:"length(3|5),required"`
+		Bar string `json:"bar" valid:"length(3|5)"`
 	}
 	type NestedStruct struct {
 		Foo                 string                          `json:"foo" valid:"length(3|5),required"`
@@ -2795,7 +2795,6 @@ func TestNestedStructWithJsonTag(t *testing.T) {
 		SliceEvenMoreNested []EvenMoreNestedStruct          `json:"sliceEvenMoreNested"`
 		MapEvenMoreNested   map[string]EvenMoreNestedStruct `json:"mapEvenMoreNested"`
 	}
-
 	type OuterStruct struct {
 		Nested NestedStruct `json:"nested"`
 	}
@@ -2827,7 +2826,7 @@ func TestNestedStructWithJsonTag(t *testing.T) {
 					Bar: "123456",
 				},
 			},
-		}, false, "nested.evenMoreNested.Bar: 123456 does not validate as length(3|5)"},
+		}, false, "nested.evenMoreNested.bar: 123456 does not validate as length(3|5)"},
 		{OuterStruct{
 			Nested: NestedStruct{
 				Foo: "123",
@@ -2842,7 +2841,7 @@ func TestNestedStructWithJsonTag(t *testing.T) {
 			Nested: NestedStruct{
 				Foo: "123",
 				MapEvenMoreNested: map[string]EvenMoreNestedStruct{
-					"Foo": EvenMoreNestedStruct{
+					"foo": EvenMoreNestedStruct{
 						Bar: "123456",
 					},
 				},
