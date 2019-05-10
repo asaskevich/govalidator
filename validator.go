@@ -733,6 +733,88 @@ func PrependPathToErrors(err error, path string) error {
 	return err
 }
 
+// ValidateMap use validation map for fields.
+// result will be equal to `false` if there are any errors.
+// m is the validation map in the form
+// map[string]interface{}{"name":"required,alpha","address":map[string]interface{}{"line1":"required,alphanum"}}
+func ValidateMap(s map[string]interface{}, m map[string]interface{}) (bool, error) {
+	if s == nil {
+		return true, nil
+	}
+	result := true
+	var err error
+	var errs Errors
+	var index int
+	val := reflect.ValueOf(s)
+	for key, value := range s {
+		presentResult := true
+		validator, ok := m[key]
+		if !ok {
+			presentResult = false
+			var err error
+			err = fmt.Errorf("all map keys has to be present in the validation map; got %s", key)
+			err = PrependPathToErrors(err, key)
+			errs = append(errs, err)
+		}
+		valueField := reflect.ValueOf(value)
+		mapResult := true
+		typeResult := true
+		structResult := true
+		resultField := true
+		switch subValidator := validator.(type) {
+		case map[string]interface{}:
+			var err error
+			if v, ok := value.(map[string]interface{}); !ok {
+				mapResult = false
+				err = fmt.Errorf("map validator has to be for the map type only; got %s", valueField.Type().String())
+				err = PrependPathToErrors(err, key)
+				errs = append(errs, err)
+			} else {
+				mapResult, err = ValidateMap(v, subValidator)
+				if err != nil {
+					mapResult = false
+					err = PrependPathToErrors(err, key)
+					errs = append(errs, err)
+				}
+			}
+		case string:
+			if (valueField.Kind() == reflect.Struct ||
+				(valueField.Kind() == reflect.Ptr && valueField.Elem().Kind() == reflect.Struct)) &&
+				subValidator != "-" {
+				var err error
+				structResult, err = ValidateStruct(valueField.Interface())
+				if err != nil {
+					err = PrependPathToErrors(err, key)
+					errs = append(errs, err)
+				}
+			}
+			resultField, err = typeCheck(valueField, reflect.StructField{
+				Name:      key,
+				PkgPath:   "",
+				Type:      val.Type(),
+				Tag:       reflect.StructTag(fmt.Sprintf("%s:%q", tagName, subValidator)),
+				Offset:    0,
+				Index:     []int{index},
+				Anonymous: false,
+			}, val, nil)
+			if err != nil {
+				errs = append(errs, err)
+			}
+		default:
+			typeResult = false
+			err = fmt.Errorf("map validator has to be either map[string]interface{} or string; got %s", valueField.Type().String())
+			err = PrependPathToErrors(err, key)
+			errs = append(errs, err)
+		}
+		result = result && presentResult && typeResult && resultField && structResult && mapResult
+		index++
+	}
+	if len(errs) > 0 {
+		err = errs
+	}
+	return result, err
+}
+
 // ValidateStruct use tags for fields.
 // result will be equal to `false` if there are any errors.
 func ValidateStruct(s interface{}) (bool, error) {
