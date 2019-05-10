@@ -3904,6 +3904,52 @@ func TestValidateMap(t *testing.T) {
 	}
 }
 
+func TestValidateMapMissing(t *testing.T) {
+	t.Parallel()
+	var tests = []struct {
+		params    map[string]interface{}
+		validator map[string]interface{}
+		expected  bool
+	}{
+		{
+			map[string]interface{}{
+				"name": "Bob",
+			},
+			map[string]interface{}{
+				"name":   "required,alpha",
+				"family": "required,alpha",
+			},
+			false,
+		},
+		{
+			map[string]interface{}{
+				"name": "Bob",
+				"submap": map[string]interface{}{
+					"family": "Smith",
+				},
+			},
+			map[string]interface{}{
+				"name": "required,alpha",
+				"submap": map[string]interface{}{
+					"name":   "required,alpha",
+					"family": "required,alpha",
+				},
+			},
+			false,
+		},
+	}
+
+	for _, test := range tests {
+		actual, err := ValidateMap(test.params, test.validator)
+		if actual != test.expected {
+			t.Errorf("Expected ValidateMap(%q, %q) to be %v, got %v", test.params, test.validator, test.expected, actual)
+			if err != nil {
+				t.Errorf("Got Error on ValidateMap(%q, %q): %s", test.params, test.validator, err)
+			}
+		}
+	}
+}
+
 func TestIsType(t *testing.T) {
 	t.Parallel()
 	i := 1

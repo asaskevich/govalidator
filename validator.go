@@ -809,10 +809,29 @@ func ValidateMap(s map[string]interface{}, m map[string]interface{}) (bool, erro
 		result = result && presentResult && typeResult && resultField && structResult && mapResult
 		index++
 	}
+	// check required keys
+	requiredResult := true
+	for key, value := range m {
+		if schema, ok := value.(string); ok {
+			tags := parseTagIntoMap(schema)
+			if required, ok := tags["required"]; ok {
+				if _, ok := s[key]; !ok {
+					requiredResult = false
+					if required.customErrorMessage != "" {
+						err = Error{key, fmt.Errorf(required.customErrorMessage), true, "required", []string{}}
+					} else {
+						err = Error{key, fmt.Errorf("required field missing"), false, "required", []string{}}
+					}
+					errs = append(errs, err)
+				}
+			}
+		}
+	}
+
 	if len(errs) > 0 {
 		err = errs
 	}
-	return result, err
+	return result && requiredResult, err
 }
 
 // ValidateStruct use tags for fields.
