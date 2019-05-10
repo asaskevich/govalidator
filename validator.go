@@ -800,6 +800,8 @@ func ValidateMap(s map[string]interface{}, m map[string]interface{}) (bool, erro
 			if err != nil {
 				errs = append(errs, err)
 			}
+		case nil:
+			// already handlerd when checked before
 		default:
 			typeResult = false
 			err = fmt.Errorf("map validator has to be either map[string]interface{} or string; got %s", valueField.Type().String())
