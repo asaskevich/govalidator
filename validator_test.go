@@ -3903,3 +3903,99 @@ func TestValidateMap(t *testing.T) {
 		}
 	}
 }
+
+func TestIsType(t *testing.T) {
+	t.Parallel()
+	i := 1
+	ptr := &i
+	var tests = []struct {
+		param    interface{}
+		expected bool
+	}{
+		{
+			struct {
+				Name string `valid:"type(string)"`
+				Age  int    `valid:"type(int)"`
+			}{"Bob", 20},
+			true,
+		},
+		{
+			struct {
+				Name string `valid:"type(int)"`
+				Age  int    `valid:"type(int)"`
+			}{"Bob", 20},
+			false,
+		},
+		{
+			struct {
+				PtrToInt *int `valid:"type(int)"`
+			}{ptr},
+			false,
+		},
+		{
+			struct {
+				PtrToInt    *int  `valid:"type(*int)"`
+				PtrPtrToInt **int `valid:"type(**int)"`
+			}{ptr, &ptr},
+			true,
+		},
+		{
+			struct {
+				StringInterface interface{} `valid:"type(string)"`
+			}{"Bob"},
+			true,
+		},
+		{
+			struct {
+				StringInterface interface{} `valid:"type(int)"`
+			}{"Bob"},
+			false,
+		},
+		{
+			struct {
+				Map map[string]interface{} `valid:"type(map[string]interface {})"`
+			}{map[string]interface{}{"x": struct{}{}}},
+			true,
+		},
+		{
+			struct {
+				Map map[string]interface{} `valid:"type(map[string]interface{})"`
+			}{map[string]interface{}{"x": struct{}{}}},
+			true,
+		},
+		{
+			struct {
+				Map interface{} `valid:"type(map[string]interface{})"`
+			}{map[string]interface{}{"x": struct{}{}}},
+			true,
+		},
+		{
+			struct {
+				Array []string `valid:"type([]string)"`
+			}{[]string{"Bob"}},
+			true,
+		},
+	}
+
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			if err != nil {
+				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+			}
+		}
+		mapParams, mapValidator, err := structToMaps(test.param)
+		if err != nil {
+			t.Errorf("Got Error on structToMaps(%q): %s", test.param, err)
+		} else {
+			actual, err := ValidateMap(mapParams, mapValidator)
+			if actual != test.expected {
+				t.Errorf("Expected ValidateMap(%q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
+				if err != nil {
+					t.Errorf("Got Error on ValidateMap(%q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
+				}
+			}
+		}
+	}
+}
