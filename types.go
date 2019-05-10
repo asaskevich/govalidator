@@ -16,6 +16,7 @@ type CustomTypeValidator func(i interface{}, o interface{}) bool
 
 // ParamValidator is a wrapper for validator functions that accepts additional parameters.
 type ParamValidator func(str string, params ...string) bool
+type InterfaceParamValidator func(in interface{}, params ...string) bool
 type tagOptionsMap map[string]tagOption
 
 func (t tagOptionsMap) orderedKeys() []string {
@@ -45,6 +46,16 @@ type UnsupportedTypeError struct {
 // stringValues is a slice of reflect.Value holding *reflect.StringValue.
 // It implements the methods to sort by string.
 type stringValues []reflect.Value
+
+// InterfaceParamTagMap is a map of functions accept variants parameters for an interface value
+var InterfaceParamTagMap = map[string]InterfaceParamValidator{
+	"type": IsType,
+}
+
+// InterfaceParamTagRegexMap maps interface param tags to their respective regexes.
+var InterfaceParamTagRegexMap = map[string]*regexp.Regexp{
+	"type": regexp.MustCompile(`^type\((.*)\)$`),
+}
 
 // ParamTagMap is a map of functions accept variants parameters
 var ParamTagMap = map[string]ParamValidator{

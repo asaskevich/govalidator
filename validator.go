@@ -938,6 +938,15 @@ func IsSemver(str string) bool {
 	return rxSemver.MatchString(str)
 }
 
+// IsType check if interface is of some type
+func IsType(v interface{}, params ...string) bool {
+	if len(params) == 1 {
+		typ := params[0]
+		return strings.Replace(reflect.TypeOf(v).String(), " ", "", -1) == strings.Replace(typ, " ", "", -1)
+	}
+	return false
+}
+
 // IsTime check if string is valid according to given format
 func IsTime(str string, format string) bool {
 	_, err := time.Parse(format, str)
@@ -1142,6 +1151,45 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 				}
 			}
 		}()
+	}
+
+	for _, validatorSpec := range optionsOrder {
+		validatorStruct := options[validatorSpec]
+		var negate bool
+		validator := validatorSpec
+		customMsgExists := len(validatorStruct.customErrorMessage) > 0
+
+		// Check whether the tag looks like '!something' or 'something'
+		if validator[0] == '!' {
+			validator = validator[1:]
+			negate = true
+		}
+
+		// Check for interface param validators
+		for key, value := range InterfaceParamTagRegexMap {
+			ps := value.FindStringSubmatch(validator)
+			if len(ps) == 0 {
+				continue
+			}
+
+			validatefunc, ok := InterfaceParamTagMap[key]
+			if !ok {
+				continue
+			}
+
+			delete(options, validatorSpec)
+
+			field := fmt.Sprint(v)
+			if result := validatefunc(v.Interface(), ps[1:]...); (!result && !negate) || (result && negate) {
+				if customMsgExists {
+					return false, Error{t.Name, TruncatingErrorf(validatorStruct.customErrorMessage, field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+				}
+				if negate {
+					return false, Error{t.Name, fmt.Errorf("%s does validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+				}
+				return false, Error{t.Name, fmt.Errorf("%s does not validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+			}
+		}
 	}
 
 	switch v.Kind() {
