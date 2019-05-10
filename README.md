@@ -165,6 +165,7 @@ func IsRequestURL(rawurl string) bool
 func IsSSN(str string) bool
 func IsSemver(str string) bool
 func IsTime(str string, format string) bool
+func IsType(in interface{}, params ...string) bool
 func IsURL(str string) bool
 func IsUTFDigit(str string) bool
 func IsUTFLetter(str string) bool
@@ -227,6 +228,27 @@ type Validator
 ###### IsURL
 ```go
 println(govalidator.IsURL(`http://user@pass:domain.com/path/page`))
+```
+###### IsType
+```go
+println(govalidator.IsType("Bob", "string"))
+println(govalidator.IsType(1, "int"))
+i := 1
+println(govalidator.IsType(&i, "*int"))
+```
+
+IsType can be used through the tag `type` which is essential for map validation:
+```go
+type User	struct {
+  Name string      `valid:"type(string)"`
+  Age  int         `valid:"type(int)"`
+  Meta interface{} `valid:"type(string)"`
+}
+result, err := govalidator.ValidateStruct(user{"Bob", 20, "meta"})
+if err != nil {
+	println("error: " + err.Error())
+}
+println(result)
 ```
 ###### ToString
 ```go
@@ -335,6 +357,11 @@ Validators with parameters
 "matches(pattern)": StringMatches,
 "in(string1|string2|...|stringN)": IsIn,
 "rsapub(keylength)" : IsRsaPub,
+```
+Validators with parameters for any type
+
+```go
+"type(type)": IsType,
 ```
 
 And here is small example of usage:
