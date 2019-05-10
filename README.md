@@ -204,6 +204,7 @@ func ToString(obj interface{}) string
 func Trim(str, chars string) string
 func Truncate(str string, length int, ending string) string
 func UnderscoreToCamelCase(s string) string
+func ValidateMap(s map[string]interface{}, o map[string]interface{}) (bool, error)
 func ValidateStruct(s interface{}) (bool, error)
 func WhiteList(str, chars string) string
 type ConditionIterator
@@ -370,6 +371,41 @@ if err != nil {
 }
 println(result)
 ```
+###### ValidateMap [#2](https://github.com/asaskevich/govalidator/pull/338)
+If you want to validate maps, you can use the map to be validated and a validation map that contain the same tags used in ValidateStruct, both maps have to be in the form `map[string]interface{}`
+
+So here is small example of usage:
+```go
+var mapTemplate = map[string]interface{}{
+	"name":"required,alpha",
+	"family":"required,alpha",
+	"email":"required,email",
+	"cell-phone":"numeric",
+	"address":map[string]interface{}{
+		"line1":"required,alphanum",
+		"line2":"alphanum",
+		"postal-code":"numeric",
+	},
+}
+
+var inputMap = map[string]interface{}{
+	"name":"Bob",
+	"family":"Smith",
+	"email":"foo@bar.baz",
+	"address":map[string]interface{}{
+		"line1":"",
+		"line2":"",
+		"postal-code":"",
+	},
+}
+
+result, err := govalidator.ValidateMap(mapTemplate, inputMap)
+if err != nil {
+	println("error: " + err.Error())
+}
+println(result)
+```
+
 ###### WhiteList
 ```go
 // Remove all characters from string ignoring characters between "a" and "z"
@@ -445,7 +481,7 @@ If you don't know what to do, there are some features and functions that need to
 - [ ] Update actual [list of functions](https://github.com/asaskevich/govalidator#list-of-functions)
 - [ ] Update [list of validators](https://github.com/asaskevich/govalidator#validatestruct-2) that available for `ValidateStruct` and add new
 - [ ] Implement new validators: `IsFQDN`, `IsIMEI`, `IsPostalCode`, `IsISIN`, `IsISRC` etc
-- [ ] Implement [validation by maps](https://github.com/asaskevich/govalidator/issues/224)
+- [x] Implement [validation by maps](https://github.com/asaskevich/govalidator/issues/224)
 - [ ] Implement fuzzing testing
 - [ ] Implement some struct/map/array utilities
 - [ ] Implement map/array validation
