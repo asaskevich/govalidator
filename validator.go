@@ -513,6 +513,11 @@ func IsDataURI(str string) bool {
 	return IsBase64(dataURI[1])
 }
 
+// IsMagnetURI checks if a string is valid magnet URI
+func IsMagnetURI(str string) bool {
+	return rxMagnetURI.MatchString(str)
+}
+
 // IsISO3166Alpha2 checks if a string is valid two-letter country code
 func IsISO3166Alpha2(str string) bool {
 	for _, entry := range ISO3166List {
