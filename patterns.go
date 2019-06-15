@@ -27,7 +27,7 @@ const (
 	Base64            string = "^(?:[A-Za-z0-9+\\/]{4})*(?:[A-Za-z0-9+\\/]{2}==|[A-Za-z0-9+\\/]{3}=|[A-Za-z0-9+\\/]{4})$"
 	PrintableASCII    string = "^[\x20-\x7E]+$"
 	DataURI           string = "^data:.+\\/(.+);base64$"
-    MagnetURI         string = "^magnet:\\?xt=urn:[a-zA-Z0-9]+:[a-zA-Z0-9]{32,40}&dn=.+&tr=.+$"
+	MagnetURI         string = "^magnet:\\?xt=urn:[a-zA-Z0-9]+:[a-zA-Z0-9]{32,40}&dn=.+&tr=.+$"
 	Latitude          string = "^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)$"
 	Longitude         string = "^[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$"
 	DNSName           string = `^([a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62}){1}(\.[a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62})*[\._]?$`
@@ -87,7 +87,7 @@ var (
 	rxHalfWidth         = regexp.MustCompile(HalfWidth)
 	rxBase64            = regexp.MustCompile(Base64)
 	rxDataURI           = regexp.MustCompile(DataURI)
-    rxMagnetURI         = regexp.MustCompile(MagnetURI)
+	rxMagnetURI         = regexp.MustCompile(MagnetURI)
 	rxLatitude          = regexp.MustCompile(Latitude)
 	rxLongitude         = regexp.MustCompile(Longitude)
 	rxDNSName           = regexp.MustCompile(DNSName)
