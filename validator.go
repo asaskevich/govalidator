@@ -594,9 +594,73 @@ func IsHash(str string, algorithm string) bool {
 	return Matches(str, "^[a-f0-9]{"+len+"}$")
 }
 
+// IsSHA512 checks is a string is a SHA512 hash. Alias for `IsHash(str, "sha512")`
+func IsSHA512(str string) bool {
+	return IsHash(str, "sha512")
+}
+
+// IsSHA384 checks is a string is a SHA384 hash. Alias for `IsHash(str, "sha384")`
+func IsSHA384(str string) bool {
+	return IsHash(str, "sha384")
+}
+
+// IsSHA256 checks is a string is a SHA256 hash. Alias for `IsHash(str, "sha256")`
+func IsSHA256(str string) bool {
+	return IsHash(str, "sha256")
+}
+
+// IsTiger192 checks is a string is a Tiger192 hash. Alias for `IsHash(str, "tiger192")`
+func IsTiger192(str string) bool {
+	return IsHash(str, "tiger192")
+}
+
+// IsTiger160 checks is a string is a Tiger160 hash. Alias for `IsHash(str, "tiger160")`
+func IsTiger160(str string) bool {
+	return IsHash(str, "tiger160")
+}
+
+// IsRipeMD160 checks is a string is a RipeMD160 hash. Alias for `IsHash(str, "ripemd160")`
+func IsRipeMD160(str string) bool {
+	return IsHash(str, "ripemd160")
+}
+
+// IsSHA1 checks is a string is a SHA-1 hash. Alias for `IsHash(str, "sha1")`
+func IsSHA1(str string) bool {
+	return IsHash(str, "sha1")
+}
+
+// IsTiger128 checks is a string is a Tiger128 hash. Alias for `IsHash(str, "tiger128")`
+func IsTiger128(str string) bool {
+	return IsHash(str, "tiger128")
+}
+
+// IsRipeMD128 checks is a string is a RipeMD128 hash. Alias for `IsHash(str, "ripemd128")`
+func IsRipeMD128(str string) bool {
+	return IsHash(str, "ripemd128")
+}
+
+// IsCRC32 checks is a string is a CRC32 hash. Alias for `IsHash(str, "crc32")`
+func IsCRC32(str string) bool {
+	return IsHash(str, "crc32")
+}
+
+// IsCRC32b checks is a string is a CRC32b hash. Alias for `IsHash(str, "crc32b")`
+func IsCRC32b(str string) bool {
+	return IsHash(str, "crc32b")
+}
+
+// IsMD5 checks is a string is a MD5 hash. Alias for `IsHash(str, "md5")`
+func IsMD5(str string) bool {
+	return IsHash(str, "md5")
+}
+
+// IsMD4 checks is a string is a MD4 hash. Alias for `IsHash(str, "md4")`
+func IsMD4(str string) bool {
+	return IsHash(str, "md4")
+}
+
 // IsDialString validates the given string for usage with the various Dial() functions
 func IsDialString(str string) bool {
-
 	if h, p, err := net.SplitHostPort(str); err == nil && h != "" && p != "" && (IsDNSName(h) || IsIP(h)) && IsPort(p) {
 		return true
 	}
@@ -604,7 +668,7 @@ func IsDialString(str string) bool {
 	return false
 }
 
-// IsIP checks if a string is either IP version 4 or 6.
+// IsIP checks if a string is either IP version 4 or 6. Alias for `net.ParseIP`
 func IsIP(str string) bool {
 	return net.ParseIP(str) != nil
 }
