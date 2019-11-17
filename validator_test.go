@@ -1020,53 +1020,53 @@ func TestIsNull(t *testing.T) {
 }
 
 func TestHasWhitespaceOnly(t *testing.T) {
-    t.Parallel()
+	t.Parallel()
 
-    var tests = []struct {
-        param    string
-        expected bool
-    }{
-        {"abacaba", false},
-        {"", false},
-        {"    ", true},
-        {"  \r\n  ", true},
-        {"\014\012\011\013\015", true},
-        {"\014\012\011\013 abc  \015", false},
-        {"\f\n\t\v\r\f", true},
-        {"x\n\t\t\t\t", false},
-        {"\f\n\t  \n\n\n   \v\r\f", true},
-    }
-    for _, test := range tests {
-        actual := HasWhitespaceOnly(test.param)
-        if actual != test.expected {
-            t.Errorf("Expected HasWhitespaceOnly(%q) to be %v, got %v", test.param, test.expected, actual)
-        }
-    }
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"abacaba", false},
+		{"", false},
+		{"    ", true},
+		{"  \r\n  ", true},
+		{"\014\012\011\013\015", true},
+		{"\014\012\011\013 abc  \015", false},
+		{"\f\n\t\v\r\f", true},
+		{"x\n\t\t\t\t", false},
+		{"\f\n\t  \n\n\n   \v\r\f", true},
+	}
+	for _, test := range tests {
+		actual := HasWhitespaceOnly(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected HasWhitespaceOnly(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
 }
 
 func TestHasWhitespace(t *testing.T) {
-    t.Parallel()
+	t.Parallel()
 
-    var tests = []struct {
-        param    string
-        expected bool
-    }{
-        {"abacaba", false},
-        {"", false},
-        {"    ", true},
-        {"  \r\n  ", true},
-        {"\014\012\011\013\015", true},
-        {"\014\012\011\013 abc  \015", true},
-        {"\f\n\t\v\r\f", true},
-        {"x\n\t\t\t\t", true},
-        {"\f\n\t  \n\n\n   \v\r\f", true},
-    }
-    for _, test := range tests {
-        actual := HasWhitespace(test.param)
-        if actual != test.expected {
-            t.Errorf("Expected HasWhitespace(%q) to be %v, got %v", test.param, test.expected, actual)
-        }
-    }
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"abacaba", false},
+		{"", false},
+		{"    ", true},
+		{"  \r\n  ", true},
+		{"\014\012\011\013\015", true},
+		{"\014\012\011\013 abc  \015", true},
+		{"\f\n\t\v\r\f", true},
+		{"x\n\t\t\t\t", true},
+		{"\f\n\t  \n\n\n   \v\r\f", true},
+	}
+	for _, test := range tests {
+		actual := HasWhitespace(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected HasWhitespace(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
 }
 
 func TestIsDivisibleBy(t *testing.T) {
@@ -1384,26 +1384,28 @@ func TestIsUUID(t *testing.T) {
 
 func TestIsCreditCard(t *testing.T) {
 	t.Parallel()
-
-	var tests = []struct {
-		param    string
-		expected bool
+	tests := []struct {
+		name   string
+		number string
+		want   bool
 	}{
-		{"", false},
-		{"foo", false},
-		{"5398228707871528", false},
-		{"375556917985515", true},
-		{"36050234196908", true},
-		{"4716461583322103", true},
-		{"4716-2210-5188-5662", true},
-		{"4929 7226 5379 7141", true},
-		{"5398228707871527", true},
+		{"empty", "", false},
+		{"not numbers", "credit card", false},
+
+		{"visa", "4220855426222389", true},
+		{"visa spaces", "4220 8554 2622 2389", true},
+		{"visa dashes", "4220-8554-2622-2389", true},
+		{"mastercard", "5139288802098206", true},
+		{"american express", "374953669708156", true},
+		{"discover", "6011464355444102", true},
+		{"jcb", "3548209662790989", true},
 	}
-	for _, test := range tests {
-		actual := IsCreditCard(test.param)
-		if actual != test.expected {
-			t.Errorf("Expected IsCreditCard(%q) to be %v, got %v", test.param, test.expected, actual)
-		}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsCreditCard(tt.number); got != tt.want {
+				t.Errorf("IsCreditCard(%v) = %v, want %v", tt.number, got, tt.want)
+			}
+		})
 	}
 }
 
@@ -2842,7 +2844,7 @@ func TestValidateStruct(t *testing.T) {
 		param    interface{}
 		expected bool
 	}{
-		{User{"John", "john@yahoo.com", "123G#678", 20, &Address{"Street", "ABC456D89"},    []Address{{"Street", "123456"}, {"Street", "123456"}}}, false},
+		{User{"John", "john@yahoo.com", "123G#678", 20, &Address{"Street", "ABC456D89"}, []Address{{"Street", "123456"}, {"Street", "123456"}}}, false},
 		{User{"John", "john!yahoo.com", "12345678", 20, &Address{"Street", "ABC456D89"}, []Address{{"Street", "ABC456D89"}, {"Street", "123456"}}}, false},
 		{User{"John", "", "12345", 0, &Address{"Street", "123456789"}, []Address{{"Street", "ABC456D89"}, {"Street", "123456"}}}, false},
 		{UserValid{"John", "john@yahoo.com", "123G#678", 20, &Address{"Street", "123456"}, []Address{{"Street", "123456"}, {"Street", "123456"}}}, true},
@@ -3239,67 +3241,67 @@ func TestValidateStructParamValidatorInt(t *testing.T) {
 	if err == nil {
 		t.Errorf("Test failed: nil")
 	}
-	
+
 	type Test3 struct {
-        Int   int   `valid:"in(1|10),int"`
-        Int8  int8  `valid:"in(1|10),int8"`
-        Int16 int16 `valid:"in(1|10),int16"`
-        Int32 int32 `valid:"in(1|10),int32"`
-        Int64 int64 `valid:"in(1|10),int64"`
+		Int   int   `valid:"in(1|10),int"`
+		Int8  int8  `valid:"in(1|10),int8"`
+		Int16 int16 `valid:"in(1|10),int16"`
+		Int32 int32 `valid:"in(1|10),int32"`
+		Int64 int64 `valid:"in(1|10),int64"`
 
-        Uint   uint   `valid:"in(1|10),uint"`
-        Uint8  uint8  `valid:"in(1|10),uint8"`
-        Uint16 uint16 `valid:"in(1|10),uint16"`
-        Uint32 uint32 `valid:"in(1|10),uint32"`
-        Uint64 uint64 `valid:"in(1|10),uint64"`
+		Uint   uint   `valid:"in(1|10),uint"`
+		Uint8  uint8  `valid:"in(1|10),uint8"`
+		Uint16 uint16 `valid:"in(1|10),uint16"`
+		Uint32 uint32 `valid:"in(1|10),uint32"`
+		Uint64 uint64 `valid:"in(1|10),uint64"`
 
-        Float32 float32 `valid:"in(1|10),float32"`
-        Float64 float64 `valid:"in(1|10),float64"`
-    }
+		Float32 float32 `valid:"in(1|10),float32"`
+		Float64 float64 `valid:"in(1|10),float64"`
+	}
 
-    test3Ok1 := &Test2{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-    test3Ok2 := &Test2{10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10}
-    test3NotOk := &Test2{2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
+	test3Ok1 := &Test2{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+	test3Ok2 := &Test2{10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10}
+	test3NotOk := &Test2{2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
 
-    _, err = ValidateStruct(test3Ok1)
-    if err != nil {
-        t.Errorf("Test failed: %s", err)
-    }
+	_, err = ValidateStruct(test3Ok1)
+	if err != nil {
+		t.Errorf("Test failed: %s", err)
+	}
 
-    _, err = ValidateStruct(test3Ok2)
-    if err != nil {
-        t.Errorf("Test failed: %s", err)
-    }
+	_, err = ValidateStruct(test3Ok2)
+	if err != nil {
+		t.Errorf("Test failed: %s", err)
+	}
 
-    _, err = ValidateStruct(test3NotOk)
-    if err == nil {
-        t.Errorf("Test failed: nil")
-    }
+	_, err = ValidateStruct(test3NotOk)
+	if err == nil {
+		t.Errorf("Test failed: nil")
+	}
 }
 
 func TestValidateStructUpperAndLowerCaseWithNumTypeCheck(t *testing.T) {
 
-    type StructCapital struct {
-        Total float32 `valid:"float,required"`
-    }
-    
-    structCapital := &StructCapital{53.3535}
-    _, err := ValidateStruct(structCapital)
-    if err != nil {
-        t.Errorf("Test failed: nil")
-        fmt.Println(err)
-    }
-    
-    type StructLower struct {
-        total float32 `valid:"float,required"`
-    }
-    
-    structLower := &StructLower{53.3535}
-    _, err = ValidateStruct(structLower)
-    if err != nil {
-        t.Errorf("Test failed: nil")
-        fmt.Println(err)
-    }
+	type StructCapital struct {
+		Total float32 `valid:"float,required"`
+	}
+
+	structCapital := &StructCapital{53.3535}
+	_, err := ValidateStruct(structCapital)
+	if err != nil {
+		t.Errorf("Test failed: nil")
+		fmt.Println(err)
+	}
+
+	type StructLower struct {
+		total float32 `valid:"float,required"`
+	}
+
+	structLower := &StructLower{53.3535}
+	_, err = ValidateStruct(structLower)
+	if err != nil {
+		t.Errorf("Test failed: nil")
+		fmt.Println(err)
+	}
 }
 
 func TestIsCIDR(t *testing.T) {
