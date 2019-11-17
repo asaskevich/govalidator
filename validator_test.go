@@ -1399,6 +1399,13 @@ func TestIsCreditCard(t *testing.T) {
 		{"american express", "374953669708156", true},
 		{"discover", "6011464355444102", true},
 		{"jcb", "3548209662790989", true},
+
+		// below should be valid, do they respect international standards?
+		// is our validator logic not correct?
+		{"diners club international", "30190239451016", false},
+		{"rupay", "6521674451993089", false},
+		{"mir", "2204151414444676", false},
+		{"china unionPay", "624356436327468104", false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
