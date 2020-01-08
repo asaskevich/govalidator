@@ -803,7 +803,6 @@ func PrependPathToErrors(err error, path string) error {
 		}
 		return err2
 	}
-	fmt.Println(err)
 	return err
 }
 
