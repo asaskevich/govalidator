@@ -2243,7 +2243,7 @@ type User struct {
 	Name     string `valid:"required"`
 	Email    string `valid:"required,email"`
 	Password string `valid:"required"`
-	Age      int    `valid:"required,numeric,@#\u0000"`
+	Age      int    `valid:"required,numeric,range(1|200),@#\u0000"`
 	Home     *Address
 	Work     []Address
 }
@@ -2293,6 +2293,10 @@ type IsInStruct struct {
 	IsIn string `valid:"in(PRESENT|PRÉSENTE|NOTABSENT)"`
 }
 
+type IsInStructWithPointer struct {
+	IsIn *string `valid:"in(PRESENT|PRÉSENTE|NOTABSENT)"`
+}
+
 type Post struct {
 	Title    string `valid:"alpha,required"`
 	Message  string `valid:"ascii"`
@@ -2321,6 +2325,11 @@ type FieldsRequiredByDefaultButExemptStruct struct {
 type FieldsRequiredByDefaultButExemptOrOptionalStruct struct {
 	Name  string `valid:"-"`
 	Email string `valid:"optional,email"`
+}
+
+type FieldsRequiredByDefaultButExemptOrOptionalStructWithPointers struct {
+	Name  *string `valid:"-"`
+	Email *string `valid:"optional,email"`
 }
 
 type MessageWithSeveralFieldsStruct struct {
@@ -2417,9 +2426,9 @@ func TestFieldsRequiredByDefaultButExemptOrOptionalStruct(t *testing.T) {
 		param    FieldsRequiredByDefaultButExemptOrOptionalStruct
 		expected bool
 	}{
-		{FieldsRequiredByDefaultButExemptOrOptionalStruct{}, true},
-		{FieldsRequiredByDefaultButExemptOrOptionalStruct{Name: "TEST"}, true},
-		{FieldsRequiredByDefaultButExemptOrOptionalStruct{Email: ""}, true},
+		{FieldsRequiredByDefaultButExemptOrOptionalStruct{}, false},
+		{FieldsRequiredByDefaultButExemptOrOptionalStruct{Name: "TEST"}, false},
+		{FieldsRequiredByDefaultButExemptOrOptionalStruct{Email: ""}, false},
 		{FieldsRequiredByDefaultButExemptOrOptionalStruct{Email: "test@example.com"}, true},
 		{FieldsRequiredByDefaultButExemptOrOptionalStruct{Email: "test@example"}, false},
 	}
@@ -2430,6 +2439,31 @@ func TestFieldsRequiredByDefaultButExemptOrOptionalStruct(t *testing.T) {
 			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
 				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+			}
+		}
+	}
+	SetFieldsRequiredByDefault(false)
+}
+
+func TestFieldsRequiredByDefaultButExemptOrOptionalStructWithPointers(t *testing.T) {
+	var tests = []struct {
+		param    FieldsRequiredByDefaultButExemptOrOptionalStructWithPointers
+		expected bool
+	}{
+		{FieldsRequiredByDefaultButExemptOrOptionalStructWithPointers{}, true},
+		{FieldsRequiredByDefaultButExemptOrOptionalStructWithPointers{Name: ptrString("TEST")}, true},
+		{FieldsRequiredByDefaultButExemptOrOptionalStructWithPointers{Email: ptrString("")}, false},
+		{FieldsRequiredByDefaultButExemptOrOptionalStructWithPointers{Email: nil}, true},
+		{FieldsRequiredByDefaultButExemptOrOptionalStructWithPointers{Email: ptrString("test@example.com")}, true},
+		{FieldsRequiredByDefaultButExemptOrOptionalStructWithPointers{Email: ptrString("test@example")}, false},
+	}
+	SetFieldsRequiredByDefault(true)
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%#v) to be %v, got %v", test.param, test.expected, actual)
+			if err != nil {
+				t.Errorf("Got Error on ValidateStruct(%#v): %s", test.param, err)
 			}
 		}
 	}
@@ -2458,7 +2492,7 @@ func TestCustomValidator(t *testing.T) {
 	}
 
 	type StructWithCustomAndBuiltinValidator struct {
-		Field int `valid:"customTrueValidator,required"`
+		Field *int `valid:"customTrueValidator,required"`
 	}
 
 	if valid, err := ValidateStruct(&ValidStruct{Field: 1}); !valid || err != nil {
@@ -2475,7 +2509,7 @@ func TestCustomValidator(t *testing.T) {
 		t.Errorf("Got an unexpected result for invalid struct with custom and built-in validators: %t %s", valid, err)
 	}
 
-	mixedStruct.Field = 1
+	mixedStruct.Field = ptrInt(1)
 	if valid, err := ValidateStruct(&mixedStruct); !valid || err != nil {
 		t.Errorf("Got an unexpected result for valid struct with custom and built-in validators: %t %s", valid, err)
 	}
@@ -2643,9 +2677,13 @@ func TestIsInStruct(t *testing.T) {
 		expected bool
 	}{
 		{IsInStruct{"PRESENT"}, true},
-		{IsInStruct{""}, true},
+		{IsInStruct{""}, false},
 		{IsInStruct{" "}, false},
 		{IsInStruct{"ABSENT"}, false},
+		{IsInStructWithPointer{ptrString("PRESENT")}, true},
+		{IsInStructWithPointer{nil}, true},
+		{IsInStructWithPointer{ptrString("")}, false},
+		{IsInStructWithPointer{ptrString("ABSENT")}, false},
 	}
 
 	for _, test := range tests {
@@ -2663,6 +2701,9 @@ func TestRequiredIsInStruct(t *testing.T) {
 	type RequiredIsInStruct struct {
 		IsIn string `valid:"in(PRESENT|PRÉSENTE|NOTABSENT),required"`
 	}
+	type RequiredIsInStructWithPointer struct {
+		IsIn *string `valid:"in(PRESENT|PRÉSENTE|NOTABSENT),required"`
+	}
 
 	var tests = []struct {
 		param    interface{}
@@ -2672,6 +2713,10 @@ func TestRequiredIsInStruct(t *testing.T) {
 		{RequiredIsInStruct{""}, false},
 		{RequiredIsInStruct{" "}, false},
 		{RequiredIsInStruct{"ABSENT"}, false},
+		{RequiredIsInStructWithPointer{ptrString("PRESENT")}, true},
+		{RequiredIsInStructWithPointer{ptrString("")}, false},
+		{RequiredIsInStructWithPointer{nil}, false},
+		{RequiredIsInStructWithPointer{ptrString("ABSENT")}, false},
 	}
 
 	for _, test := range tests {
@@ -2689,15 +2734,21 @@ func TestEmptyRequiredIsInStruct(t *testing.T) {
 	type EmptyRequiredIsInStruct struct {
 		IsIn string `valid:"in(),required"`
 	}
+	type EmptyRequiredIsInStructWithPointer struct {
+		IsIn *string `valid:"in(),required"`
+	}
 
 	var tests = []struct {
 		param    interface{}
 		expected bool
 	}{
 		{EmptyRequiredIsInStruct{"PRESENT"}, false},
-		{EmptyRequiredIsInStruct{""}, false},
+		{EmptyRequiredIsInStruct{""}, true}, // an empty string is allowed by 'in()' !
 		{EmptyRequiredIsInStruct{" "}, false},
 		{EmptyRequiredIsInStruct{"ABSENT"}, false},
+		{EmptyRequiredIsInStructWithPointer{ptrString("PRESENT")}, false},
+		{EmptyRequiredIsInStructWithPointer{ptrString("")}, true},
+		{EmptyRequiredIsInStructWithPointer{nil}, false},
 	}
 
 	for _, test := range tests {
@@ -2725,8 +2776,8 @@ func TestEmptyStringPtr(t *testing.T) {
 		expected    bool
 		expectedErr string
 	}{
-		{EmptyIsInStruct{&empty}, false, "IsIn: non zero value required"},
-		{EmptyIsInStruct{nil}, true, ""},
+		{EmptyIsInStruct{&empty}, false, "IsIn:  does not validate as length(3|5)"},
+		{EmptyIsInStruct{nil}, true, ""}, // because of SetNilPtrAllowedByRequired(true)
 		{EmptyIsInStruct{&valid}, true, ""},
 		{EmptyIsInStruct{&invalid}, false, "IsIn: 123456 does not validate as length(3|5)"},
 	}
@@ -2736,14 +2787,14 @@ func TestEmptyStringPtr(t *testing.T) {
 		actual, err := ValidateStruct(test.param)
 
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(%#v) to be %v, got %v", test.param, test.expected, actual)
 		}
 		if err != nil {
 			if err.Error() != test.expectedErr {
-				t.Errorf("Got Error on ValidateStruct(%q). Expected: %s Actual: %s", test.param, test.expectedErr, err)
+				t.Errorf("Got Error on ValidateStruct(%#v). Expected: %s Actual: %s", test.param, test.expectedErr, err)
 			}
 		} else if test.expectedErr != "" {
-			t.Errorf("Expected error on ValidateStruct(%q).", test.param)
+			t.Errorf("Expected error on ValidateStruct(%#v).", test.param)
 		}
 	}
 	SetNilPtrAllowedByRequired(false)
@@ -2772,17 +2823,17 @@ func TestNestedStruct(t *testing.T) {
 			Nested: NestedStruct{
 				Foo: "",
 			},
-		}, false, "Nested.Foo: non zero value required"},
+		}, false, "Nested.Foo:  does not validate as length(3|5);Nested.EvenMoreNested.Bar:  does not validate as length(3|5)"},
 		{OuterStruct{
 			Nested: NestedStruct{
 				Foo: "123",
 			},
-		}, true, ""},
+		}, false, "Nested.EvenMoreNested.Bar:  does not validate as length(3|5)"},
 		{OuterStruct{
 			Nested: NestedStruct{
 				Foo: "123456",
 			},
-		}, false, "Nested.Foo: 123456 does not validate as length(3|5)"},
+		}, false, "Nested.Foo: 123456 does not validate as length(3|5);Nested.EvenMoreNested.Bar:  does not validate as length(3|5)"},
 		{OuterStruct{
 			Nested: NestedStruct{
 				Foo: "123",
@@ -2800,7 +2851,7 @@ func TestNestedStruct(t *testing.T) {
 					},
 				},
 			},
-		}, false, "Nested.SliceEvenMoreNested.0.Bar: 123456 does not validate as length(3|5)"},
+		}, false, "Nested.EvenMoreNested.Bar:  does not validate as length(3|5);Nested.SliceEvenMoreNested.0.Bar: 123456 does not validate as length(3|5)"},
 		{OuterStruct{
 			Nested: NestedStruct{
 				Foo: "123",
@@ -2810,7 +2861,7 @@ func TestNestedStruct(t *testing.T) {
 					},
 				},
 			},
-		}, false, "Nested.MapEvenMoreNested.Foo.Bar: 123456 does not validate as length(3|5)"},
+		}, false, "Nested.EvenMoreNested.Bar:  does not validate as length(3|5);Nested.MapEvenMoreNested.Foo.Bar: 123456 does not validate as length(3|5)"},
 	}
 
 	for _, test := range tests {
@@ -2901,9 +2952,9 @@ func TestValidateStruct(t *testing.T) {
 	for _, test := range tests {
 		actual, err := ValidateStruct(test.param)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(%#v) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+				t.Errorf("Got Error on ValidateStruct(%#v): %s", test.param, err)
 			}
 		}
 	}
@@ -2946,7 +2997,7 @@ func TestRequired(t *testing.T) {
 			}{
 				Pointer: &testEmptyString,
 			},
-			false,
+			true,
 		},
 		{
 			struct {
@@ -2960,7 +3011,7 @@ func TestRequired(t *testing.T) {
 			struct {
 				Addr Address `valid:"required"`
 			}{},
-			false,
+			true,
 		},
 		{
 			struct {
@@ -2987,16 +3038,10 @@ func TestRequired(t *testing.T) {
 		{
 			struct {
 				TestByteArray testByteArray `valid:"required"`
-			}{},
-			false,
-		},
-		{
-			struct {
-				TestByteArray testByteArray `valid:"required"`
 			}{
 				testByteArray{},
 			},
-			false,
+			true, // array cannot be nil
 		},
 		{
 			struct {
@@ -3038,9 +3083,9 @@ func TestRequired(t *testing.T) {
 	for _, test := range tests {
 		actual, err := ValidateStruct(test.param)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(%#v) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+				t.Errorf("Got Error on ValidateStruct(%#v): %s", test.param, err)
 			}
 		}
 	}
@@ -3382,6 +3427,29 @@ func TestOptionalCustomValidators(t *testing.T) {
 
 	ok, err := ValidateStruct(val)
 
+	if err == nil {
+		t.Error("Expected non-nil err with optional validation, got nil")
+	}
+
+	if ok {
+		t.Error("Expected validation to return false, got true")
+	}
+}
+
+func TestOptionalCustomValidatorsWithPointers(t *testing.T) {
+
+	CustomTypeTagMap.Set("f2", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+		return false
+	}))
+
+	var val struct {
+		WithCustomError    *string `valid:"f2~boom,optional"`
+		WithoutCustomError *string `valid:"f2,optional"`
+		OptionalFirst      *string `valid:"optional,f2"`
+	}
+
+	ok, err := ValidateStruct(val)
+
 	if err != nil {
 		t.Errorf("Expected nil err with optional validation, got %v", err)
 	}
@@ -3532,3 +3600,6 @@ bQIDAQAB
 		}
 	}
 }
+
+func ptrString(s string) *string { return &s }
+func ptrInt(i int) *int          { return &i }
