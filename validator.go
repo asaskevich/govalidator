@@ -1279,7 +1279,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		}
 		return typeCheck(v.Elem(), t, o, options)
 	case reflect.Struct:
-		return ValidateStruct(v.Interface())
+		return true, nil
 	default:
 		return false, &UnsupportedTypeError{v.Type()}
 	}

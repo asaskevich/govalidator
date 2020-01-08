@@ -3604,3 +3604,34 @@ bQIDAQAB
 
 func ptrString(s string) *string { return &s }
 func ptrInt(i int) *int          { return &i }
+
+func TestDoNotRepeatStructErrors(t *testing.T) {
+	// based on the code provided by @apremalal
+	type TestB struct {
+		B string `valid:"required,matches(B)"`
+	}
+
+	type TestA struct {
+		TB TestB `valid:"optional"`
+	}
+
+	r := TestA{
+		TB: TestB{
+			B: "C",
+		},
+	}
+
+	ok, errors := ValidateStruct(r)
+	if ok {
+		t.Errorf("expected validation to fail, %v", ok)
+	}
+
+	validator := errors.(Errors)[0].(Errors)[0].(Error).Validator
+	if validator != "matches" {
+		t.Errorf("expected validator for Text to be matches, but was %s", validator)
+	}
+
+	if len(errors.(Errors).Errors()) > 1 {
+		t.Errorf("expected errors count to be 1, but was %d (%#v)", len(errors.(Errors).Errors()), errors)
+	}
+}
