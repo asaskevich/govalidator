@@ -912,6 +912,7 @@ func ValidateMap(s map[string]interface{}, m map[string]interface{}) (bool, erro
 
 // ValidateStruct use tags for fields.
 // result will be equal to `false` if there are any errors.
+// todo currently there is no guarantee that errors will be returned in predictable order (tests may to fail)
 func ValidateStruct(s interface{}) (bool, error) {
 	if s == nil {
 		return true, nil
