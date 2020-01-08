@@ -108,23 +108,34 @@ func Filter(array []interface{}, iterator ConditionIterator) []interface{}
 func Find(array []interface{}, iterator ConditionIterator) interface{}
 func GetLine(s string, index int) (string, error)
 func GetLines(s string) []string
-func InRange(value, left, right float64) bool
+func HasLowerCase(str string) bool
+func HasUpperCase(str string) bool
+func HasWhitespace(str string) bool
+func HasWhitespaceOnly(str string) bool
+func InRange(value interface{}, left interface{}, right interface{}) bool
+func InRangeFloat32(value, left, right float32) bool
+func InRangeFloat64(value, left, right float64) bool
+func InRangeInt(value, left, right interface{}) bool
 func IsASCII(str string) bool
 func IsAlpha(str string) bool
 func IsAlphanumeric(str string) bool
 func IsBase64(str string) bool
 func IsByteLength(str string, min, max int) bool
 func IsCIDR(str string) bool
+func IsCRC32(str string) bool
+func IsCRC32b(str string) bool
 func IsCreditCard(str string) bool
 func IsDNSName(str string) bool
 func IsDataURI(str string) bool
 func IsDialString(str string) bool
 func IsDivisibleBy(str, num string) bool
 func IsEmail(str string) bool
+func IsExistingEmail(email string) bool
 func IsFilePath(str string) (bool, int)
 func IsFloat(str string) bool
 func IsFullWidth(str string) bool
 func IsHalfWidth(str string) bool
+func IsHash(str string, algorithm string) bool
 func IsHexadecimal(str string) bool
 func IsHexcolor(str string) bool
 func IsHost(str string) bool
@@ -136,22 +147,27 @@ func IsISBN10(str string) bool
 func IsISBN13(str string) bool
 func IsISO3166Alpha2(str string) bool
 func IsISO3166Alpha3(str string) bool
+func IsISO4217(str string) bool
 func IsISO693Alpha2(str string) bool
 func IsISO693Alpha3b(str string) bool
-func IsISO4217(str string) bool
 func IsIn(str string, params ...string) bool
+func IsInRaw(str string, params ...string) bool
 func IsInt(str string) bool
 func IsJSON(str string) bool
 func IsLatitude(str string) bool
 func IsLongitude(str string) bool
 func IsLowerCase(str string) bool
 func IsMAC(str string) bool
+func IsMD4(str string) bool
+func IsMD5(str string) bool
+func IsMagnetURI(str string) bool
 func IsMongoID(str string) bool
 func IsMultibyte(str string) bool
 func IsNatural(value float64) bool
 func IsNegative(value float64) bool
 func IsNonNegative(value float64) bool
 func IsNonPositive(value float64) bool
+func IsNotNull(str string) bool
 func IsNull(str string) bool
 func IsNumeric(str string) bool
 func IsPort(str string) bool
@@ -162,11 +178,21 @@ func IsRFC3339WithoutZone(str string) bool
 func IsRGBcolor(str string) bool
 func IsRequestURI(rawurl string) bool
 func IsRequestURL(rawurl string) bool
+func IsRipeMD128(str string) bool
+func IsRipeMD160(str string) bool
+func IsRsaPub(str string, params ...string) bool
+func IsRsaPublicKey(str string, keylen int) bool
+func IsSHA1(str string) bool
+func IsSHA256(str string) bool
+func IsSHA384(str string) bool
+func IsSHA512(str string) bool
 func IsSSN(str string) bool
 func IsSemver(str string) bool
+func IsTiger128(str string) bool
+func IsTiger160(str string) bool
+func IsTiger192(str string) bool
 func IsTime(str string, format string) bool
-func IsType(in interface{}, params ...string) bool
-func IsUnixTime(str string) bool
+func IsType(v interface{}, params ...string) bool
 func IsURL(str string) bool
 func IsUTFDigit(str string) bool
 func IsUTFLetter(str string) bool
@@ -176,16 +202,20 @@ func IsUUID(str string) bool
 func IsUUIDv3(str string) bool
 func IsUUIDv4(str string) bool
 func IsUUIDv5(str string) bool
+func IsUnixTime(str string) bool
 func IsUpperCase(str string) bool
 func IsVariableWidth(str string) bool
 func IsWhole(value float64) bool
 func LeftTrim(str, chars string) string
 func Map(array []interface{}, iterator ResultIterator) []interface{}
 func Matches(str, pattern string) bool
+func MaxStringLength(str string, params ...string) bool
+func MinStringLength(str string, params ...string) bool
 func NormalizeEmail(str string) (string, error)
 func PadBoth(str string, padStr string, padLen int) string
 func PadLeft(str string, padStr string, padLen int) string
 func PadRight(str string, padStr string, padLen int) string
+func PrependPathToErrors(err error, path string) error
 func Range(str string, params ...string) bool
 func RemoveTags(s string) string
 func ReplacePattern(str, pattern, replace string) string
@@ -194,19 +224,21 @@ func RightTrim(str, chars string) string
 func RuneLength(str string, params ...string) bool
 func SafeFileName(str string) string
 func SetFieldsRequiredByDefault(value bool)
+func SetNilPtrAllowedByRequired(value bool)
 func Sign(value float64) float64
 func StringLength(str string, params ...string) bool
 func StringMatches(s string, params ...string) bool
 func StripLow(str string, keepNewLines bool) string
 func ToBoolean(str string) (bool, error)
 func ToFloat(str string) (float64, error)
-func ToInt(str string) (int64, error)
+func ToInt(value interface{}) (res int64, err error)
 func ToJSON(obj interface{}) (string, error)
 func ToString(obj interface{}) string
 func Trim(str, chars string) string
 func Truncate(str string, length int, ending string) string
+func TruncatingErrorf(str string, args ...interface{}) error
 func UnderscoreToCamelCase(s string) string
-func ValidateMap(s map[string]interface{}, o map[string]interface{}) (bool, error)
+func ValidateMap(s map[string]interface{}, m map[string]interface{}) (bool, error)
 func ValidateStruct(s interface{}) (bool, error)
 func WhiteList(str, chars string) string
 type ConditionIterator
@@ -217,6 +249,8 @@ type Errors
 func (es Errors) Error() string
 func (es Errors) Errors() []error
 type ISO3166Entry
+type ISO693Entry
+type InterfaceParamValidator
 type Iterator
 type ParamValidator
 type ResultIterator
