@@ -1390,6 +1390,7 @@ func TestIsCreditCard(t *testing.T) {
 	}{
 		{"empty", "", false},
 		{"not numbers", "credit card", false},
+		{"invalid luhn algorithm", "4220855426213389", false},
 
 		{"visa", "4220855426222389", true},
 		{"visa spaces", "4220 8554 2622 2389", true},
