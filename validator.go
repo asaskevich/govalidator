@@ -321,6 +321,11 @@ func IsNull(str string) bool {
 	return len(str) == 0
 }
 
+// IsNotNull check if the string is not null.
+func IsNotNull(str string) bool {
+	return !IsNull(str)
+}
+
 // HasWhitespaceOnly checks the string only contains whitespace
 func HasWhitespaceOnly(str string) bool {
 	return len(str) > 0 && rxHasWhitespaceOnly.MatchString(str)
@@ -802,6 +807,109 @@ func PrependPathToErrors(err error, path string) error {
 	return err
 }
 
+// ValidateMap use validation map for fields.
+// result will be equal to `false` if there are any errors.
+// m is the validation map in the form
+// map[string]interface{}{"name":"required,alpha","address":map[string]interface{}{"line1":"required,alphanum"}}
+func ValidateMap(s map[string]interface{}, m map[string]interface{}) (bool, error) {
+	if s == nil {
+		return true, nil
+	}
+	result := true
+	var err error
+	var errs Errors
+	var index int
+	val := reflect.ValueOf(s)
+	for key, value := range s {
+		presentResult := true
+		validator, ok := m[key]
+		if !ok {
+			presentResult = false
+			var err error
+			err = fmt.Errorf("all map keys has to be present in the validation map; got %s", key)
+			err = PrependPathToErrors(err, key)
+			errs = append(errs, err)
+		}
+		valueField := reflect.ValueOf(value)
+		mapResult := true
+		typeResult := true
+		structResult := true
+		resultField := true
+		switch subValidator := validator.(type) {
+		case map[string]interface{}:
+			var err error
+			if v, ok := value.(map[string]interface{}); !ok {
+				mapResult = false
+				err = fmt.Errorf("map validator has to be for the map type only; got %s", valueField.Type().String())
+				err = PrependPathToErrors(err, key)
+				errs = append(errs, err)
+			} else {
+				mapResult, err = ValidateMap(v, subValidator)
+				if err != nil {
+					mapResult = false
+					err = PrependPathToErrors(err, key)
+					errs = append(errs, err)
+				}
+			}
+		case string:
+			if (valueField.Kind() == reflect.Struct ||
+				(valueField.Kind() == reflect.Ptr && valueField.Elem().Kind() == reflect.Struct)) &&
+				subValidator != "-" {
+				var err error
+				structResult, err = ValidateStruct(valueField.Interface())
+				if err != nil {
+					err = PrependPathToErrors(err, key)
+					errs = append(errs, err)
+				}
+			}
+			resultField, err = typeCheck(valueField, reflect.StructField{
+				Name:      key,
+				PkgPath:   "",
+				Type:      val.Type(),
+				Tag:       reflect.StructTag(fmt.Sprintf("%s:%q", tagName, subValidator)),
+				Offset:    0,
+				Index:     []int{index},
+				Anonymous: false,
+			}, val, nil)
+			if err != nil {
+				errs = append(errs, err)
+			}
+		case nil:
+			// already handlerd when checked before
+		default:
+			typeResult = false
+			err = fmt.Errorf("map validator has to be either map[string]interface{} or string; got %s", valueField.Type().String())
+			err = PrependPathToErrors(err, key)
+			errs = append(errs, err)
+		}
+		result = result && presentResult && typeResult && resultField && structResult && mapResult
+		index++
+	}
+	// check required keys
+	requiredResult := true
+	for key, value := range m {
+		if schema, ok := value.(string); ok {
+			tags := parseTagIntoMap(schema)
+			if required, ok := tags["required"]; ok {
+				if _, ok := s[key]; !ok {
+					requiredResult = false
+					if required.customErrorMessage != "" {
+						err = Error{key, fmt.Errorf(required.customErrorMessage), true, "required", []string{}}
+					} else {
+						err = Error{key, fmt.Errorf("required field missing"), false, "required", []string{}}
+					}
+					errs = append(errs, err)
+				}
+			}
+		}
+	}
+
+	if len(errs) > 0 {
+		err = errs
+	}
+	return result && requiredResult, err
+}
+
 // ValidateStruct use tags for fields.
 // result will be equal to `false` if there are any errors.
 func ValidateStruct(s interface{}) (bool, error) {
@@ -923,6 +1031,15 @@ func IsSSN(str string) bool {
 // IsSemver check if string is valid semantic version
 func IsSemver(str string) bool {
 	return rxSemver.MatchString(str)
+}
+
+// IsType check if interface is of some type
+func IsType(v interface{}, params ...string) bool {
+	if len(params) == 1 {
+		typ := params[0]
+		return strings.Replace(reflect.TypeOf(v).String(), " ", "", -1) == strings.Replace(typ, " ", "", -1)
+	}
+	return false
 }
 
 // IsTime check if string is valid according to given format
@@ -1137,6 +1254,45 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 				}
 			}
 		}()
+	}
+
+	for _, validatorSpec := range optionsOrder {
+		validatorStruct := options[validatorSpec]
+		var negate bool
+		validator := validatorSpec
+		customMsgExists := len(validatorStruct.customErrorMessage) > 0
+
+		// Check whether the tag looks like '!something' or 'something'
+		if validator[0] == '!' {
+			validator = validator[1:]
+			negate = true
+		}
+
+		// Check for interface param validators
+		for key, value := range InterfaceParamTagRegexMap {
+			ps := value.FindStringSubmatch(validator)
+			if len(ps) == 0 {
+				continue
+			}
+
+			validatefunc, ok := InterfaceParamTagMap[key]
+			if !ok {
+				continue
+			}
+
+			delete(options, validatorSpec)
+
+			field := fmt.Sprint(v)
+			if result := validatefunc(v.Interface(), ps[1:]...); (!result && !negate) || (result && negate) {
+				if customMsgExists {
+					return false, Error{t.Name, TruncatingErrorf(validatorStruct.customErrorMessage, field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+				}
+				if negate {
+					return false, Error{t.Name, fmt.Errorf("%s does validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+				}
+				return false, Error{t.Name, fmt.Errorf("%s does not validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+			}
+		}
 	}
 
 	switch v.Kind() {
