@@ -13,7 +13,7 @@ Type the following command in your terminal:
 
 or you can get specified release of the package with `gopkg.in`:
 
-	go get gopkg.in/asaskevich/govalidator.v4
+	go get gopkg.in/asaskevich/govalidator.v10
 
 After it the package is ready to use.
 
