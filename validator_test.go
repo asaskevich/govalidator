@@ -1383,26 +1383,36 @@ func TestIsUUID(t *testing.T) {
 
 func TestIsCreditCard(t *testing.T) {
 	t.Parallel()
-
-	var tests = []struct {
-		param    string
-		expected bool
+	tests := []struct {
+		name   string
+		number string
+		want   bool
 	}{
-		{"", false},
-		{"foo", false},
-		{"5398228707871528", false},
-		{"375556917985515", true},
-		{"36050234196908", true},
-		{"4716461583322103", true},
-		{"4716-2210-5188-5662", true},
-		{"4929 7226 5379 7141", true},
-		{"5398228707871527", true},
+		{"empty", "", false},
+		{"not numbers", "credit card", false},
+		{"invalid luhn algorithm", "4220855426213389", false},
+
+		{"visa", "4220855426222389", true},
+		{"visa spaces", "4220 8554 2622 2389", true},
+		{"visa dashes", "4220-8554-2622-2389", true},
+		{"mastercard", "5139288802098206", true},
+		{"american express", "374953669708156", true},
+		{"discover", "6011464355444102", true},
+		{"jcb", "3548209662790989", true},
+
+		// below should be valid, do they respect international standards?
+		// is our validator logic not correct?
+		{"diners club international", "30190239451016", false},
+		{"rupay", "6521674451993089", false},
+		{"mir", "2204151414444676", false},
+		{"china unionPay", "624356436327468104", false},
 	}
-	for _, test := range tests {
-		actual := IsCreditCard(test.param)
-		if actual != test.expected {
-			t.Errorf("Expected IsCreditCard(%q) to be %v, got %v", test.param, test.expected, actual)
-		}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsCreditCard(tt.number); got != tt.want {
+				t.Errorf("IsCreditCard(%v) = %v, want %v", tt.number, got, tt.want)
+			}
+		})
 	}
 }
 
