@@ -475,7 +475,7 @@ This project exists thanks to all the people who contribute. [[Contribute](CONTR
 * [Matt Sanford](https://github.com/mzsanford)
 * [Simon ccl1115](https://github.com/ccl1115)
 
-<a href="graphs/contributors"><img src="https://opencollective.com/govalidator/contributors.svg?width=890" /></a>
+<a href="https://github.com/asaskevich/govalidator/graphs/contributors"><img src="https://opencollective.com/govalidator/contributors.svg?width=890" /></a>
 
 
 ### Backers
