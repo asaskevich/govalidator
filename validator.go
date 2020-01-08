@@ -803,7 +803,6 @@ func PrependPathToErrors(err error, path string) error {
 		}
 		return err2
 	}
-	fmt.Println(err)
 	return err
 }
 
@@ -1128,6 +1127,30 @@ func StringLength(str string, params ...string) bool {
 	return false
 }
 
+// MinStringLength check string's minimum length (including multi byte strings)
+func MinStringLength(str string, params ...string) bool {
+
+	if len(params) == 1 {
+		strLength := utf8.RuneCountInString(str)
+		min, _ := ToInt(params[0])
+		return strLength >= int(min)
+	}
+
+	return false
+}
+
+// MaxStringLength check string's maximum length (including multi byte strings)
+func MaxStringLength(str string, params ...string) bool {
+
+	if len(params) == 1 {
+		strLength := utf8.RuneCountInString(str)
+		max, _ := ToInt(params[0])
+		return strLength <= int(max)
+	}
+
+	return false
+}
+
 // Range check string's length
 func Range(str string, params ...string) bool {
 	if len(params) == 2 {
@@ -1140,7 +1163,7 @@ func Range(str string, params ...string) bool {
 	return false
 }
 
-func isInRaw(str string, params ...string) bool {
+func IsInRaw(str string, params ...string) bool {
 	if len(params) == 1 {
 		rawParams := params[0]
 

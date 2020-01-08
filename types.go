@@ -59,13 +59,15 @@ var InterfaceParamTagRegexMap = map[string]*regexp.Regexp{
 
 // ParamTagMap is a map of functions accept variants parameters
 var ParamTagMap = map[string]ParamValidator{
-	"length":       ByteLength,
-	"range":        Range,
-	"runelength":   RuneLength,
-	"stringlength": StringLength,
-	"matches":      StringMatches,
-	"in":           isInRaw,
-	"rsapub":       IsRsaPub,
+	"length":          ByteLength,
+	"range":           Range,
+	"runelength":      RuneLength,
+	"stringlength":    StringLength,
+	"matches":         StringMatches,
+	"in":              IsInRaw,
+	"rsapub":          IsRsaPub,
+	"minstringlength": MinStringLength,
+	"maxstringlength": MaxStringLength,
 }
 
 // ParamTagRegexMap maps param tags to their respective regexes.
@@ -77,6 +79,8 @@ var ParamTagRegexMap = map[string]*regexp.Regexp{
 	"in":           regexp.MustCompile(`^in\((.*)\)`),
 	"matches":      regexp.MustCompile(`^matches\((.+)\)$`),
 	"rsapub":       regexp.MustCompile("^rsapub\\((\\d+)\\)$"),
+	"minstringlength": regexp.MustCompile("^minstringlength\\((\\d+)\\)$"),
+	"maxstringlength": regexp.MustCompile("^maxstringlength\\((\\d+)\\)$"),
 }
 
 type customTypeTagMap struct {
