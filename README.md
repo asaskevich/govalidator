@@ -392,6 +392,8 @@ Validators with parameters
 "matches(pattern)": StringMatches,
 "in(string1|string2|...|stringN)": IsIn,
 "rsapub(keylength)" : IsRsaPub,
+"minstringlength(int): MinStringLength,
+"maxstringlength(int): MaxStringLength,
 ```
 Validators with parameters for any type
 
