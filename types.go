@@ -162,6 +162,7 @@ var TagMap = map[string]Validator{
 	"ISO3166Alpha2":      IsISO3166Alpha2,
 	"ISO3166Alpha3":      IsISO3166Alpha3,
 	"ISO4217":            IsISO4217,
+	"postalcode":         IsPostalCode,
 }
 
 // ISO3166Entry stores country codes

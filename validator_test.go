@@ -4239,3 +4239,33 @@ func TestIsType(t *testing.T) {
 		}
 	}
 }
+
+func TestIsPostalCode(t *testing.T) {
+	type args struct {
+		str string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantRes bool
+	}{
+		{
+			name:    "ValidCase",
+			args:    args{str: "429951"},
+			wantRes: true,
+		},
+		{
+			name:    "InvalidCase",
+			args:    args{str: "000000000"},
+			wantRes: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotRes := IsPostalCode(tt.args.str); gotRes != tt.wantRes {
+				t.Errorf("IsPostalCode() = %v, want %v", gotRes, tt.wantRes)
+			}
+		})
+	}
+}

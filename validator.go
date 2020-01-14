@@ -9,6 +9,8 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"github.com/mkrou/geonames"
+	"github.com/mkrou/geonames/models"
 	"io/ioutil"
 	"net"
 	"net/url"
@@ -1075,6 +1077,27 @@ func IsISO4217(str string) bool {
 	}
 
 	return false
+}
+
+// IsPostalCode check if postal code is valid
+func IsPostalCode(str string) (res bool) {
+	p := geonames.NewParser()
+
+	err := p.GetCountries(func(country *models.Country) error {
+		if len(country.PostalCodeRegex) > 0 {
+			if matched, _ := regexp.MatchString(country.PostalCodeRegex, str); matched {
+				res = true
+			}
+			return nil
+		}
+		return nil
+	})
+
+	if err != nil {
+		panic(err)
+	}
+
+	return
 }
 
 // ByteLength check string's length
