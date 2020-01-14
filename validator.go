@@ -577,7 +577,7 @@ func IsDNSName(str string) bool {
 // IsHash checks if a string is a hash of type algorithm.
 // Algorithm is one of ['md4', 'md5', 'sha1', 'sha256', 'sha384', 'sha512', 'ripemd128', 'ripemd160', 'tiger128', 'tiger160', 'tiger192', 'crc32', 'crc32b']
 func IsHash(str string, algorithm string) bool {
-	len := "0"
+	var len string
 	algo := strings.ToLower(algorithm)
 
 	if algo == "crc32" || algo == "crc32b" {
