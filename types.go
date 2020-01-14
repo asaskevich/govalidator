@@ -72,13 +72,13 @@ var ParamTagMap = map[string]ParamValidator{
 
 // ParamTagRegexMap maps param tags to their respective regexes.
 var ParamTagRegexMap = map[string]*regexp.Regexp{
-	"range":        regexp.MustCompile("^range\\((\\d+)\\|(\\d+)\\)$"),
-	"length":       regexp.MustCompile("^length\\((\\d+)\\|(\\d+)\\)$"),
-	"runelength":   regexp.MustCompile("^runelength\\((\\d+)\\|(\\d+)\\)$"),
-	"stringlength": regexp.MustCompile("^stringlength\\((\\d+)\\|(\\d+)\\)$"),
-	"in":           regexp.MustCompile(`^in\((.*)\)`),
-	"matches":      regexp.MustCompile(`^matches\((.+)\)$`),
-	"rsapub":       regexp.MustCompile("^rsapub\\((\\d+)\\)$"),
+	"range":           regexp.MustCompile("^range\\((\\d+)\\|(\\d+)\\)$"),
+	"length":          regexp.MustCompile("^length\\((\\d+)\\|(\\d+)\\)$"),
+	"runelength":      regexp.MustCompile("^runelength\\((\\d+)\\|(\\d+)\\)$"),
+	"stringlength":    regexp.MustCompile("^stringlength\\((\\d+)\\|(\\d+)\\)$"),
+	"in":              regexp.MustCompile(`^in\((.*)\)`),
+	"matches":         regexp.MustCompile(`^matches\((.+)\)$`),
+	"rsapub":          regexp.MustCompile("^rsapub\\((\\d+)\\)$"),
 	"minstringlength": regexp.MustCompile("^minstringlength\\((\\d+)\\)$"),
 	"maxstringlength": regexp.MustCompile("^maxstringlength\\((\\d+)\\)$"),
 }
@@ -162,6 +162,7 @@ var TagMap = map[string]Validator{
 	"ISO3166Alpha2":      IsISO3166Alpha2,
 	"ISO3166Alpha3":      IsISO3166Alpha3,
 	"ISO4217":            IsISO4217,
+	"postalcode":         IsPostalCode,
 }
 
 // ISO3166Entry stores country codes
