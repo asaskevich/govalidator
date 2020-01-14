@@ -1498,11 +1498,11 @@ func ErrorsByField(e error) map[string]string {
 	}
 	// prototype for ValidateStruct
 
-	switch e.(type) {
+	switch e := e.(type) {
 	case Error:
-		m[e.(Error).Name] = e.(Error).Err.Error()
+		m[e.Name] = e.Err.Error()
 	case Errors:
-		for _, item := range e.(Errors).Errors() {
+		for _, item := range e.Errors() {
 			n := ErrorsByField(item)
 			for k, v := range n {
 				m[k] = v
