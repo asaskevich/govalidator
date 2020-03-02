@@ -808,8 +808,9 @@ func PrependPathToErrors(err error, path string) error {
 
 // ValidateMap use validation map for fields.
 // result will be equal to `false` if there are any errors.
-// m is the validation map in the form
-// map[string]interface{}{"name":"required,alpha","address":map[string]interface{}{"line1":"required,alphanum"}}
+// s is the map containing the data to be validated.
+// m is the validation map in the form:
+//   map[string]interface{}{"name":"required,alpha","address":map[string]interface{}{"line1":"required,alphanum"}}
 func ValidateMap(s map[string]interface{}, m map[string]interface{}) (bool, error) {
 	if s == nil {
 		return true, nil
