@@ -461,7 +461,7 @@ var inputMap = map[string]interface{}{
 	},
 }
 
-result, err := govalidator.ValidateMap(mapTemplate, inputMap)
+result, err := govalidator.ValidateMap(inputMap, mapTemplate)
 if err != nil {
 	println("error: " + err.Error())
 }
