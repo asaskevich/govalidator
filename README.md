@@ -517,6 +517,17 @@ govalidator.CustomTypeTagMap.Set("customMinLengthValidator", CustomTypeValidator
 }))
 ```
 
+###### Loop over Error()
+By default .Error() returns all errors in a single String. To access each error you can do this:
+```go
+  if err != nil {
+    errs := err.(govalidator.Errors).Errors()
+    for _, e := range errs {
+      fmt.Println(e.Error())
+    }
+  }
+```
+
 ###### Custom error messages
 Custom error messages are supported via annotations by adding the `~` separator - here's an example of how to use it:
 ```go
