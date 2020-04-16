@@ -3068,7 +3068,7 @@ func TestNestedStruct(t *testing.T) {
 			Nested: NestedStruct{
 				Foo: "",
 			},
-		}, false, "Nested.Foo:  does not validate as length(3|5);Nested.EvenMoreNested.Bar:  does not validate as length(3|5)"},
+		}, false, "Nested.EvenMoreNested.Bar:  does not validate as length(3|5);Nested.Foo:  does not validate as length(3|5)"},
 		{OuterStruct{
 			Nested: NestedStruct{
 				Foo: "123",
@@ -3078,7 +3078,7 @@ func TestNestedStruct(t *testing.T) {
 			Nested: NestedStruct{
 				Foo: "123456",
 			},
-		}, false, "Nested.Foo: 123456 does not validate as length(3|5);Nested.EvenMoreNested.Bar:  does not validate as length(3|5)"},
+		}, false, "Nested.EvenMoreNested.Bar:  does not validate as length(3|5);Nested.Foo: 123456 does not validate as length(3|5)"},
 		{OuterStruct{
 			Nested: NestedStruct{
 				Foo: "123",
