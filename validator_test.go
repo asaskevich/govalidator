@@ -9,12 +9,12 @@ import (
 )
 
 func init() {
-	CustomTypeTagMap.Set("customFalseValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+	CustomTypeTagMap.Set("customFalseValidator", func(i interface{}, o interface{}) bool {
 		return false
-	}))
-	CustomTypeTagMap.Set("customTrueValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+	})
+	CustomTypeTagMap.Set("customTrueValidator", func(i interface{}, o interface{}) bool {
 		return true
-	}))
+	})
 }
 
 func TestIsAlpha(t *testing.T) {
@@ -2649,7 +2649,7 @@ func TestStructWithCustomByteArray(t *testing.T) {
 	t.Parallel()
 
 	// add our custom byte array validator that fails when the byte array is pristine (all zeroes)
-	CustomTypeTagMap.Set("customByteArrayValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+	CustomTypeTagMap.Set("customByteArrayValidator", func(i interface{}, o interface{}) bool {
 		switch v := o.(type) {
 		case StructWithCustomByteArray:
 			if len(v.Email) > 0 {
@@ -2677,8 +2677,8 @@ func TestStructWithCustomByteArray(t *testing.T) {
 			}
 		}
 		return false
-	}))
-	CustomTypeTagMap.Set("customMinLengthValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+	})
+	CustomTypeTagMap.Set("customMinLengthValidator", func(i interface{}, o interface{}) bool {
 		switch v := o.(type) {
 		case StructWithCustomByteArray:
 			return len(v.ID) >= v.CustomMinLength
@@ -2687,7 +2687,7 @@ func TestStructWithCustomByteArray(t *testing.T) {
 			return len(v["iD"].(CustomByteArray)) > v["CustomMinLength"].(int)
 		}
 		return false
-	}))
+	})
 	testCustomByteArray := CustomByteArray{'1', '2', '3', '4', '5', '6'}
 	var tests = []struct {
 		param    StructWithCustomByteArray
@@ -3470,9 +3470,9 @@ func TestErrorsByField(t *testing.T) {
 		ID    string `valid:"falseValidation"`
 	}
 
-	CustomTypeTagMap.Set("falseValidation", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+	CustomTypeTagMap.Set("falseValidation", func(i interface{}, o interface{}) bool {
 		return false
-	}))
+	})
 
 	tests = []struct {
 		param    string
@@ -3741,9 +3741,9 @@ func TestIsCIDR(t *testing.T) {
 
 func TestOptionalCustomValidators(t *testing.T) {
 
-	CustomTypeTagMap.Set("f2", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+	CustomTypeTagMap.Set("f2", func(i interface{}, o interface{}) bool {
 		return false
-	}))
+	})
 
 	var val struct {
 		WithCustomError    string `valid:"f2~boom,optional"`
@@ -3764,9 +3764,9 @@ func TestOptionalCustomValidators(t *testing.T) {
 
 func TestOptionalCustomValidatorsWithPointers(t *testing.T) {
 
-	CustomTypeTagMap.Set("f2", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+	CustomTypeTagMap.Set("f2", func(i interface{}, o interface{}) bool {
 		return false
-	}))
+	})
 
 	var val struct {
 		WithCustomError    *string `valid:"f2~boom,optional"`
