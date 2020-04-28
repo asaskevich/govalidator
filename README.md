@@ -83,14 +83,14 @@ This was changed to prevent data races when accessing custom validators.
 import "github.com/asaskevich/govalidator"
 
 // before
-govalidator.CustomTypeTagMap["customByteArrayValidator"] = CustomTypeValidator(func(i interface{}, o interface{}) bool {
+govalidator.CustomTypeTagMap["customByteArrayValidator"] = func(i interface{}, o interface{}) bool {
   // ...
-})
+}
 
 // after
-govalidator.CustomTypeTagMap.Set("customByteArrayValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+govalidator.CustomTypeTagMap.Set("customByteArrayValidator", func(i interface{}, o interface{}) bool {
   // ...
-}))
+})
 ```
 
 #### List of functions:
@@ -461,7 +461,7 @@ var inputMap = map[string]interface{}{
 	},
 }
 
-result, err := govalidator.ValidateMap(mapTemplate, inputMap)
+result, err := govalidator.ValidateMap(inputMap, mapTemplate)
 if err != nil {
 	println("error: " + err.Error())
 }
@@ -487,7 +487,7 @@ type StructWithCustomByteArray struct {
   CustomMinLength int             `valid:"-"`
 }
 
-govalidator.CustomTypeTagMap.Set("customByteArrayValidator", CustomTypeValidator(func(i interface{}, context interface{}) bool {
+govalidator.CustomTypeTagMap.Set("customByteArrayValidator", func(i interface{}, context interface{}) bool {
   switch v := context.(type) { // you can type switch on the context interface being validated
   case StructWithCustomByteArray:
     // you can check and validate against some other field in the context,
@@ -507,14 +507,25 @@ govalidator.CustomTypeTagMap.Set("customByteArrayValidator", CustomTypeValidator
     }
   }
   return false
-}))
-govalidator.CustomTypeTagMap.Set("customMinLengthValidator", CustomTypeValidator(func(i interface{}, context interface{}) bool {
+})
+govalidator.CustomTypeTagMap.Set("customMinLengthValidator", func(i interface{}, context interface{}) bool {
   switch v := context.(type) { // this validates a field against the value in another field, i.e. dependent validation
   case StructWithCustomByteArray:
     return len(v.ID) >= v.CustomMinLength
   }
   return false
-}))
+})
+```
+
+###### Loop over Error()
+By default .Error() returns all errors in a single String. To access each error you can do this:
+```go
+  if err != nil {
+    errs := err.(govalidator.Errors).Errors()
+    for _, e := range errs {
+      fmt.Println(e.Error())
+    }
+  }
 ```
 
 ###### Custom error messages
