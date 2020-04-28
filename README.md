@@ -238,7 +238,7 @@ func Trim(str, chars string) string
 func Truncate(str string, length int, ending string) string
 func TruncatingErrorf(str string, args ...interface{}) error
 func UnderscoreToCamelCase(s string) string
-func ValidateMap(s map[string]interface{}, m map[string]interface{}) (bool, error)
+func ValidateMap(inputMap map[string]interface{}, validationMap map[string]interface{}) (bool, error)
 func ValidateStruct(s interface{}) (bool, error)
 func WhiteList(str, chars string) string
 type ConditionIterator
