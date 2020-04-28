@@ -3338,6 +3338,14 @@ func TestRequired(t *testing.T) {
 		},
 		{
 			struct {
+				TestByteSlice testByteSlice `valid:"required"`
+			}{
+				[]byte{93, 93, 0, 75},
+			},
+			true,
+		},
+		{
+			struct {
 				TestStringStringMap testStringStringMap `valid:"required"`
 			}{
 				testStringStringMap{"test": "test"},
