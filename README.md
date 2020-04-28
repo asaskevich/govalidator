@@ -461,7 +461,7 @@ var inputMap = map[string]interface{}{
 	},
 }
 
-result, err := govalidator.ValidateMap(mapTemplate, inputMap)
+result, err := govalidator.ValidateMap(inputMap, mapTemplate)
 if err != nil {
 	println("error: " + err.Error())
 }
@@ -515,6 +515,17 @@ govalidator.CustomTypeTagMap.Set("customMinLengthValidator", CustomTypeValidator
   }
   return false
 }))
+```
+
+###### Loop over Error()
+By default .Error() returns all errors in a single String. To access each error you can do this:
+```go
+  if err != nil {
+    errs := err.(govalidator.Errors).Errors()
+    for _, e := range errs {
+      fmt.Println(e.Error())
+    }
+  }
 ```
 
 ###### Custom error messages
