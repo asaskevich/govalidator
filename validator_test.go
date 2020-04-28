@@ -4246,3 +4246,21 @@ func TestIsType(t *testing.T) {
 		}
 	}
 }
+
+func TestIsIMEI(t *testing.T) {
+	tests := []struct {
+		param    string
+		expected bool
+	}{
+		{"990000862471854", true},
+		{"351756051523999", true},
+		{"9900008624718541", false},
+		{"1", false},
+	}
+	for _, test := range tests {
+		actual := IsIMEI(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsIMEI(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}

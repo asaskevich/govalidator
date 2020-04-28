@@ -737,6 +737,11 @@ func IsLongitude(str string) bool {
 	return rxLongitude.MatchString(str)
 }
 
+// IsIMEI check if a string is valid IMEI
+func IsIMEI(str string) bool {
+	return rxIMEI.MatchString(str)
+}
+
 // IsRsaPublicKey check if a string is valid public key with provided length
 func IsRsaPublicKey(str string, keylen int) bool {
 	bb := bytes.NewBufferString(str)
