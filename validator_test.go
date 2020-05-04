@@ -1093,7 +1093,7 @@ func TestIsDivisibleBy(t *testing.T) {
 	}
 }
 
-// This small example illustrate how to work with IsDivisibleBy function.
+// ExampleIsDivisibleBy: This small example illustrate how to work with IsDivisibleBy function.
 func ExampleIsDivisibleBy() {
 	println("1024 is divisible by 64: ", IsDivisibleBy("1024", "64"))
 }

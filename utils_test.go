@@ -105,7 +105,7 @@ func TestTrim(t *testing.T) {
 	}
 }
 
-// This small example illustrate how to work with Trim function.
+// ExampleTrim: This small example illustrate how to work with Trim function.
 func ExampleTrim() {
 	// Remove from left and right spaces and "\r", "\n", "\t" characters
 	println(Trim("   \r\r\ntext\r   \t\n", "") == "text")
@@ -136,7 +136,7 @@ func TestWhiteList(t *testing.T) {
 	}
 }
 
-// This small example illustrate how to work with WhiteList function.
+// ExampleWhiteList: This small example illustrate how to work with WhiteList function.
 func ExampleWhiteList() {
 	// Remove all characters from string ignoring characters between "a" and "z"
 	println(WhiteList("a3a43a5a4a3a2a23a4a5a4a3a4", "a-z") == "aaaaaaaaaaaa")
@@ -213,7 +213,7 @@ func TestReplacePattern(t *testing.T) {
 	}
 }
 
-// This small example illustrate how to work with ReplacePattern function.
+// ExampleReplacePattern: This small example illustrate how to work with ReplacePattern function.
 func ExampleReplacePattern() {
 	// Replace in "http123123ftp://git534543hub.comio" following (pattern "(ftp|io|[0-9]+)"):
 	// - Sequence "ftp".
