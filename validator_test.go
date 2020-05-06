@@ -2495,7 +2495,7 @@ func TestFieldsRequiredByDefaultButExemptOrOptionalStruct(t *testing.T) {
 		expected bool
 	}{
 		{FieldsRequiredByDefaultButExemptOrOptionalStruct{}, true},
-		{FieldsRequiredByDefaultButExemptOrOptionalStruct{Name: "TEST"}, false},
+		{FieldsRequiredByDefaultButExemptOrOptionalStruct{Name: "TEST"}, true},
 		{FieldsRequiredByDefaultButExemptOrOptionalStruct{Email: ""}, true},
 		{FieldsRequiredByDefaultButExemptOrOptionalStruct{Email: "test@example.com"}, true},
 		{FieldsRequiredByDefaultButExemptOrOptionalStruct{Email: "test@example"}, false},
@@ -2532,7 +2532,7 @@ func TestFieldsRequiredByDefaultButExemptOrOptionalStructWithPointers(t *testing
 	}{
 		{FieldsRequiredByDefaultButExemptOrOptionalStructWithPointers{}, true},
 		{FieldsRequiredByDefaultButExemptOrOptionalStructWithPointers{Name: ptrString("TEST")}, true},
-		{FieldsRequiredByDefaultButExemptOrOptionalStructWithPointers{Email: ptrString("")}, false},
+		{FieldsRequiredByDefaultButExemptOrOptionalStructWithPointers{Email: ptrString("")}, true},
 		{FieldsRequiredByDefaultButExemptOrOptionalStructWithPointers{Email: nil}, true},
 		{FieldsRequiredByDefaultButExemptOrOptionalStructWithPointers{Email: ptrString("test@example.com")}, true},
 		{FieldsRequiredByDefaultButExemptOrOptionalStructWithPointers{Email: ptrString("test@example")}, false},
@@ -2868,12 +2868,12 @@ func TestIsInStruct(t *testing.T) {
 		expected bool
 	}{
 		{IsInStruct{"PRESENT"}, true},
-		{IsInStruct{""}, false},
+		{IsInStruct{""}, true},
 		{IsInStruct{" "}, false},
 		{IsInStruct{"ABSENT"}, false},
 		{IsInStructWithPointer{ptrString("PRESENT")}, true},
 		{IsInStructWithPointer{nil}, true},
-		{IsInStructWithPointer{ptrString("")}, false},
+		{IsInStructWithPointer{ptrString("")}, true},
 		{IsInStructWithPointer{ptrString("ABSENT")}, false},
 	}
 
@@ -3067,17 +3067,17 @@ func TestNestedStruct(t *testing.T) {
 			Nested: NestedStruct{
 				Foo: "",
 			},
-		}, false, "Nested.EvenMoreNested.Bar:  does not validate as length(3|5);Nested.Foo:  does not validate as length(3|5)"},
+		}, false, "Nested.Foo:  does not validate as length(3|5)"},
 		{OuterStruct{
 			Nested: NestedStruct{
 				Foo: "123",
 			},
-		}, false, "Nested.EvenMoreNested.Bar:  does not validate as length(3|5)"},
+		}, true, ""},
 		{OuterStruct{
 			Nested: NestedStruct{
 				Foo: "123456",
 			},
-		}, false, "Nested.EvenMoreNested.Bar:  does not validate as length(3|5);Nested.Foo: 123456 does not validate as length(3|5)"},
+		}, false, "Nested.Foo: 123456 does not validate as length(3|5)"},
 		{OuterStruct{
 			Nested: NestedStruct{
 				Foo: "123",
@@ -3095,7 +3095,7 @@ func TestNestedStruct(t *testing.T) {
 					},
 				},
 			},
-		}, false, "Nested.EvenMoreNested.Bar:  does not validate as length(3|5);Nested.SliceEvenMoreNested.0.Bar: 123456 does not validate as length(3|5)"},
+		}, false, "Nested.SliceEvenMoreNested.0.Bar: 123456 does not validate as length(3|5)"},
 		{OuterStruct{
 			Nested: NestedStruct{
 				Foo: "123",
@@ -3105,7 +3105,7 @@ func TestNestedStruct(t *testing.T) {
 					},
 				},
 			},
-		}, false, "Nested.EvenMoreNested.Bar:  does not validate as length(3|5);Nested.MapEvenMoreNested.Foo.Bar: 123456 does not validate as length(3|5)"},
+		}, false, "Nested.MapEvenMoreNested.Foo.Bar: 123456 does not validate as length(3|5)"},
 	}
 
 	for _, test := range tests {
@@ -3760,12 +3760,12 @@ func TestOptionalCustomValidators(t *testing.T) {
 
 	ok, err := ValidateStruct(val)
 
-	if err == nil {
-		t.Error("Expected non-nil err with optional validation, got nil")
+	if err != nil {
+		t.Errorf("Expected nil err with optional validation, got %v", err)
 	}
 
-	if ok {
-		t.Error("Expected validation to return false, got true")
+	if !ok {
+		t.Error("Expected validation to return true, got false")
 	}
 }
 

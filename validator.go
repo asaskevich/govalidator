@@ -1238,13 +1238,25 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		options = parseTagIntoMap(tag)
 	}
 
-	if !isFieldSet(v) {
-		// an empty value is not validated, check only required
-		isValid, resultErr = checkRequired(v, t, options)
-		for key := range options {
-			delete(options, key)
+	if notRequired, resultErr := checkRequired(v, t, options); notRequired {
+		// If the field is not required, nil and empty value is valid
+		if isEmptyValue(v) || !isFieldSet(v) {
+			for key := range options {
+				if key == "required" || key == "optional" {
+					continue
+				}
+				delete(options, key)
+			}
+			return true, nil
 		}
-		return isValid, resultErr
+	} else {
+		// If the field is reuired, only nil value is invalid
+		if !isFieldSet(v) {
+			for key := range options {
+				delete(options, key)
+			}
+			return false, resultErr
+		}
 	}
 
 	var customTypeErrors Errors
@@ -1483,6 +1495,24 @@ func isFieldSet(v reflect.Value) bool {
 	}
 
 	return true
+}
+
+// isEmptyValue returns false for zero values.
+func isEmptyValue(v reflect.Value) bool {
+	switch v.Kind() {
+	case reflect.String:
+		return v.String() == ""
+	case reflect.Bool:
+		return !v.Bool()
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return v.Int() == 0
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		return v.Uint() == 0
+	case reflect.Float32, reflect.Float64:
+		return v.Float() == 0
+	}
+
+	return false
 }
 
 // ErrorByField returns error for specified field of the struct
