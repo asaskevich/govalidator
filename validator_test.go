@@ -2494,9 +2494,9 @@ func TestFieldsRequiredByDefaultButExemptOrOptionalStruct(t *testing.T) {
 		param    FieldsRequiredByDefaultButExemptOrOptionalStruct
 		expected bool
 	}{
-		{FieldsRequiredByDefaultButExemptOrOptionalStruct{}, false},
+		{FieldsRequiredByDefaultButExemptOrOptionalStruct{}, true},
 		{FieldsRequiredByDefaultButExemptOrOptionalStruct{Name: "TEST"}, false},
-		{FieldsRequiredByDefaultButExemptOrOptionalStruct{Email: ""}, false},
+		{FieldsRequiredByDefaultButExemptOrOptionalStruct{Email: ""}, true},
 		{FieldsRequiredByDefaultButExemptOrOptionalStruct{Email: "test@example.com"}, true},
 		{FieldsRequiredByDefaultButExemptOrOptionalStruct{Email: "test@example"}, false},
 	}
