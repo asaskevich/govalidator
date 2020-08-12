@@ -84,12 +84,12 @@ func IsExistingEmail(email string) bool {
 	if len(user) > 64 {
 		return false
 	}
-	if userDotRegexp.MatchString(user) || !userRegexp.MatchString(user) || !hostRegexp.MatchString(host) {
-		return false
-	}
 	switch host {
 	case "localhost", "example.com":
 		return true
+	}
+	if userDotRegexp.MatchString(user) || !userRegexp.MatchString(user) || !hostRegexp.MatchString(host) {
+		return false
 	}
 	if _, err := net.LookupMX(host); err != nil {
 		if _, err := net.LookupIP(host); err != nil {
