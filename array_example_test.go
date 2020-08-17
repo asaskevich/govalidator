@@ -31,3 +31,11 @@ func ExampleEach() {
 	}
 	Each(data, fn)
 }
+
+func ExampleFind() {
+	data := []interface{}{1, 2, 3, 4, 5}
+	var fn ConditionIterator = func(value interface{}, index int) bool {
+		return value.(int) == 4
+	}
+	_ = Find(data, fn) // result = 4
+}
