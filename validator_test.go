@@ -1025,8 +1025,8 @@ func TestIsNotNull(t *testing.T) {
 		param    string
 		expected bool
 	}{
-		{"abacaba", false},
-		{"", true},
+		{"abacaba", true},
+		{"", false},
 	}
 	for _, test := range tests {
 		actual := IsNotNull(test.param)
