@@ -32,7 +32,7 @@ var (
 
 const maxURLRuneCount = 2083
 const minURLRuneCount = 3
-const RF3339WithoutZone = "2006-01-02T15:04:05"
+const rfc3339WithoutZone = "2006-01-02T15:04:05"
 
 // SetFieldsRequiredByDefault causes validation to fail when struct fields
 // do not include validations or are not explicitly marked as exempt (using `valid:"-"` or `valid:"email,optional"`).
@@ -63,13 +63,13 @@ func SetNilPtrAllowedByRequired(value bool) {
 	nilPtrAllowedByRequired = value
 }
 
-// IsEmail check if the string is an email.
+// IsEmail checks if the string is an email.
 func IsEmail(str string) bool {
 	// TODO uppercase letters are not supported
 	return rxEmail.MatchString(str)
 }
 
-// IsExistingEmail check if the string is an email of existing domain
+// IsExistingEmail checks if the string is an email of existing domain
 func IsExistingEmail(email string) bool {
 
 	if len(email) < 6 || len(email) > 254 {
@@ -100,7 +100,7 @@ func IsExistingEmail(email string) bool {
 	return true
 }
 
-// IsURL check if the string is an URL.
+// IsURL checks if the string is an URL.
 func IsURL(str string) bool {
 	if str == "" || utf8.RuneCountInString(str) >= maxURLRuneCount || len(str) <= minURLRuneCount || strings.HasPrefix(str, ".") {
 		return false
@@ -124,7 +124,7 @@ func IsURL(str string) bool {
 	return rxURL.MatchString(str)
 }
 
-// IsRequestURL check if the string rawurl, assuming
+// IsRequestURL checks if the string rawurl, assuming
 // it was received in an HTTP request, is a valid
 // URL confirm to RFC 3986
 func IsRequestURL(rawurl string) bool {
@@ -138,7 +138,7 @@ func IsRequestURL(rawurl string) bool {
 	return true
 }
 
-// IsRequestURI check if the string rawurl, assuming
+// IsRequestURI checks if the string rawurl, assuming
 // it was received in an HTTP request, is an
 // absolute URI or an absolute path.
 func IsRequestURI(rawurl string) bool {
@@ -146,7 +146,7 @@ func IsRequestURI(rawurl string) bool {
 	return err == nil
 }
 
-// IsAlpha check if the string contains only letters (a-zA-Z). Empty string is valid.
+// IsAlpha checks if the string contains only letters (a-zA-Z). Empty string is valid.
 func IsAlpha(str string) bool {
 	if IsNull(str) {
 		return true
@@ -154,7 +154,7 @@ func IsAlpha(str string) bool {
 	return rxAlpha.MatchString(str)
 }
 
-//IsUTFLetter check if the string contains only unicode letter characters.
+//IsUTFLetter checks if the string contains only unicode letter characters.
 //Similar to IsAlpha but for all languages. Empty string is valid.
 func IsUTFLetter(str string) bool {
 	if IsNull(str) {
@@ -170,7 +170,7 @@ func IsUTFLetter(str string) bool {
 
 }
 
-// IsAlphanumeric check if the string contains only letters and numbers. Empty string is valid.
+// IsAlphanumeric checks if the string contains only letters and numbers. Empty string is valid.
 func IsAlphanumeric(str string) bool {
 	if IsNull(str) {
 		return true
@@ -178,7 +178,7 @@ func IsAlphanumeric(str string) bool {
 	return rxAlphanumeric.MatchString(str)
 }
 
-// IsUTFLetterNumeric check if the string contains only unicode letters and numbers. Empty string is valid.
+// IsUTFLetterNumeric checks if the string contains only unicode letters and numbers. Empty string is valid.
 func IsUTFLetterNumeric(str string) bool {
 	if IsNull(str) {
 		return true
@@ -192,7 +192,7 @@ func IsUTFLetterNumeric(str string) bool {
 
 }
 
-// IsNumeric check if the string contains only numbers. Empty string is valid.
+// IsNumeric checks if the string contains only numbers. Empty string is valid.
 func IsNumeric(str string) bool {
 	if IsNull(str) {
 		return true
@@ -200,7 +200,7 @@ func IsNumeric(str string) bool {
 	return rxNumeric.MatchString(str)
 }
 
-// IsUTFNumeric check if the string contains only unicode numbers of any kind.
+// IsUTFNumeric checks if the string contains only unicode numbers of any kind.
 // Numbers can be 0-9 but also Fractions ¾,Roman Ⅸ and Hangzhou 〩. Empty string is valid.
 func IsUTFNumeric(str string) bool {
 	if IsNull(str) {
@@ -222,7 +222,7 @@ func IsUTFNumeric(str string) bool {
 
 }
 
-// IsUTFDigit check if the string contains only unicode radix-10 decimal digits. Empty string is valid.
+// IsUTFDigit checks if the string contains only unicode radix-10 decimal digits. Empty string is valid.
 func IsUTFDigit(str string) bool {
 	if IsNull(str) {
 		return true
@@ -243,22 +243,22 @@ func IsUTFDigit(str string) bool {
 
 }
 
-// IsHexadecimal check if the string is a hexadecimal number.
+// IsHexadecimal checks if the string is a hexadecimal number.
 func IsHexadecimal(str string) bool {
 	return rxHexadecimal.MatchString(str)
 }
 
-// IsHexcolor check if the string is a hexadecimal color.
+// IsHexcolor checks if the string is a hexadecimal color.
 func IsHexcolor(str string) bool {
 	return rxHexcolor.MatchString(str)
 }
 
-// IsRGBcolor check if the string is a valid RGB color in form rgb(RRR, GGG, BBB).
+// IsRGBcolor checks if the string is a valid RGB color in form rgb(RRR, GGG, BBB).
 func IsRGBcolor(str string) bool {
 	return rxRGBcolor.MatchString(str)
 }
 
-// IsLowerCase check if the string is lowercase. Empty string is valid.
+// IsLowerCase checks if the string is lowercase. Empty string is valid.
 func IsLowerCase(str string) bool {
 	if IsNull(str) {
 		return true
@@ -266,7 +266,7 @@ func IsLowerCase(str string) bool {
 	return str == strings.ToLower(str)
 }
 
-// IsUpperCase check if the string is uppercase. Empty string is valid.
+// IsUpperCase checks if the string is uppercase. Empty string is valid.
 func IsUpperCase(str string) bool {
 	if IsNull(str) {
 		return true
@@ -274,7 +274,7 @@ func IsUpperCase(str string) bool {
 	return str == strings.ToUpper(str)
 }
 
-// HasLowerCase check if the string contains at least 1 lowercase. Empty string is valid.
+// HasLowerCase checks if the string contains at least 1 lowercase. Empty string is valid.
 func HasLowerCase(str string) bool {
 	if IsNull(str) {
 		return true
@@ -282,7 +282,7 @@ func HasLowerCase(str string) bool {
 	return rxHasLowerCase.MatchString(str)
 }
 
-// HasUpperCase check if the string contains as least 1 uppercase. Empty string is valid.
+// HasUpperCase checks if the string contains as least 1 uppercase. Empty string is valid.
 func HasUpperCase(str string) bool {
 	if IsNull(str) {
 		return true
@@ -290,7 +290,7 @@ func HasUpperCase(str string) bool {
 	return rxHasUpperCase.MatchString(str)
 }
 
-// IsInt check if the string is an integer. Empty string is valid.
+// IsInt checks if the string is an integer. Empty string is valid.
 func IsInt(str string) bool {
 	if IsNull(str) {
 		return true
@@ -298,12 +298,12 @@ func IsInt(str string) bool {
 	return rxInt.MatchString(str)
 }
 
-// IsFloat check if the string is a float.
+// IsFloat checks if the string is a float.
 func IsFloat(str string) bool {
 	return str != "" && rxFloat.MatchString(str)
 }
 
-// IsDivisibleBy check if the string is a number that's divisible by another.
+// IsDivisibleBy checks if the string is a number that's divisible by another.
 // If second argument is not valid integer or zero, it's return false.
 // Otherwise, if first argument is not valid integer or zero, it's return true (Invalid string converts to zero).
 func IsDivisibleBy(str, num string) bool {
@@ -316,12 +316,12 @@ func IsDivisibleBy(str, num string) bool {
 	return (p == 0) || (p%q == 0)
 }
 
-// IsNull check if the string is null.
+// IsNull checks if the string is null.
 func IsNull(str string) bool {
 	return len(str) == 0
 }
 
-// IsNotNull check if the string is not null.
+// IsNotNull checks if the string is not null.
 func IsNotNull(str string) bool {
 	return !IsNull(str)
 }
@@ -336,32 +336,32 @@ func HasWhitespace(str string) bool {
 	return len(str) > 0 && rxHasWhitespace.MatchString(str)
 }
 
-// IsByteLength check if the string's length (in bytes) falls in a range.
+// IsByteLength checks if the string's length (in bytes) falls in a range.
 func IsByteLength(str string, min, max int) bool {
 	return len(str) >= min && len(str) <= max
 }
 
-// IsUUIDv3 check if the string is a UUID version 3.
+// IsUUIDv3 checks if the string is a UUID version 3.
 func IsUUIDv3(str string) bool {
 	return rxUUID3.MatchString(str)
 }
 
-// IsUUIDv4 check if the string is a UUID version 4.
+// IsUUIDv4 checks if the string is a UUID version 4.
 func IsUUIDv4(str string) bool {
 	return rxUUID4.MatchString(str)
 }
 
-// IsUUIDv5 check if the string is a UUID version 5.
+// IsUUIDv5 checks if the string is a UUID version 5.
 func IsUUIDv5(str string) bool {
 	return rxUUID5.MatchString(str)
 }
 
-// IsUUID check if the string is a UUID (version 3, 4 or 5).
+// IsUUID checks if the string is a UUID (version 3, 4 or 5).
 func IsUUID(str string) bool {
 	return rxUUID.MatchString(str)
 }
 
-// IsCreditCard check if the string is a credit card.
+// IsCreditCard checks if the string is a credit card.
 func IsCreditCard(str string) bool {
 	sanitized := notNumberRegexp.ReplaceAllString(str, "")
 	if !rxCreditCard.MatchString(sanitized) {
@@ -390,18 +390,18 @@ func IsCreditCard(str string) bool {
 	return sum%10 == 0
 }
 
-// IsISBN10 check if the string is an ISBN version 10.
+// IsISBN10 checks if the string is an ISBN version 10.
 func IsISBN10(str string) bool {
 	return IsISBN(str, 10)
 }
 
-// IsISBN13 check if the string is an ISBN version 13.
+// IsISBN13 checks if the string is an ISBN version 13.
 func IsISBN13(str string) bool {
 	return IsISBN(str, 13)
 }
 
-// IsISBN check if the string is an ISBN (version 10 or 13).
-// If version value is not equal to 10 or 13, it will be check both variants.
+// IsISBN checks if the string is an ISBN (version 10 or 13).
+// If version value is not equal to 10 or 13, it will be checks both variants.
 func IsISBN(str string, version int) bool {
 	sanitized := whiteSpacesAndMinus.ReplaceAllString(str, "")
 	var checksum int32
@@ -435,13 +435,13 @@ func IsISBN(str string, version int) bool {
 	return IsISBN(str, 10) || IsISBN(str, 13)
 }
 
-// IsJSON check if the string is valid JSON (note: uses json.Unmarshal).
+// IsJSON checks if the string is valid JSON (note: uses json.Unmarshal).
 func IsJSON(str string) bool {
 	var js json.RawMessage
 	return json.Unmarshal([]byte(str), &js) == nil
 }
 
-// IsMultibyte check if the string contains one or more multibyte chars. Empty string is valid.
+// IsMultibyte checks if the string contains one or more multibyte chars. Empty string is valid.
 func IsMultibyte(str string) bool {
 	if IsNull(str) {
 		return true
@@ -449,7 +449,7 @@ func IsMultibyte(str string) bool {
 	return rxMultibyte.MatchString(str)
 }
 
-// IsASCII check if the string contains ASCII chars only. Empty string is valid.
+// IsASCII checks if the string contains ASCII chars only. Empty string is valid.
 func IsASCII(str string) bool {
 	if IsNull(str) {
 		return true
@@ -457,7 +457,7 @@ func IsASCII(str string) bool {
 	return rxASCII.MatchString(str)
 }
 
-// IsPrintableASCII check if the string contains printable ASCII chars only. Empty string is valid.
+// IsPrintableASCII checks if the string contains printable ASCII chars only. Empty string is valid.
 func IsPrintableASCII(str string) bool {
 	if IsNull(str) {
 		return true
@@ -465,7 +465,7 @@ func IsPrintableASCII(str string) bool {
 	return rxPrintableASCII.MatchString(str)
 }
 
-// IsFullWidth check if the string contains any full-width chars. Empty string is valid.
+// IsFullWidth checks if the string contains any full-width chars. Empty string is valid.
 func IsFullWidth(str string) bool {
 	if IsNull(str) {
 		return true
@@ -473,7 +473,7 @@ func IsFullWidth(str string) bool {
 	return rxFullWidth.MatchString(str)
 }
 
-// IsHalfWidth check if the string contains any half-width chars. Empty string is valid.
+// IsHalfWidth checks if the string contains any half-width chars. Empty string is valid.
 func IsHalfWidth(str string) bool {
 	if IsNull(str) {
 		return true
@@ -481,7 +481,7 @@ func IsHalfWidth(str string) bool {
 	return rxHalfWidth.MatchString(str)
 }
 
-// IsVariableWidth check if the string contains a mixture of full and half-width chars. Empty string is valid.
+// IsVariableWidth checks if the string contains a mixture of full and half-width chars. Empty string is valid.
 func IsVariableWidth(str string) bool {
 	if IsNull(str) {
 		return true
@@ -489,12 +489,12 @@ func IsVariableWidth(str string) bool {
 	return rxHalfWidth.MatchString(str) && rxFullWidth.MatchString(str)
 }
 
-// IsBase64 check if a string is base64 encoded.
+// IsBase64 checks if a string is base64 encoded.
 func IsBase64(str string) bool {
 	return rxBase64.MatchString(str)
 }
 
-// IsFilePath check is a string is Win or Unix file path and returns it's type.
+// IsFilePath checks is a string is Win or Unix file path and returns it's type.
 func IsFilePath(str string) (bool, int) {
 	if rxWinPath.MatchString(str) {
 		//check windows path limit see:
@@ -686,25 +686,25 @@ func IsPort(str string) bool {
 	return false
 }
 
-// IsIPv4 check if the string is an IP version 4.
+// IsIPv4 checks if the string is an IP version 4.
 func IsIPv4(str string) bool {
 	ip := net.ParseIP(str)
 	return ip != nil && strings.Contains(str, ".")
 }
 
-// IsIPv6 check if the string is an IP version 6.
+// IsIPv6 checks if the string is an IP version 6.
 func IsIPv6(str string) bool {
 	ip := net.ParseIP(str)
 	return ip != nil && strings.Contains(str, ":")
 }
 
-// IsCIDR check if the string is an valid CIDR notiation (IPV4 & IPV6)
+// IsCIDR checks if the string is an valid CIDR notiation (IPV4 & IPV6)
 func IsCIDR(str string) bool {
 	_, _, err := net.ParseCIDR(str)
 	return err == nil
 }
 
-// IsMAC check if a string is valid MAC address.
+// IsMAC checks if a string is valid MAC address.
 // Possible MAC formats:
 // 01:23:45:67:89:ab
 // 01:23:45:67:89:ab:cd:ef
@@ -722,27 +722,27 @@ func IsHost(str string) bool {
 	return IsIP(str) || IsDNSName(str)
 }
 
-// IsMongoID check if the string is a valid hex-encoded representation of a MongoDB ObjectId.
+// IsMongoID checks if the string is a valid hex-encoded representation of a MongoDB ObjectId.
 func IsMongoID(str string) bool {
 	return rxHexadecimal.MatchString(str) && (len(str) == 24)
 }
 
-// IsLatitude check if a string is valid latitude.
+// IsLatitude checks if a string is valid latitude.
 func IsLatitude(str string) bool {
 	return rxLatitude.MatchString(str)
 }
 
-// IsLongitude check if a string is valid longitude.
+// IsLongitude checks if a string is valid longitude.
 func IsLongitude(str string) bool {
 	return rxLongitude.MatchString(str)
 }
 
-// IsIMEI check if a string is valid IMEI
+// IsIMEI checks if a string is valid IMEI
 func IsIMEI(str string) bool {
 	return rxIMEI.MatchString(str)
 }
 
-// IsIMSI check if a string is valid IMSI
+// IsIMSI checks if a string is valid IMSI
 func IsIMSI(str string) bool {
 	if !rxIMSI.MatchString(str) {
 		return false
@@ -785,7 +785,7 @@ func IsIMSI(str string) bool {
 	return true
 }
 
-// IsRsaPublicKey check if a string is valid public key with provided length
+// IsRsaPublicKey checks if a string is valid public key with provided length
 func IsRsaPublicKey(str string, keylen int) bool {
 	bb := bytes.NewBufferString(str)
 	pemBytes, err := ioutil.ReadAll(bb)
@@ -839,7 +839,7 @@ func toJSONName(tag string) string {
 	return name
 }
 
-func PrependPathToErrors(err error, path string) error {
+func prependPathToErrors(err error, path string) error {
 	switch err2 := err.(type) {
 	case Error:
 		err2.Path = append([]string{path}, err2.Path...)
@@ -847,7 +847,7 @@ func PrependPathToErrors(err error, path string) error {
 	case Errors:
 		errors := err2.Errors()
 		for i, err3 := range errors {
-			errors[i] = PrependPathToErrors(err3, path)
+			errors[i] = prependPathToErrors(err3, path)
 		}
 		return err2
 	}
@@ -875,7 +875,7 @@ func ValidateMap(s map[string]interface{}, m map[string]interface{}) (bool, erro
 			presentResult = false
 			var err error
 			err = fmt.Errorf("all map keys has to be present in the validation map; got %s", key)
-			err = PrependPathToErrors(err, key)
+			err = prependPathToErrors(err, key)
 			errs = append(errs, err)
 		}
 		valueField := reflect.ValueOf(value)
@@ -889,13 +889,13 @@ func ValidateMap(s map[string]interface{}, m map[string]interface{}) (bool, erro
 			if v, ok := value.(map[string]interface{}); !ok {
 				mapResult = false
 				err = fmt.Errorf("map validator has to be for the map type only; got %s", valueField.Type().String())
-				err = PrependPathToErrors(err, key)
+				err = prependPathToErrors(err, key)
 				errs = append(errs, err)
 			} else {
 				mapResult, err = ValidateMap(v, subValidator)
 				if err != nil {
 					mapResult = false
-					err = PrependPathToErrors(err, key)
+					err = prependPathToErrors(err, key)
 					errs = append(errs, err)
 				}
 			}
@@ -906,7 +906,7 @@ func ValidateMap(s map[string]interface{}, m map[string]interface{}) (bool, erro
 				var err error
 				structResult, err = ValidateStruct(valueField.Interface())
 				if err != nil {
-					err = PrependPathToErrors(err, key)
+					err = prependPathToErrors(err, key)
 					errs = append(errs, err)
 				}
 			}
@@ -927,13 +927,13 @@ func ValidateMap(s map[string]interface{}, m map[string]interface{}) (bool, erro
 		default:
 			typeResult = false
 			err = fmt.Errorf("map validator has to be either map[string]interface{} or string; got %s", valueField.Type().String())
-			err = PrependPathToErrors(err, key)
+			err = prependPathToErrors(err, key)
 			errs = append(errs, err)
 		}
 		result = result && presentResult && typeResult && resultField && structResult && mapResult
 		index++
 	}
-	// check required keys
+	// checks required keys
 	requiredResult := true
 	for key, value := range m {
 		if schema, ok := value.(string); ok {
@@ -992,7 +992,7 @@ func ValidateStruct(s interface{}) (bool, error) {
 			var err error
 			structResult, err = ValidateStruct(valueField.Interface())
 			if err != nil {
-				err = PrependPathToErrors(err, typeField.Name)
+				err = prependPathToErrors(err, typeField.Name)
 				errs = append(errs, err)
 			}
 		}
@@ -1077,12 +1077,12 @@ func IsSSN(str string) bool {
 	return rxSSN.MatchString(str)
 }
 
-// IsSemver check if string is valid semantic version
+// IsSemver checks if string is valid semantic version
 func IsSemver(str string) bool {
 	return rxSemver.MatchString(str)
 }
 
-// IsType check if interface is of some type
+// IsType checks if interface is of some type
 func IsType(v interface{}, params ...string) bool {
 	if len(params) == 1 {
 		typ := params[0]
@@ -1091,13 +1091,13 @@ func IsType(v interface{}, params ...string) bool {
 	return false
 }
 
-// IsTime check if string is valid according to given format
+// IsTime checks if string is valid according to given format
 func IsTime(str string, format string) bool {
 	_, err := time.Parse(format, str)
 	return err == nil
 }
 
-// IsUnixTime check if string is valid unix timestamp value
+// IsUnixTime checks if string is valid unix timestamp value
 func IsUnixTime(str string) bool {
 	if _, err := strconv.Atoi(str); err == nil {
 		return true
@@ -1105,17 +1105,17 @@ func IsUnixTime(str string) bool {
 	return false
 }
 
-// IsRFC3339 check if string is valid timestamp value according to RFC3339
+// IsRFC3339 checks if string is valid timestamp value according to RFC3339
 func IsRFC3339(str string) bool {
 	return IsTime(str, time.RFC3339)
 }
 
-// IsRFC3339WithoutZone check if string is valid timestamp value according to RFC3339 which excludes the timezone.
+// IsRFC3339WithoutZone checks if string is valid timestamp value according to RFC3339 which excludes the timezone.
 func IsRFC3339WithoutZone(str string) bool {
-	return IsTime(str, RF3339WithoutZone)
+	return IsTime(str, rfc3339WithoutZone)
 }
 
-// IsISO4217 check if string is valid ISO currency code
+// IsISO4217 checks if string is valid ISO currency code
 func IsISO4217(str string) bool {
 	for _, currency := range ISO4217List {
 		if str == currency {
@@ -1126,7 +1126,7 @@ func IsISO4217(str string) bool {
 	return false
 }
 
-// ByteLength check string's length
+// ByteLength checks string's length
 func ByteLength(str string, params ...string) bool {
 	if len(params) == 2 {
 		min, _ := ToInt(params[0])
@@ -1137,13 +1137,13 @@ func ByteLength(str string, params ...string) bool {
 	return false
 }
 
-// RuneLength check string's length
+// RuneLength checks string's length
 // Alias for StringLength
 func RuneLength(str string, params ...string) bool {
 	return StringLength(str, params...)
 }
 
-// IsRsaPub check whether string is valid RSA key
+// IsRsaPub checks whether string is valid RSA key
 // Alias for IsRsaPublicKey
 func IsRsaPub(str string, params ...string) bool {
 	if len(params) == 1 {
@@ -1163,7 +1163,7 @@ func StringMatches(s string, params ...string) bool {
 	return false
 }
 
-// StringLength check string's length (including multi byte strings)
+// StringLength checks string's length (including multi byte strings)
 func StringLength(str string, params ...string) bool {
 
 	if len(params) == 2 {
@@ -1176,7 +1176,7 @@ func StringLength(str string, params ...string) bool {
 	return false
 }
 
-// MinStringLength check string's minimum length (including multi byte strings)
+// MinStringLength checks string's minimum length (including multi byte strings)
 func MinStringLength(str string, params ...string) bool {
 
 	if len(params) == 1 {
@@ -1188,7 +1188,7 @@ func MinStringLength(str string, params ...string) bool {
 	return false
 }
 
-// MaxStringLength check string's maximum length (including multi byte strings)
+// MaxStringLength checks string's maximum length (including multi byte strings)
 func MaxStringLength(str string, params ...string) bool {
 
 	if len(params) == 1 {
@@ -1200,7 +1200,7 @@ func MaxStringLength(str string, params ...string) bool {
 	return false
 }
 
-// Range check string's length
+// Range checks string's length
 func Range(str string, params ...string) bool {
 	if len(params) == 2 {
 		value, _ := ToFloat(str)
@@ -1212,6 +1212,7 @@ func Range(str string, params ...string) bool {
 	return false
 }
 
+// IsInRaw checks if string is in list of allowed values
 func IsInRaw(str string, params ...string) bool {
 	if len(params) == 1 {
 		rawParams := params[0]
@@ -1224,7 +1225,7 @@ func IsInRaw(str string, params ...string) bool {
 	return false
 }
 
-// IsIn check if string str is a member of the set of strings params
+// IsIn checks if string str is a member of the set of strings params
 func IsIn(str string, params ...string) bool {
 	for _, param := range params {
 		if str == param {
@@ -1262,7 +1263,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 
 	tag := t.Tag.Get(tagName)
 
-	// Check if the field should be ignored
+	// checks if the field should be ignored
 	switch tag {
 	case "":
 		if v.Kind() != reflect.Slice && v.Kind() != reflect.Map {
@@ -1282,7 +1283,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 	}
 
 	if isEmptyValue(v) {
-		// an empty value is not validated, check only required
+		// an empty value is not validated, checks only required
 		isValid, resultErr = checkRequired(v, t, options)
 		for key := range options {
 			delete(options, key)
@@ -1335,13 +1336,13 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		validator := validatorSpec
 		customMsgExists := len(validatorStruct.customErrorMessage) > 0
 
-		// Check whether the tag looks like '!something' or 'something'
+		// checks whether the tag looks like '!something' or 'something'
 		if validator[0] == '!' {
 			validator = validator[1:]
 			negate = true
 		}
 
-		// Check for interface param validators
+		// checks for interface param validators
 		for key, value := range InterfaceParamTagRegexMap {
 			ps := value.FindStringSubmatch(validator)
 			if len(ps) == 0 {
@@ -1374,20 +1375,20 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
 		reflect.Float32, reflect.Float64,
 		reflect.String:
-		// for each tag option check the map of validator functions
+		// for each tag option checks the map of validator functions
 		for _, validatorSpec := range optionsOrder {
 			validatorStruct := options[validatorSpec]
 			var negate bool
 			validator := validatorSpec
 			customMsgExists := len(validatorStruct.customErrorMessage) > 0
 
-			// Check whether the tag looks like '!something' or 'something'
+			// checks whether the tag looks like '!something' or 'something'
 			if validator[0] == '!' {
 				validator = validator[1:]
 				negate = true
 			}
 
-			// Check for param validators
+			// checks for param validators
 			for key, value := range ParamTagRegexMap {
 				ps := value.FindStringSubmatch(validator)
 				if len(ps) == 0 {
@@ -1468,7 +1469,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 			} else {
 				resultItem, err = ValidateStruct(v.MapIndex(k).Interface())
 				if err != nil {
-					err = PrependPathToErrors(err, t.Name+"."+sv[i].Interface().(string))
+					err = prependPathToErrors(err, t.Name+"."+sv[i].Interface().(string))
 					return false, err
 				}
 			}
@@ -1488,7 +1489,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 			} else {
 				resultItem, err = ValidateStruct(v.Index(i).Interface())
 				if err != nil {
-					err = PrependPathToErrors(err, t.Name+"."+strconv.Itoa(i))
+					err = prependPathToErrors(err, t.Name+"."+strconv.Itoa(i))
 					return false, err
 				}
 			}
@@ -1502,7 +1503,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		}
 		return ValidateStruct(v.Interface())
 	case reflect.Ptr:
-		// If the value is a pointer then check its element
+		// If the value is a pointer then checks its element
 		if v.IsNil() {
 			return true, nil
 		}

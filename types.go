@@ -14,8 +14,10 @@ type Validator func(str string) bool
 // The second parameter should be the context (in the case of validating a struct: the whole object being validated).
 type CustomTypeValidator func(i interface{}, o interface{}) bool
 
-// ParamValidator is a wrapper for validator functions that accepts additional parameters.
+// ParamValidator is a wrapper for validator functions that accept additional parameters.
 type ParamValidator func(str string, params ...string) bool
+
+// InterfaceParamValidator is a wrapper for functions that accept variants parameters for an interface value
 type InterfaceParamValidator func(in interface{}, params ...string) bool
 type tagOptionsMap map[string]tagOption
 

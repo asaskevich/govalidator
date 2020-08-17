@@ -2115,13 +2115,13 @@ func TestIsTime(t *testing.T) {
 		{"2016-12-31T11:00:00.05Z", time.RFC3339, true},
 		{"2016-12-31T11:00:00.05-01:00", time.RFC3339, true},
 		{"2016-12-31T11:00:00.05+01:00", time.RFC3339, true},
-		{"2016-12-31T11:00:00", RF3339WithoutZone, true},
-		{"2016-12-31T11:00:00Z", RF3339WithoutZone, false},
-		{"2016-12-31T11:00:00+01:00", RF3339WithoutZone, false},
-		{"2016-12-31T11:00:00-01:00", RF3339WithoutZone, false},
-		{"2016-12-31T11:00:00.05Z", RF3339WithoutZone, false},
-		{"2016-12-31T11:00:00.05-01:00", RF3339WithoutZone, false},
-		{"2016-12-31T11:00:00.05+01:00", RF3339WithoutZone, false},
+		{"2016-12-31T11:00:00", rfc3339WithoutZone, true},
+		{"2016-12-31T11:00:00Z", rfc3339WithoutZone, false},
+		{"2016-12-31T11:00:00+01:00", rfc3339WithoutZone, false},
+		{"2016-12-31T11:00:00-01:00", rfc3339WithoutZone, false},
+		{"2016-12-31T11:00:00.05Z", rfc3339WithoutZone, false},
+		{"2016-12-31T11:00:00.05-01:00", rfc3339WithoutZone, false},
+		{"2016-12-31T11:00:00.05+01:00", rfc3339WithoutZone, false},
 	}
 	for _, test := range tests {
 		actual := IsTime(test.param, test.format)
@@ -2547,7 +2547,7 @@ func TestStructWithCustomByteArray(t *testing.T) {
 
 		switch v := i.(type) {
 		case CustomByteArray:
-			for _, e := range v { // check if v is empty, i.e. all zeroes
+			for _, e := range v { // checks if v is empty, i.e. all zeroes
 				if e != 0 {
 					return true
 				}
@@ -2835,7 +2835,7 @@ func TestNestedStruct(t *testing.T) {
 			Nested: NestedStruct{
 				Foo: "123",
 				SliceEvenMoreNested: []EvenMoreNestedStruct{
-					EvenMoreNestedStruct{
+					{
 						Bar: "123456",
 					},
 				},
@@ -2845,7 +2845,7 @@ func TestNestedStruct(t *testing.T) {
 			Nested: NestedStruct{
 				Foo: "123",
 				MapEvenMoreNested: map[string]EvenMoreNestedStruct{
-					"Foo": EvenMoreNestedStruct{
+					"Foo": {
 						Bar: "123456",
 					},
 				},
@@ -3489,7 +3489,7 @@ func TestValidatorIncludedInError(t *testing.T) {
 		}
 	}
 
-	// check to make sure that validators with arguments (like length(1|10)) don't include the arguments
+	// checks to make sure that validators with arguments (like length(1|10)) don't include the arguments
 	// in the validator name
 	message := MessageWithSeveralFieldsStruct{
 		Title: "",
