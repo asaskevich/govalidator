@@ -16,14 +16,6 @@ func TestEach(t *testing.T) {
 	}
 }
 
-func ExampleEach() {
-	data := []interface{}{1, 2, 3, 4, 5}
-	var fn Iterator = func(value interface{}, index int) {
-		println(value.(int))
-	}
-	Each(data, fn)
-}
-
 func TestMap(t *testing.T) {
 	// TODO Maybe refactor?
 	t.Parallel()
@@ -37,14 +29,6 @@ func TestMap(t *testing.T) {
 			t.Errorf("Expected Map(..) to be %v, got %v", fn(data[i], i), d)
 		}
 	}
-}
-
-func ExampleMap() {
-	data := []interface{}{1, 2, 3, 4, 5}
-	var fn ResultIterator = func(value interface{}, index int) interface{} {
-		return value.(int) * 3
-	}
-	_ = Map(data, fn) // result = []interface{}{1, 6, 9, 12, 15}
 }
 
 func TestFind(t *testing.T) {
@@ -85,14 +69,6 @@ func TestFilter(t *testing.T) {
 	}
 }
 
-func ExampleFilter() {
-	data := []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
-	var fn ConditionIterator = func(value interface{}, index int) bool {
-		return value.(int)%2 == 0
-	}
-	_ = Filter(data, fn) // result = []interface{}{2, 4, 6, 8, 10}
-}
-
 func TestCount(t *testing.T) {
 	// TODO Maybe refactor?
 	t.Parallel()
@@ -105,12 +81,4 @@ func TestCount(t *testing.T) {
 	if result != count {
 		t.Errorf("Expected Count(..) to be %v, got %v", count, result)
 	}
-}
-
-func ExampleCount() {
-	data := []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
-	var fn ConditionIterator = func(value interface{}, index int) bool {
-		return value.(int)%2 == 0
-	}
-	_ = Count(data, fn) // result = 5
 }

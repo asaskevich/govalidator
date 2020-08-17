@@ -280,7 +280,7 @@ type User	struct {
   Age  int         `valid:"type(int)"`
   Meta interface{} `valid:"type(string)"`
 }
-result, err := govalidator.ValidateStruct(user{"Bob", 20, "meta"})
+result, err := govalidator.ValidateStruct(User{"Bob", 20, "meta"})
 if err != nil {
 	println("error: " + err.Error())
 }
@@ -393,6 +393,8 @@ Validators with parameters
 "matches(pattern)": StringMatches,
 "in(string1|string2|...|stringN)": IsIn,
 "rsapub(keylength)" : IsRsaPub,
+"minstringlength(int): MinStringLength,
+"maxstringlength(int): MaxStringLength,
 ```
 Validators with parameters for any type
 

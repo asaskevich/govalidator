@@ -6,8 +6,8 @@ import (
 )
 
 func TestToInt(t *testing.T) {
-	tests := []string{"1000", "-123", "abcdef", "100000000000000000000000000000000000000000000"}
-	expected := []int64{1000, -123, 0, 0}
+	tests := []interface{}{"1000", "-123", "abcdef", "100000000000000000000000000000000000000000000", false}
+	expected := []int64{1000, -123, 0, 0, 0}
 	for i := 0; i < len(tests); i++ {
 		result, _ := ToInt(tests[i])
 		if result != expected[i] {

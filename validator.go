@@ -742,6 +742,49 @@ func IsIMEI(str string) bool {
 	return rxIMEI.MatchString(str)
 }
 
+// IsIMSI check if a string is valid IMSI
+func IsIMSI(str string) bool {
+	if !rxIMSI.MatchString(str) {
+		return false
+	}
+
+	mcc, err := strconv.ParseInt(str[0:3], 10, 32)
+	if err != nil {
+		return false
+	}
+
+	switch mcc {
+	case 202, 204, 206, 208, 212, 213, 214, 216, 218, 219:
+	case 220, 221, 222, 226, 228, 230, 231, 232, 234, 235:
+	case 238, 240, 242, 244, 246, 247, 248, 250, 255, 257:
+	case 259, 260, 262, 266, 268, 270, 272, 274, 276, 278:
+	case 280, 282, 283, 284, 286, 288, 289, 290, 292, 293:
+	case 294, 295, 297, 302, 308, 310, 311, 312, 313, 314:
+	case 315, 316, 330, 332, 334, 338, 340, 342, 344, 346:
+	case 348, 350, 352, 354, 356, 358, 360, 362, 363, 364:
+	case 365, 366, 368, 370, 372, 374, 376, 400, 401, 402:
+	case 404, 405, 406, 410, 412, 413, 414, 415, 416, 417:
+	case 418, 419, 420, 421, 422, 424, 425, 426, 427, 428:
+	case 429, 430, 431, 432, 434, 436, 437, 438, 440, 441:
+	case 450, 452, 454, 455, 456, 457, 460, 461, 466, 467:
+	case 470, 472, 502, 505, 510, 514, 515, 520, 525, 528:
+	case 530, 536, 537, 539, 540, 541, 542, 543, 544, 545:
+	case 546, 547, 548, 549, 550, 551, 552, 553, 554, 555:
+	case 602, 603, 604, 605, 606, 607, 608, 609, 610, 611:
+	case 612, 613, 614, 615, 616, 617, 618, 619, 620, 621:
+	case 622, 623, 624, 625, 626, 627, 628, 629, 630, 631:
+	case 632, 633, 634, 635, 636, 637, 638, 639, 640, 641:
+	case 642, 643, 645, 646, 647, 648, 649, 650, 651, 652:
+	case 653, 654, 655, 657, 658, 659, 702, 704, 706, 708:
+	case 710, 712, 714, 716, 722, 724, 730, 732, 734, 736:
+	case 738, 740, 742, 744, 746, 748, 750, 995:
+		return true
+	default:
+		return false
+	}
+	return true
+}
+
 // IsRsaPublicKey check if a string is valid public key with provided length
 func IsRsaPublicKey(str string, keylen int) bool {
 	bb := bytes.NewBufferString(str)
@@ -1238,7 +1281,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		options = parseTagIntoMap(tag)
 	}
 
-	if !isFieldSet(v) {
+	if isEmptyValue(v) {
 		// an empty value is not validated, check only required
 		isValid, resultErr = checkRequired(v, t, options)
 		for key := range options {
@@ -1475,14 +1518,26 @@ func stripParams(validatorString string) string {
 	return paramsRegexp.ReplaceAllString(validatorString, "")
 }
 
-// isFieldSet returns false for nil pointers, interfaces, maps, and slices. For all other values, it returns true.
-func isFieldSet(v reflect.Value) bool {
+// isEmptyValue checks whether value empty or not
+func isEmptyValue(v reflect.Value) bool {
 	switch v.Kind() {
-	case reflect.Map, reflect.Slice, reflect.Interface, reflect.Ptr:
-		return !v.IsNil()
+	case reflect.String, reflect.Array:
+		return v.Len() == 0
+	case reflect.Map, reflect.Slice:
+		return v.Len() == 0 || v.IsNil()
+	case reflect.Bool:
+		return !v.Bool()
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return v.Int() == 0
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		return v.Uint() == 0
+	case reflect.Float32, reflect.Float64:
+		return v.Float() == 0
+	case reflect.Interface, reflect.Ptr:
+		return v.IsNil()
 	}
 
-	return true
+	return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
 }
 
 // ErrorByField returns error for specified field of the struct
