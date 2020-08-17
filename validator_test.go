@@ -4264,3 +4264,16 @@ func TestIsIMEI(t *testing.T) {
 		}
 	}
 }
+
+type SpannerSlugger struct {
+	Slug string `spanner:"slug" valid:"required"`
+	Name string `spanner:"name" valid:"required"`
+}
+
+func TestValidation_Slugs(t *testing.T) {
+	ok, err := ValidateStruct(&SpannerSlugger{})
+
+	if (!ok) {
+		t.Errorf("Got an error, so ok = %v, err = %v", ok, err)
+	}
+}
