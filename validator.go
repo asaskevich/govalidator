@@ -1238,7 +1238,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		options = parseTagIntoMap(tag)
 	}
 
-	if !isFieldSet(v) {
+	if isEmptyValue(v) {
 		// an empty value is not validated, check only required
 		isValid, resultErr = checkRequired(v, t, options)
 		for key := range options {
@@ -1475,14 +1475,26 @@ func stripParams(validatorString string) string {
 	return paramsRegexp.ReplaceAllString(validatorString, "")
 }
 
-// isFieldSet returns false for nil pointers, interfaces, maps, and slices. For all other values, it returns true.
-func isFieldSet(v reflect.Value) bool {
+// isEmptyValue checks whether value empty or not
+func isEmptyValue(v reflect.Value) bool {
 	switch v.Kind() {
-	case reflect.Map, reflect.Slice, reflect.Interface, reflect.Ptr:
-		return !v.IsNil()
+	case reflect.String, reflect.Array:
+		return v.Len() == 0
+	case reflect.Map, reflect.Slice:
+		return v.Len() == 0 || v.IsNil()
+	case reflect.Bool:
+		return !v.Bool()
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return v.Int() == 0
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		return v.Uint() == 0
+	case reflect.Float32, reflect.Float64:
+		return v.Float() == 0
+	case reflect.Interface, reflect.Ptr:
+		return v.IsNil()
 	}
 
-	return true
+	return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
 }
 
 // ErrorByField returns error for specified field of the struct
