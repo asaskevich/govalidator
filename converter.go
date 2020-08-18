@@ -10,7 +10,7 @@ import (
 // ToString convert the input to a string.
 func ToString(obj interface{}) string {
 	res := fmt.Sprintf("%v", obj)
-	return string(res)
+	return res
 }
 
 // ToJSON convert the input to a valid JSON string

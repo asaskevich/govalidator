@@ -1,12 +1,31 @@
 package govalidator
 
-import "testing"
+// Benchmark testing is produced with randomly filled array of 1 million elements
+
+import (
+	"math/rand"
+	"testing"
+)
+
+func randomInt(min, max int) int {
+	return min + rand.Intn(max-min)
+}
+
+func randomArray(n int) (res []interface{}) {
+	res = make([]interface{}, n)
+
+	for i := 0; i < n; i++ {
+		res[i] = randomInt(-1000, 1000)
+	}
+
+	return
+}
 
 func BenchmarkEach(b *testing.B) {
+	data := randomArray(1000000)
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		acc := 0
-		data := []interface{}{1, 2, 3, 4, 5}
 		var fn Iterator = func(value interface{}, index int) {
 			acc = acc + value.(int)
 		}
@@ -15,9 +34,9 @@ func BenchmarkEach(b *testing.B) {
 }
 
 func BenchmarkMap(b *testing.B) {
+	data := randomArray(1000000)
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		data := []interface{}{1, 2, 3, 4, 5}
 		var fn ResultIterator = func(value interface{}, index int) interface{} {
 			return value.(int) * 3
 		}
@@ -26,10 +45,10 @@ func BenchmarkMap(b *testing.B) {
 }
 
 func BenchmarkFind(b *testing.B) {
+	data := randomArray(1000000)
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		findElement := 96
-		data := []interface{}{1, 2, 3, 4, findElement, 5}
 		var fn1 ConditionIterator = func(value interface{}, index int) bool {
 			return value.(int) == findElement
 		}
@@ -38,9 +57,9 @@ func BenchmarkFind(b *testing.B) {
 }
 
 func BenchmarkFilter(b *testing.B) {
+	data := randomArray(1000000)
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		data := []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 		var fn ConditionIterator = func(value interface{}, index int) bool {
 			return value.(int)%2 == 0
 		}
@@ -49,9 +68,9 @@ func BenchmarkFilter(b *testing.B) {
 }
 
 func BenchmarkCount(b *testing.B) {
+	data := randomArray(1000000)
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		data := []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 		var fn ConditionIterator = func(value interface{}, index int) bool {
 			return value.(int)%2 == 0
 		}

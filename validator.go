@@ -377,7 +377,7 @@ func IsCreditCard(str string) bool {
 		if shouldDouble {
 			tmpNum *= 2
 			if tmpNum >= 10 {
-				sum += ((tmpNum % 10) + 1)
+				sum += (tmpNum % 10) + 1
 			} else {
 				sum += tmpNum
 			}
