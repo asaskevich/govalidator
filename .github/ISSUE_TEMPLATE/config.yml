@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: ❓ Support & Discussion
+    url: https://gitter.im/asaskevich/govalidator
+    about: 'You can leave comments and participate in the discussion via Gitter:'
