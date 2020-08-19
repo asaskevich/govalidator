@@ -854,6 +854,11 @@ func prependPathToErrors(err error, path string) error {
 	return err
 }
 
+// ValidateArray performs validation according to condition iterator that validates every element of the array
+func ValidateArray(array []interface{}, iterator ConditionIterator) bool {
+	return Every(array, iterator)
+}
+
 // ValidateMap use validation map for fields.
 // result will be equal to `false` if there are any errors.
 // s is the map containing the data to be validated.
