@@ -1029,6 +1029,42 @@ func ValidateStruct(s interface{}) (bool, error) {
 	return result, err
 }
 
+// ValidateStructAsync performs async validation of the struct and returns results through the channels
+func ValidateStructAsync(s interface{}) (<-chan bool, <-chan error) {
+	res := make(chan bool)
+	errors := make(chan error)
+
+	go func() {
+		defer close(res)
+		defer close(errors)
+
+		isValid, isFailed := ValidateStruct(s)
+
+		res <- isValid
+		errors <- isFailed
+	}()
+
+	return res, errors
+}
+
+// ValidateMapAsync performs async validation of the map and returns results through the channels
+func ValidateMapAsync(s map[string]interface{}, m map[string]interface{}) (<-chan bool, <-chan error) {
+	res := make(chan bool)
+	errors := make(chan error)
+
+	go func() {
+		defer close(res)
+		defer close(errors)
+
+		isValid, isFailed := ValidateMap(s, m)
+
+		res <- isValid
+		errors <- isFailed
+	}()
+
+	return res, errors
+}
+
 // parseTagIntoMap parses a struct tag `valid:required~Some error message,length(2|3)` into map[string]string{"required": "Some error message", "length(2|3)": ""}
 func parseTagIntoMap(tag string) tagOptionsMap {
 	optionsMap := make(tagOptionsMap)
