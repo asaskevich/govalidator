@@ -73,11 +73,15 @@ func InRangeFloat64(value, left, right float64) bool {
 func InRange(value interface{}, left interface{}, right interface{}) bool {
 	switch value.(type) {
 	case int:
-		return InRangeInt(value.(int), left.(int), right.(int))
-	case float32:
-		return InRangeFloat32(value.(float32), left.(float32), right.(float32))
-	case float64:
-		return InRangeFloat64(value.(float64), left.(float64), right.(float64))
+		intValue, _ := ToInt(value)
+		intLeft, _ := ToInt(left)
+		intRight, _ := ToInt(right)
+		return InRangeInt(intValue, intLeft, intRight)
+	case float32, float64:
+		intValue, _ := ToFloat(value)
+		intLeft, _ := ToFloat(left)
+		intRight, _ := ToFloat(right)
+		return InRangeFloat64(intValue, intLeft, intRight)
 	case string:
 		return value.(string) >= left.(string) && value.(string) <= right.(string)
 	default:
