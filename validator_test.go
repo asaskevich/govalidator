@@ -615,7 +615,9 @@ func TestIsHash(t *testing.T) {
 		{"3ca25ae354e192b26879f651a51d92aa8a34d8d3", "sha1", true},
 		{"3ca25ae354e192b26879f651a51d34d8d3", "sha1", false},
 		{"3ca25ae354e192b26879f651a51d92aa8a34d8d3", "Tiger160", true},
+		{"3ca25ae354e192b26879f651a51d92aa8a34d8d32", "Tiger160", false},
 		{"3ca25ae354e192b26879f651a51d34d8d3", "ripemd160", false},
+		{"108f07b8382412612c048d07d13f814118445acd", "ripemd160", true},
 		{"579282cfb65ca1f109b78536effaf621b853c9f7079664a3fbe2b519f435898c", "sha256", true},
 		{"579282cfb65ca1f109b78536effaf621b853c9f7079664a3fbe2b519f435898casfdsafsadfsdf", "sha256", false},
 		{"bf547c3fc5841a377eb1519c2890344dbab15c40ae4150b4b34443d2212e5b04aa9d58865bf03d8ae27840fef430b891", "sha384", true},
@@ -624,12 +626,258 @@ func TestIsHash(t *testing.T) {
 		{"579282cfb65ca1f109b78536effaf621b853c9f7079664a3fbe2b519f435898casfdsafsadfsdf", "sha512", false},
 		{"46fc0125a148788a3ac1d649566fc04eb84a746f1a6e4fa7", "tiger192", true},
 		{"46fc0125a148788a3ac1d649566fc04eb84a746f1a6$$%@^", "TIGER192", false},
+		{"e8e50e239f932a1c357194e5ead0f528", "tiger128", true},
+		{"e8e50e239f932a1c357194e5ead0f528g", "tiger128", false},
+		{"789d569f08ed7055e94b4289a4195012", "RipeMD128", true},
+		{"789d569f08ed7055e94b4289a4195012g", "RipeMD128", false},
+		{"3d653119", "crc32", true},
+		{"3d653119g", "crc32", false},
+		{"3610a686", "crc32b", true},
+		{"3610a686g", "crc32b", false},
+		{"5d41402abc4b2a76b9719d911017c592", "md5", true},
+		{"5d41402abc4b2a76b9719d911017c592g", "md5", false},
+		{"866437cb7a794bce2b727acc0362ee27", "md4", true},
+		{"866437cb7a794bce2b727acc0362ee27g", "md4", false},
 		{"46fc0125a148788a3ac1d649566fc04eb84a746f1a6$$%@^", "SOMEHASH", false},
 	}
 	for _, test := range tests {
 		actual := IsHash(test.param, test.algo)
 		if actual != test.expected {
 			t.Errorf("Expected IsHash(%q, %q) to be %v, got %v", test.param, test.algo, test.expected, actual)
+		}
+	}
+}
+
+func TestIsMD4(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"866437cb7a794bce2b727acc0362ee27", true},
+		{"866437cb7a794bce2b727acc0362ee27g", false},
+	}
+	for _, test := range tests {
+		actual := IsMD4(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsMD4(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsMD5(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"5d41402abc4b2a76b9719d911017c592", true},
+		{"5d41402abc4b2a76b9719d911017c592g", false},
+	}
+	for _, test := range tests {
+		actual := IsMD5(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsMD5(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsCRC32b(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"3610a686", true},
+		{"3610a686g", false},
+	}
+	for _, test := range tests {
+		actual := IsCRC32b(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsCRC32b(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsCRC32(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"3d653119", true},
+		{"3d653119g", false},
+	}
+	for _, test := range tests {
+		actual := IsCRC32(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsCRC32(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsTiger128(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"e8e50e239f932a1c357194e5ead0f528", true},
+		{"e8e50e239f932a1c357194e5ead0f528g", false},
+	}
+	for _, test := range tests {
+		actual := IsTiger128(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsTiger128(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsRipeMD128(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"789d569f08ed7055e94b4289a4195012", true},
+		{"789d569f08ed7055e94b4289a4195012g", false},
+	}
+	for _, test := range tests {
+		actual := IsRipeMD128(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsRipeMD128(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsSHA384(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"bf547c3fc5841a377eb1519c2890344dbab15c40ae4150b4b34443d2212e5b04aa9d58865bf03d8ae27840fef430b891", true},
+		{"579282cfb65ca1f109b78536effaf621b853c9f7079664a3fbe2b519f435898casfdsafsadfsdf", false},
+	}
+	for _, test := range tests {
+		actual := IsSHA384(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsSHA384(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsSHA512(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"45bc5fa8cb45ee408c04b6269e9f1e1c17090c5ce26ffeeda2af097735b29953ce547e40ff3ad0d120e5361cc5f9cee35ea91ecd4077f3f589b4d439168f91b9", true},
+		{"579282cfb65ca1f109b78536effaf621b853c9f7079664a3fbe2b519f435898casfdsafsadfsdf", false},
+	}
+	for _, test := range tests {
+		actual := IsSHA512(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsSHA512(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsSHA256(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"579282cfb65ca1f109b78536effaf621b853c9f7079664a3fbe2b519f435898c", true},
+		{"579282cfb65ca1f109b78536effaf621b853c9f7079664a3fbe2b519f435898casfdsafsadfsdf", false},
+	}
+	for _, test := range tests {
+		actual := IsSHA256(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsSHA256(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsTiger192(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"46fc0125a148788a3ac1d649566fc04eb84a746f1a6e4fa7", true},
+		{"46fc0125a148788a3ac1d649566fc04eb84a746f1a6$$%@^", false},
+	}
+	for _, test := range tests {
+		actual := IsTiger192(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsTiger192(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsTiger160(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"3ca25ae354e192b26879f651a51d92aa8a34d8d3", true},
+		{"3ca25ae354e192b26879f651a51d92aa8a34d8d32", false},
+	}
+	for _, test := range tests {
+		actual := IsTiger160(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsTiger160(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsRipeMD160(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"3ca25ae354e192b26879f651a51d92aa8a34d8d3", true},
+		{"3ca25ae354e192b26879f651a51d34d8d3", false},
+	}
+	for _, test := range tests {
+		actual := IsRipeMD160(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsRipeMD160(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsSHA1(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"3ca25ae354e192b26879f651a51d92aa8a34d8d3", true},
+		{"3ca25ae354e192b26879f651a51d34d8d3", false},
+	}
+	for _, test := range tests {
+		actual := IsSHA1(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsSHA1(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
