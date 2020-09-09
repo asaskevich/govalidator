@@ -625,11 +625,91 @@ func TestIsHash(t *testing.T) {
 		{"46fc0125a148788a3ac1d649566fc04eb84a746f1a6e4fa7", "tiger192", true},
 		{"46fc0125a148788a3ac1d649566fc04eb84a746f1a6$$%@^", "TIGER192", false},
 		{"46fc0125a148788a3ac1d649566fc04eb84a746f1a6$$%@^", "SOMEHASH", false},
+		{"b87f88c72702fff1748e58b87e9141a42c0dbedc29a78cb0d4a5cd81", "sha3-224", true},
+		{"b87f88c72702fff1748e58b87e9141a42c0dbedc29a78cb0d4a5cd81g", "sha3-224", false},
+		{"3338be694f50c5f338814986cdf0686453a888b84f424d792af4b9202398f392", "sha3-256", true},
+		{"3338be694f50c5f338814986cdf0686453a888b84f424d792af4b9202398f392g", "sha3-256", false},
+		{"720aea11019ef06440fbf05d87aa24680a2153df3907b23631e7177ce620fa1330ff07c0fddee54699a4c3ee0ee9d887", "sha3-384", true},
+		{"720aea11019ef06440fbf05d87aa24680a2153df3907b23631e7177ce620fa1330ff07c0fddee54699a4c3ee0ee9d88", "sha3-384", false},
+		{"75d527c368f2efe848ecf6b073a36767800805e9eef2b1857d5f984f036eb6df891d75f72d9b154518c1cd58835286d1da9a38deba3de98b5a53e5ed78a84976", "sha3-512", true},
+		{"75d527c368f2efe848ecf6b073a36767800805e9eef2b1857d5f984f036eb6df891d75f72d9b154518c1cd58835286d1da9a38deba3de98b5a53e5ed78a8497", "sha3-512", false},
 	}
 	for _, test := range tests {
 		actual := IsHash(test.param, test.algo)
 		if actual != test.expected {
 			t.Errorf("Expected IsHash(%q, %q) to be %v, got %v", test.param, test.algo, test.expected, actual)
+		}
+	}
+}
+
+func TestIsSHA3224(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"b87f88c72702fff1748e58b87e9141a42c0dbedc29a78cb0d4a5cd81", true},
+		{"b87f88c72702fff1748e58b87e9141a42c0dbedc29a78cb0d4a5cd81g", false},
+	}
+	for _, test := range tests {
+		actual := IsSHA3224(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsSHA3224(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsSHA3256(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"3338be694f50c5f338814986cdf0686453a888b84f424d792af4b9202398f392", true},
+		{"3338be694f50c5f338814986cdf0686453a888b84f424d792af4b9202398f39", false},
+	}
+	for _, test := range tests {
+		actual := IsSHA3256(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsSHA3256(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsSHA3384(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"720aea11019ef06440fbf05d87aa24680a2153df3907b23631e7177ce620fa1330ff07c0fddee54699a4c3ee0ee9d887", true},
+		{"720aea11019ef06440fbf05d87aa24680a2153df3907b23631e7177ce620fa1330ff07c0fddee54699a4c3ee0ee9d88", false},
+	}
+	for _, test := range tests {
+		actual := IsSHA3384(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsSHA3384(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsSHA3512(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"75d527c368f2efe848ecf6b073a36767800805e9eef2b1857d5f984f036eb6df891d75f72d9b154518c1cd58835286d1da9a38deba3de98b5a53e5ed78a84976", true},
+		{"75d527c368f2efe848ecf6b073a36767800805e9eef2b1857d5f984f036eb6df891d75f72d9b154518c1cd58835286d1da9a38deba3de98b5a53e5ed78a8497", false},
+	}
+	for _, test := range tests {
+		actual := IsSHA3512(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsSHA3512(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }

@@ -586,17 +586,39 @@ func IsHash(str string, algorithm string) bool {
 		len = "40"
 	} else if algo == "tiger192" {
 		len = "48"
-	} else if algo == "sha256" {
+	} else if algo == "sha3-224" {
+		len = "56"
+	} else if algo == "sha256" || algo == "sha3-256" {
 		len = "64"
-	} else if algo == "sha384" {
+	} else if algo == "sha384" || algo == "sha3-384" {
 		len = "96"
-	} else if algo == "sha512" {
+	} else if algo == "sha512" || algo == "sha3-512" {
 		len = "128"
 	} else {
 		return false
 	}
 
 	return Matches(str, "^[a-f0-9]{"+len+"}$")
+}
+
+// IsSHA3224 checks is a string is a SHA3-224 hash. Alias for `IsHash(str, "sha3-224")`
+func IsSHA3224(str string) bool {
+	return IsHash(str, "sha3-224")
+}
+
+// IsSHA3256 checks is a string is a SHA3-256 hash. Alias for `IsHash(str, "sha3-256")`
+func IsSHA3256(str string) bool {
+	return IsHash(str, "sha3-256")
+}
+
+// IsSHA3384 checks is a string is a SHA3-384 hash. Alias for `IsHash(str, "sha3-384")`
+func IsSHA3384(str string) bool {
+	return IsHash(str, "sha3-384")
+}
+
+// IsSHA3512 checks is a string is a SHA3-512 hash. Alias for `IsHash(str, "sha3-512")`
+func IsSHA3512(str string) bool {
+	return IsHash(str, "sha3-512")
 }
 
 // IsSHA512 checks is a string is a SHA512 hash. Alias for `IsHash(str, "sha512")`
