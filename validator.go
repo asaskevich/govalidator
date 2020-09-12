@@ -1298,6 +1298,8 @@ func checkRequired(v reflect.Value, t reflect.StructField, options tagOptionsMap
 }
 
 func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options tagOptionsMap) (isValid bool, resultErr error) {
+	var err error
+	var errs Errors
 	if !v.IsValid() {
 		return false, nil
 	}
@@ -1501,7 +1503,6 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		result := true
 		for i, k := range sv {
 			var resultItem bool
-			var err error
 			if v.MapIndex(k).Kind() != reflect.Struct {
 				resultItem, err = typeCheck(v.MapIndex(k), t, o, options)
 				if err != nil {
@@ -1511,17 +1512,20 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 				resultItem, err = ValidateStruct(v.MapIndex(k).Interface())
 				if err != nil {
 					err = prependPathToErrors(err, t.Name+"."+sv[i].Interface().(string))
-					return false, err
+					errs = append(errs, err)
+					result = false
 				}
 			}
 			result = result && resultItem
 		}
-		return result, nil
+		if len(errs) > 0 {
+			err = errs
+		}
+		return result, err
 	case reflect.Slice, reflect.Array:
 		result := true
 		for i := 0; i < v.Len(); i++ {
 			var resultItem bool
-			var err error
 			if v.Index(i).Kind() != reflect.Struct {
 				resultItem, err = typeCheck(v.Index(i), t, o, options)
 				if err != nil {
@@ -1531,12 +1535,16 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 				resultItem, err = ValidateStruct(v.Index(i).Interface())
 				if err != nil {
 					err = prependPathToErrors(err, t.Name+"."+strconv.Itoa(i))
-					return false, err
+					errs = append(errs, err)
+					result = false
 				}
 			}
 			result = result && resultItem
 		}
-		return result, nil
+		if len(errs) > 0 {
+			err = errs
+		}
+		return result, err
 	case reflect.Interface:
 		// If the value is an interface then encode its element
 		if v.IsNil() {
