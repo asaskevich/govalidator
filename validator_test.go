@@ -3469,7 +3469,11 @@ func TestStructWithManyErrors(t *testing.T) {
 		CountryCode string `json:"country_code" valid:"ISO3166Alpha3"`
 	}
 
+	type Details struct {
+		Email string `json:"email" valid:"email"`
+	}
 	type Person struct {
+		Details map[string]Details `json:"details"`
 		Addresses []Address `json:"addresses"`
 	}
 
@@ -3479,6 +3483,14 @@ func TestStructWithManyErrors(t *testing.T) {
 		expectedErr string
 	}{
 		{Person{
+			Details: map[string]Details{
+				"Email" :{
+					Email: "gogopher@example-com",
+				},
+				"Email1" :{
+					Email: "gogopher1@example-com",
+				},
+			},
 			Addresses: []Address{
 				{CountryCode: "GBP"},
 				{CountryCode: "BUS"},
@@ -3486,7 +3498,9 @@ func TestStructWithManyErrors(t *testing.T) {
 			},
 		}, false, "Addresses.0.country_code: GBP does not validate as ISO3166Alpha3;" +
 			"Addresses.1.country_code: BUS does not validate as ISO3166Alpha3;" +
-			"Addresses.2.country_code: CUS does not validate as ISO3166Alpha3"},
+			"Addresses.2.country_code: CUS does not validate as ISO3166Alpha3;" +
+			"Details.Email.email: gogopher@example-com does not validate as email;" +
+			"Details.Email1.email: gogopher1@example-com does not validate as email"},
 	}
 
 	for _, test := range tests {
