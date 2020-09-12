@@ -509,6 +509,22 @@ func IsFilePath(str string) (bool, int) {
 	return false, Unknown
 }
 
+//IsWinPath checks if a string is a windows path.
+func IsWinPath(str string) bool {
+	if IsNull(str) {
+		return false
+	}
+	return rxWinPath.MatchString(str)
+}
+
+//IsWinPath checks if a string is a unix path.
+func IsUnixPath(str string) bool {
+	if IsNull(str) {
+		return false
+	}
+	return rxUnixPath.MatchString(str)
+}
+
 // IsDataURI checks if a string is base64 encoded data URI such as an image
 func IsDataURI(str string) bool {
 	dataURI := strings.Split(str, ",")

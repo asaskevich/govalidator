@@ -1976,6 +1976,60 @@ func TestFilePath(t *testing.T) {
 	}
 }
 
+func TestIsWinPath(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"c:\\path\\file (x86)\bar", true},
+		{"c:\\path\\file", true},
+		{"c:\\path\\file:exe", false},
+		{"C:\\", true},
+		{"c:\\path\\file\\", true},
+		{"", false},
+		{"c:/path/file/", false},
+		{"/path/file/", false},
+
+	}
+	for _, test := range tests {
+		actual := IsWinPath(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsWinPath(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsUnixPath(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"c:\\path\\file\\", false},
+		{"/path/file/", true},
+		{"/path/file:SAMPLE/", true},
+		{"/path/file:/.txt", true},
+		{"/path", true},
+		{"/path/__bc/file.txt", true},
+		{"/path/a--ac/file.txt", true},
+		{"/_path/file.txt", true},
+		{"/path/__bc/file.txt", true},
+		{"/path/a--ac/file.txt", true},
+		{"/__path/--file.txt", true},
+		{"/path/a bc", true},
+		{"", false},
+	}
+	for _, test := range tests {
+		actual := IsUnixPath(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsUnixPath(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
 func TestIsLatitude(t *testing.T) {
 	t.Parallel()
 
