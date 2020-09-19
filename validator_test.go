@@ -3594,3 +3594,88 @@ func TestIsIMSI(t *testing.T) {
 		}
 	}
 }
+
+func TestIsUnixTime(t *testing.T) {
+	t.Parallel()
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"2016-12-31 11:00:00", false},
+		{"2016-12-31T11:00:00", false},
+		{"2016-12-31T11:00:00Z", false},
+		{"2016-12-31T11:00:00+01:00", false},
+		{"15665484887", true},
+		{"-665484887", true},
+	}
+	for _, test := range tests {
+		actual := IsUnixTime(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsUnixTime(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsRFC3339WithoutZone(t *testing.T) {
+	t.Parallel()
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"2016-12-31 11:00", false},
+		{"2016-12-31 11:00:00", false},
+		{"2016-12-31T11:00", false},
+		{"2016-12-31T11:00:00", true},
+		{"2016-12-31T11:00:00Z", false},
+		{"2016-12-31T11:00:00+01:00", false},
+		{"2016-12-31T11:00:00-01:00", false},
+	}
+	for _, test := range tests {
+		actual := IsRFC3339WithoutZone(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsRFC3339(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestMinStringLength(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		value    string
+		min      string
+		expected bool
+	}{
+		{"123456", "6", true},
+		{"123456", "7", false},
+		{"あいうえ", "4", true},
+		{"あいうえ", "5", false},
+	}
+	for _, test := range tests {
+		actual := MinStringLength(test.value, test.min)
+		if actual != test.expected {
+			t.Errorf("Expected MinStringLength(%s, %s) to be %v, got %v", test.value, test.min, test.expected, actual)
+		}
+	}
+}
+
+func TestMaxStringLength(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		value    string
+		max      string
+		expected bool
+	}{
+		{"123456", "6",true },
+		{"123456", "5", false},
+		{"あいうえ", "4", true},
+		{"あいうえ", "3", false},
+	}
+	for _, test := range tests {
+		actual := MaxStringLength(test.value, test.max)
+		if actual != test.expected {
+			t.Errorf("Expected MaxStringLength(%s, %s) to be %v, got %v", test.value, test.max, test.expected, actual)
+		}
+	}
+}
