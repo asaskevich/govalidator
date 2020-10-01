@@ -3594,3 +3594,89 @@ func TestIsIMSI(t *testing.T) {
 		}
 	}
 }
+
+func TestStringEmptyValue(t *testing.T) {
+	type EmptyIsInStruct struct {
+		IsIn string `valid:"required"`
+	}
+
+	var empty = ""
+	var normal = "123456"
+
+	var tests = []struct {
+		param       interface{}
+		expected    bool
+		expectedErr string
+	}{
+		{
+			EmptyIsInStruct{empty},
+			true,
+			"",
+		},
+		{
+			EmptyIsInStruct{normal},
+			true,
+			"",
+		},
+	}
+
+	SetEmptyValueAllowed(true)
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+		if err != nil {
+			if err.Error() != test.expectedErr {
+				t.Errorf("Got Error on ValidateStruct(%q). Expected: %s Actual: %s", test.param, test.expectedErr, err)
+			}
+		} else if test.expectedErr != "" {
+			t.Errorf("Expected error on ValidateStruct(%q).", test.param)
+		}
+	}
+	SetEmptyValueAllowed(false)
+}
+
+func TestIntEmptyValue(t *testing.T) {
+	type EmptyIsInStruct struct {
+		IsIn int `valid:"required"`
+	}
+
+	var empty = 0
+	var normal = 123456
+
+	var tests = []struct {
+		param       interface{}
+		expected    bool
+		expectedErr string
+	}{
+		{
+			EmptyIsInStruct{empty},
+			true,
+			"",
+		},
+		{
+			EmptyIsInStruct{normal},
+			true,
+			"",
+		},
+	}
+
+	SetEmptyValueAllowed(true)
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+		if err != nil {
+			if err.Error() != test.expectedErr {
+				t.Errorf("Got Error on ValidateStruct(%q). Expected: %s Actual: %s", test.param, test.expectedErr, err)
+			}
+		} else if test.expectedErr != "" {
+			t.Errorf("Expected error on ValidateStruct(%q).", test.param)
+		}
+	}
+	SetEmptyValueAllowed(false)
+}

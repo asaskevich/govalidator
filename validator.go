@@ -25,6 +25,7 @@ import (
 var (
 	fieldsRequiredByDefault bool
 	nilPtrAllowedByRequired = false
+	emptyValueAllowed       = false
 	notNumberRegexp         = regexp.MustCompile("[^0-9]+")
 	whiteSpacesAndMinus     = regexp.MustCompile(`[\s-]+`)
 	paramsRegexp            = regexp.MustCompile(`\(.*\)$`)
@@ -61,6 +62,12 @@ func SetFieldsRequiredByDefault(value bool) {
 // By default this is disabled.
 func SetNilPtrAllowedByRequired(value bool) {
 	nilPtrAllowedByRequired = value
+}
+
+// SetEmptyValueAllowed causes custom validators to be allowed to validate empty values.
+// By default this is disabled.
+func SetEmptyValueAllowed(value bool) {
+	emptyValueAllowed = value
 }
 
 // IsEmail checks if the string is an email.
@@ -1323,7 +1330,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		options = parseTagIntoMap(tag)
 	}
 
-	if isEmptyValue(v) {
+	if !emptyValueAllowed && isEmptyValue(v) {
 		// an empty value is not validated, checks only required
 		isValid, resultErr = checkRequired(v, t, options)
 		for key := range options {
