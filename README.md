@@ -36,6 +36,8 @@ import (
 
 `SetNilPtrAllowedByRequired` causes validation to pass when struct fields marked by `required` are set to nil. This is disabled by default for consistency, but some packages that need to be able to determine between `nil` and `zero value` state can use this. If disabled, both `nil` and `zero` values cause validation errors.
 
+`SetEmptyValueAllowed` causes custom validators to be allowed to validate empty values. This is disabled by default for backward compatiblity.
+
 ```go
 import "github.com/asaskevich/govalidator"
 
