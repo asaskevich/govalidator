@@ -498,7 +498,7 @@ func IsBase64(str string) bool {
 func IsFilePath(str string) (bool, int) {
 	if rxWinPath.MatchString(str) {
 		// check windows path limit see:
-		//  http://msdn.microsoft.com/en-us/library/aa365247(VS.85).aspx#maxpath
+		// http://msdn.microsoft.com/en-us/library/aa365247(VS.85).aspx#maxpath
 		if len(str[3:]) > 32767 {
 			return false, Win
 		}
