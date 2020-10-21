@@ -40,9 +40,9 @@ func TestIsAlpha(t *testing.T) {
 		{"달기&Co.", false},
 		{"〩Hours", false},
 		{"\ufff0", false},
-		{"\u0070", true},  //UTF-8(ASCII): p
-		{"\u0026", false}, //UTF-8(ASCII): &
-		{"\u0030", false}, //UTF-8(ASCII): 0
+		{"\u0070", true},  // UTF-8(ASCII): p
+		{"\u0026", false}, // UTF-8(ASCII): &
+		{"\u0030", false}, // UTF-8(ASCII): 0
 		{"123", false},
 		{"0123", false},
 		{"-00123", false},
@@ -70,7 +70,7 @@ func TestIsAlpha(t *testing.T) {
 	for _, test := range tests {
 		actual := IsAlpha(test.param)
 		if actual != test.expected {
-			t.Errorf("Expected IsAlpha(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("expected IsAlpha(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
@@ -100,9 +100,9 @@ func TestIsUTFLetter(t *testing.T) {
 		{"달기&Co.", false},
 		{"〩Hours", false},
 		{"\ufff0", false},
-		{"\u0070", true},  //UTF-8(ASCII): p
-		{"\u0026", false}, //UTF-8(ASCII): &
-		{"\u0030", false}, //UTF-8(ASCII): 0
+		{"\u0070", true},  // UTF-8(ASCII): p
+		{"\u0026", false}, // UTF-8(ASCII): &
+		{"\u0030", false}, // UTF-8(ASCII): 0
 		{"123", false},
 		{"0123", false},
 		{"-00123", false},
@@ -161,9 +161,9 @@ func TestIsAlphanumeric(t *testing.T) {
 		{"달기&Co.", false},
 		{"〩Hours", false},
 		{"\ufff0", false},
-		{"\u0070", true},  //UTF-8(ASCII): p
-		{"\u0026", false}, //UTF-8(ASCII): &
-		{"\u0030", true},  //UTF-8(ASCII): 0
+		{"\u0070", true},  // UTF-8(ASCII): p
+		{"\u0026", false}, // UTF-8(ASCII): &
+		{"\u0030", true},  // UTF-8(ASCII): 0
 		{"123", true},
 		{"0123", true},
 		{"-00123", false},
@@ -220,9 +220,9 @@ func TestIsUTFLetterNumeric(t *testing.T) {
 		{"달기&Co.", false},
 		{"〩Hours", true},
 		{"\ufff0", false},
-		{"\u0070", true},  //UTF-8(ASCII): p
-		{"\u0026", false}, //UTF-8(ASCII): &
-		{"\u0030", true},  //UTF-8(ASCII): 0
+		{"\u0070", true},  // UTF-8(ASCII): p
+		{"\u0026", false}, // UTF-8(ASCII): &
+		{"\u0030", true},  // UTF-8(ASCII): 0
 		{"123", true},
 		{"0123", true},
 		{"-00123", false},
@@ -279,9 +279,9 @@ func TestIsNumeric(t *testing.T) {
 		{"달기&Co.", false},
 		{"〩Hours", false},
 		{"\ufff0", false},
-		{"\u0070", false}, //UTF-8(ASCII): p
-		{"\u0026", false}, //UTF-8(ASCII): &
-		{"\u0030", true},  //UTF-8(ASCII): 0
+		{"\u0070", false}, // UTF-8(ASCII): p
+		{"\u0026", false}, // UTF-8(ASCII): &
+		{"\u0030", true},  // UTF-8(ASCII): 0
 		{"123", true},
 		{"0123", true},
 		{"-00123", false},
@@ -340,9 +340,9 @@ func TestIsUTFNumeric(t *testing.T) {
 		{"달기&Co.", false},
 		{"〩Hours", false},
 		{"\ufff0", false},
-		{"\u0070", false}, //UTF-8(ASCII): p
-		{"\u0026", false}, //UTF-8(ASCII): &
-		{"\u0030", true},  //UTF-8(ASCII): 0
+		{"\u0070", false}, // UTF-8(ASCII): p
+		{"\u0026", false}, // UTF-8(ASCII): &
+		{"\u0030", true},  // UTF-8(ASCII): 0
 		{"123", true},
 		{"0123", true},
 		{"-00123", true},
@@ -399,9 +399,9 @@ func TestIsUTFDigit(t *testing.T) {
 		{"달기&Co.", false},
 		{"〩Hours", false},
 		{"\ufff0", false},
-		{"\u0070", false}, //UTF-8(ASCII): p
-		{"\u0026", false}, //UTF-8(ASCII): &
-		{"\u0030", true},  //UTF-8(ASCII): 0
+		{"\u0070", false}, // UTF-8(ASCII): p
+		{"\u0026", false}, // UTF-8(ASCII): &
+		{"\u0030", true},  // UTF-8(ASCII): 0
 		{"123", true},
 		{"0123", true},
 		{"-00123", true},
@@ -574,18 +574,18 @@ func TestIsInt(t *testing.T) {
 		param    string
 		expected bool
 	}{
-		{"-2147483648", true},          //Signed 32 Bit Min Int
-		{"2147483647", true},           //Signed 32 Bit Max Int
-		{"-2147483649", true},          //Signed 32 Bit Min Int - 1
-		{"2147483648", true},           //Signed 32 Bit Max Int + 1
-		{"4294967295", true},           //Unsigned 32 Bit Max Int
-		{"4294967296", true},           //Unsigned 32 Bit Max Int + 1
-		{"-9223372036854775808", true}, //Signed 64 Bit Min Int
-		{"9223372036854775807", true},  //Signed 64 Bit Max Int
-		{"-9223372036854775809", true}, //Signed 64 Bit Min Int - 1
-		{"9223372036854775808", true},  //Signed 64 Bit Max Int + 1
-		{"18446744073709551615", true}, //Unsigned 64 Bit Max Int
-		{"18446744073709551616", true}, //Unsigned 64 Bit Max Int + 1
+		{"-2147483648", true},          // Signed 32 Bit Min Int
+		{"2147483647", true},           // Signed 32 Bit Max Int
+		{"-2147483649", true},          // Signed 32 Bit Min Int - 1
+		{"2147483648", true},           // Signed 32 Bit Max Int + 1
+		{"4294967295", true},           // Unsigned 32 Bit Max Int
+		{"4294967296", true},           // Unsigned 32 Bit Max Int + 1
+		{"-9223372036854775808", true}, // Signed 64 Bit Min Int
+		{"9223372036854775807", true},  // Signed 64 Bit Max Int
+		{"-9223372036854775809", true}, // Signed 64 Bit Min Int - 1
+		{"9223372036854775808", true},  // Signed 64 Bit Max Int + 1
+		{"18446744073709551615", true}, // Unsigned 64 Bit Max Int
+		{"18446744073709551616", true}, // Unsigned 64 Bit Max Int + 1
 		{"", true},
 		{"123", true},
 		{"0", true},
@@ -1948,7 +1948,7 @@ func TestFilePath(t *testing.T) {
 		expected bool
 		osType   int
 	}{
-		{"c:\\" + strings.Repeat("a", 32767), true, Win}, //See http://msdn.microsoft.com/en-us/library/aa365247(VS.85).aspx#maxpath
+		{"c:\\" + strings.Repeat("a", 32767), true, Win}, // See http://msdn.microsoft.com/en-us/library/aa365247(VS.85).aspx#maxpath
 		{"c:\\" + strings.Repeat("a", 32768), false, Win},
 		{"c:\\path\\file (x86)\bar", true, Win},
 		{"c:\\path\\file", true, Win},
@@ -2483,7 +2483,7 @@ func TestInvalidValidator(t *testing.T) {
 
 	invalidStruct := InvalidStruct{1}
 	if valid, err := ValidateStruct(&invalidStruct); valid || err == nil ||
-		err.Error() != `Field: The following validator is invalid or can't be applied to the field: "someInvalidValidator"` {
+		err.Error() != `Field: the following validator is invalid or can't be applied to the field: "someInvalidValidator"` {
 		t.Errorf("Got an unexpected result for struct with invalid validator: %t %s", valid, err)
 	}
 }
@@ -3158,19 +3158,19 @@ func TestErrorsByField(t *testing.T) {
 		param    string
 		expected string
 	}{
-		{"CustomField", "An error occurred"},
+		{"CustomField", "an error occurred"},
 	}
 
-	err = Error{"CustomField", fmt.Errorf("An error occurred"), false, "hello", []string{}}
+	err = Error{"CustomField", fmt.Errorf("an error occurred"), false, "hello", []string{}}
 	errs = ErrorsByField(err)
 
 	if len(errs) != 1 {
-		t.Errorf("There should only be 1 errors but got %v", len(errs))
+		t.Errorf("there should only be 1 errors but got %v", len(errs))
 	}
 
 	for _, test := range tests {
 		if actual, ok := errs[test.param]; !ok || actual != test.expected {
-			t.Errorf("Expected ErrorsByField(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("expected ErrorsByField(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 
@@ -3246,7 +3246,7 @@ func ExampleValidateStruct() {
 	}
 	post := &Post{"My Example Post", "duck", "123.234.54.3"}
 
-	//Add your own struct validation tags
+	// Add your own struct validation tags
 	TagMap["duck"] = Validator(func(str string) bool {
 		return str == "duck"
 	})
@@ -3323,67 +3323,30 @@ func TestValidateStructParamValidatorInt(t *testing.T) {
 	if err == nil {
 		t.Errorf("Test failed: nil")
 	}
-
-	type Test3 struct {
-		Int   int   `valid:"in(1|10),int"`
-		Int8  int8  `valid:"in(1|10),int8"`
-		Int16 int16 `valid:"in(1|10),int16"`
-		Int32 int32 `valid:"in(1|10),int32"`
-		Int64 int64 `valid:"in(1|10),int64"`
-
-		Uint   uint   `valid:"in(1|10),uint"`
-		Uint8  uint8  `valid:"in(1|10),uint8"`
-		Uint16 uint16 `valid:"in(1|10),uint16"`
-		Uint32 uint32 `valid:"in(1|10),uint32"`
-		Uint64 uint64 `valid:"in(1|10),uint64"`
-
-		Float32 float32 `valid:"in(1|10),float32"`
-		Float64 float64 `valid:"in(1|10),float64"`
-	}
-
-	test3Ok1 := &Test2{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-	test3Ok2 := &Test2{10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10}
-	test3NotOk := &Test2{2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
-
-	_, err = ValidateStruct(test3Ok1)
-	if err != nil {
-		t.Errorf("Test failed: %s", err)
-	}
-
-	_, err = ValidateStruct(test3Ok2)
-	if err != nil {
-		t.Errorf("Test failed: %s", err)
-	}
-
-	_, err = ValidateStruct(test3NotOk)
-	if err == nil {
-		t.Errorf("Test failed: nil")
-	}
 }
 
 func TestValidateStructUpperAndLowerCaseWithNumTypeCheck(t *testing.T) {
-
-	type StructCapital struct {
-		Total float32 `valid:"float,required"`
-	}
-
-	structCapital := &StructCapital{53.3535}
-	_, err := ValidateStruct(structCapital)
-	if err != nil {
-		t.Errorf("Test failed: nil")
-		fmt.Println(err)
-	}
-
-	type StructLower struct {
-		total float32 `valid:"float,required"`
-	}
-
-	structLower := &StructLower{53.3535}
-	_, err = ValidateStruct(structLower)
-	if err != nil {
-		t.Errorf("Test failed: nil")
-		fmt.Println(err)
-	}
+    type StructCapital struct {
+        Total float32 `valid:"float,required"`
+    }
+    
+    structCapital := &StructCapital{53.3535}
+    _, err := ValidateStruct(structCapital)
+    if err != nil {
+        t.Errorf("Test failed: nil")
+        fmt.Println(err)
+    }
+    
+    type StructLower struct {
+        Total float32 `valid:"float,required"`
+    }
+    
+    structLower := &StructLower{53.3535}
+    _, err = ValidateStruct(structLower)
+    if err != nil {
+        t.Errorf("Test failed: nil")
+        fmt.Println(err)
+    }
 }
 
 func TestIsCIDR(t *testing.T) {
