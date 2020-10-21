@@ -2,9 +2,10 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.9
+      - image: circleci/golang:1.13
     working_directory: /go/src/github.com/asaskevich/govalidator
     steps:
       - checkout
+      - run: diff -u /dev/null <(gofmt -d .)
       - run: go get -v -t -d ./...
       - run: go test -v ./...

@@ -645,13 +645,16 @@ func TestIsExistingEmail(t *testing.T) {
 		{"foo@bar.com", true},
 		{"foo@bar.com.au", true},
 		{"foo+bar@bar.com", true},
-		{"foo@bar.coffee", true},
 		{"foo@bar.coffee..coffee", false},
 		{"invalidemail@", false},
 		{"invalid.com", false},
 		{"@invalid.com", false},
 		{"NathAn.daVIeS@DomaIn.cOM", true},
 		{"NATHAN.DAVIES@DOMAIN.CO.UK", true},
+		{"prasun.joshi@localhost", true},
+		{"[prasun.joshi]@DomaIn.cOM", false},
+		{"sizeofuserismorethansixtyfour0123sizeofuserismorethansixtyfour0123@DOMAIN.CO.UK", false},
+		{"nosuchdomain@bar.nosuchdomainsuffix", false},
 	}
 	for _, test := range tests {
 		actual := IsExistingEmail(test.param)
@@ -1019,54 +1022,90 @@ func TestIsNull(t *testing.T) {
 	}
 }
 
-func TestHasWhitespaceOnly(t *testing.T) {
-    t.Parallel()
+func TestIsNotNull(t *testing.T) {
+	t.Parallel()
 
-    var tests = []struct {
-        param    string
-        expected bool
-    }{
-        {"abacaba", false},
-        {"", false},
-        {"    ", true},
-        {"  \r\n  ", true},
-        {"\014\012\011\013\015", true},
-        {"\014\012\011\013 abc  \015", false},
-        {"\f\n\t\v\r\f", true},
-        {"x\n\t\t\t\t", false},
-        {"\f\n\t  \n\n\n   \v\r\f", true},
-    }
-    for _, test := range tests {
-        actual := HasWhitespaceOnly(test.param)
-        if actual != test.expected {
-            t.Errorf("Expected HasWhitespaceOnly(%q) to be %v, got %v", test.param, test.expected, actual)
-        }
-    }
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"abacaba", true},
+		{"", false},
+	}
+	for _, test := range tests {
+		actual := IsNotNull(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsNull(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsIMEI(t *testing.T) {
+	tests := []struct {
+		param    string
+		expected bool
+	}{
+		{"990000862471854", true},
+		{"351756051523999", true},
+		{"9900008624718541", false},
+		{"1", false},
+	}
+	for _, test := range tests {
+		actual := IsIMEI(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsIMEI(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestHasWhitespaceOnly(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"abacaba", false},
+		{"", false},
+		{"    ", true},
+		{"  \r\n  ", true},
+		{"\014\012\011\013\015", true},
+		{"\014\012\011\013 abc  \015", false},
+		{"\f\n\t\v\r\f", true},
+		{"x\n\t\t\t\t", false},
+		{"\f\n\t  \n\n\n   \v\r\f", true},
+	}
+	for _, test := range tests {
+		actual := HasWhitespaceOnly(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected HasWhitespaceOnly(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
 }
 
 func TestHasWhitespace(t *testing.T) {
-    t.Parallel()
+	t.Parallel()
 
-    var tests = []struct {
-        param    string
-        expected bool
-    }{
-        {"abacaba", false},
-        {"", false},
-        {"    ", true},
-        {"  \r\n  ", true},
-        {"\014\012\011\013\015", true},
-        {"\014\012\011\013 abc  \015", true},
-        {"\f\n\t\v\r\f", true},
-        {"x\n\t\t\t\t", true},
-        {"\f\n\t  \n\n\n   \v\r\f", true},
-    }
-    for _, test := range tests {
-        actual := HasWhitespace(test.param)
-        if actual != test.expected {
-            t.Errorf("Expected HasWhitespace(%q) to be %v, got %v", test.param, test.expected, actual)
-        }
-    }
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"abacaba", false},
+		{"", false},
+		{"    ", true},
+		{"  \r\n  ", true},
+		{"\014\012\011\013\015", true},
+		{"\014\012\011\013 abc  \015", true},
+		{"\f\n\t\v\r\f", true},
+		{"x\n\t\t\t\t", true},
+		{"\f\n\t  \n\n\n   \v\r\f", true},
+	}
+	for _, test := range tests {
+		actual := HasWhitespace(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected HasWhitespace(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
 }
 
 func TestIsDivisibleBy(t *testing.T) {
@@ -1384,26 +1423,36 @@ func TestIsUUID(t *testing.T) {
 
 func TestIsCreditCard(t *testing.T) {
 	t.Parallel()
-
-	var tests = []struct {
-		param    string
-		expected bool
+	tests := []struct {
+		name   string
+		number string
+		want   bool
 	}{
-		{"", false},
-		{"foo", false},
-		{"5398228707871528", false},
-		{"375556917985515", true},
-		{"36050234196908", true},
-		{"4716461583322103", true},
-		{"4716-2210-5188-5662", true},
-		{"4929 7226 5379 7141", true},
-		{"5398228707871527", true},
+		{"empty", "", false},
+		{"not numbers", "credit card", false},
+		{"invalid luhn algorithm", "4220855426213389", false},
+
+		{"visa", "4220855426222389", true},
+		{"visa spaces", "4220 8554 2622 2389", true},
+		{"visa dashes", "4220-8554-2622-2389", true},
+		{"mastercard", "5139288802098206", true},
+		{"american express", "374953669708156", true},
+		{"discover", "6011464355444102", true},
+		{"jcb", "3548209662790989", true},
+
+		// below should be valid, do they respect international standards?
+		// is our validator logic not correct?
+		{"diners club international", "30190239451016", false},
+		{"rupay", "6521674451993089", false},
+		{"mir", "2204151414444676", false},
+		{"china unionPay", "624356436327468104", false},
 	}
-	for _, test := range tests {
-		actual := IsCreditCard(test.param)
-		if actual != test.expected {
-			t.Errorf("Expected IsCreditCard(%q) to be %v, got %v", test.param, test.expected, actual)
-		}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsCreditCard(tt.number); got != tt.want {
+				t.Errorf("IsCreditCard(%v) = %v, want %v", tt.number, got, tt.want)
+			}
+		})
 	}
 }
 
@@ -1503,6 +1552,41 @@ func TestIsDataURI(t *testing.T) {
 		actual := IsDataURI(test.param)
 		if actual != test.expected {
 			t.Errorf("Expected IsDataURI(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsMagnetURI(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"magnet:?xt=urn:btih:06E2A9683BF4DA92C73A661AC56F0ECC9C63C5B4&dn=helloword2000&tr=udp://helloworld:1337/announce", true},
+		{"magnet:?xt=urn:btih:3E30322D5BFC7444B7B1D8DD42404B75D0531DFB&dn=world&tr=udp://world.com:1337", true},
+		{"magnet:?xt=urn:btih:4ODKSDJBVMSDSNJVBCBFYFBKNRU875DW8D97DWC6&dn=helloworld&tr=udp://helloworld.com:1337", true},
+		{"magnet:?xt=urn:btih:1GSHJVBDVDVJFYEHKFHEFIO8573898434JBFEGHD&dn=foo&tr=udp://foo.com:1337", true},
+		{"magnet:?xt=urn:btih:MCJDCYUFHEUD6E2752T7UJNEKHSUGEJFGTFHVBJS&dn=bar&tr=udp://bar.com:1337", true},
+		{"magnet:?xt=urn:btih:LAKDHWDHEBFRFVUFJENBYYTEUY837562JH2GEFYH&dn=foobar&tr=udp://foobar.com:1337", true},
+		{"magnet:?xt=urn:btih:MKCJBHCBJDCU725TGEB3Y6RE8EJ2U267UNJFGUID&dn=test&tr=udp://test.com:1337", true},
+		{"magnet:?xt=urn:btih:UHWY2892JNEJ2GTEYOMDNU67E8ICGICYE92JDUGH&dn=baz&tr=udp://baz.com:1337", true},
+		{"magnet:?xt=urn:btih:HS263FG8U3GFIDHWD7829BYFCIXB78XIHG7CWCUG&dn=foz&tr=udp://foz.com:1337", true},
+		{"", false},
+		{":?xt=urn:btih:06E2A9683BF4DA92C73A661AC56F0ECC9C63C5B4&dn=helloword2000&tr=udp://helloworld:1337/announce", false},
+		{"magnett:?xt=urn:btih:3E30322D5BFC7444B7B1D8DD42404B75D0531DFB&dn=world&tr=udp://world.com:1337", false},
+		{"xt=urn:btih:4ODKSDJBVMSDSNJVBCBFYFBKNRU875DW8D97DWC6&dn=helloworld&tr=udp://helloworld.com:1337", false},
+		{"magneta:?xt=urn:btih:1GSHJVBDVDVJFYEHKFHEFIO8573898434JBFEGHD&dn=foo&tr=udp://foo.com:1337", false},
+		{"magnet:?xt=uarn:btih:MCJDCYUFHEUD6E2752T7UJNEKHSUGEJFGTFHVBJS&dn=bar&tr=udp://bar.com:1337", false},
+		{"magnet:?xt=urn:btihz&dn=foobar&tr=udp://foobar.com:1337", false},
+		{"magnet:?xat=urn:btih:MKCJBHCBJDCU725TGEB3Y6RE8EJ2U267UNJFGUID&dn=test&tr=udp://test.com:1337", false},
+		{"magnet::?xt=urn:btih:UHWY2892JNEJ2GTEYOMDNU67E8ICGICYE92JDUGH&dn=baz&tr=udp://baz.com:1337", false},
+		{"magnet:?xt:btih:HS263FG8U3GFIDHWD7829BYFCIXB78XIHG7CWCUG&dn=foz&tr=udp://foz.com:1337", false},
+	}
+	for _, test := range tests {
+		actual := IsMagnetURI(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsMagnetURI(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
@@ -2031,13 +2115,13 @@ func TestIsTime(t *testing.T) {
 		{"2016-12-31T11:00:00.05Z", time.RFC3339, true},
 		{"2016-12-31T11:00:00.05-01:00", time.RFC3339, true},
 		{"2016-12-31T11:00:00.05+01:00", time.RFC3339, true},
-		{"2016-12-31T11:00:00", RF3339WithoutZone, true},
-		{"2016-12-31T11:00:00Z", RF3339WithoutZone, false},
-		{"2016-12-31T11:00:00+01:00", RF3339WithoutZone, false},
-		{"2016-12-31T11:00:00-01:00", RF3339WithoutZone, false},
-		{"2016-12-31T11:00:00.05Z", RF3339WithoutZone, false},
-		{"2016-12-31T11:00:00.05-01:00", RF3339WithoutZone, false},
-		{"2016-12-31T11:00:00.05+01:00", RF3339WithoutZone, false},
+		{"2016-12-31T11:00:00", rfc3339WithoutZone, true},
+		{"2016-12-31T11:00:00Z", rfc3339WithoutZone, false},
+		{"2016-12-31T11:00:00+01:00", rfc3339WithoutZone, false},
+		{"2016-12-31T11:00:00-01:00", rfc3339WithoutZone, false},
+		{"2016-12-31T11:00:00.05Z", rfc3339WithoutZone, false},
+		{"2016-12-31T11:00:00.05-01:00", rfc3339WithoutZone, false},
+		{"2016-12-31T11:00:00.05+01:00", rfc3339WithoutZone, false},
 	}
 	for _, test := range tests {
 		actual := IsTime(test.param, test.format)
@@ -2463,7 +2547,7 @@ func TestStructWithCustomByteArray(t *testing.T) {
 
 		switch v := i.(type) {
 		case CustomByteArray:
-			for _, e := range v { // check if v is empty, i.e. all zeroes
+			for _, e := range v { // checks if v is empty, i.e. all zeroes
 				if e != 0 {
 					return true
 				}
@@ -2842,7 +2926,7 @@ func TestValidateStruct(t *testing.T) {
 		param    interface{}
 		expected bool
 	}{
-		{User{"John", "john@yahoo.com", "123G#678", 20, &Address{"Street", "ABC456D89"},    []Address{{"Street", "123456"}, {"Street", "123456"}}}, false},
+		{User{"John", "john@yahoo.com", "123G#678", 20, &Address{"Street", "ABC456D89"}, []Address{{"Street", "123456"}, {"Street", "123456"}}}, false},
 		{User{"John", "john!yahoo.com", "12345678", 20, &Address{"Street", "ABC456D89"}, []Address{{"Street", "ABC456D89"}, {"Street", "123456"}}}, false},
 		{User{"John", "", "12345", 0, &Address{"Street", "123456789"}, []Address{{"Street", "ABC456D89"}, {"Street", "123456"}}}, false},
 		{UserValid{"John", "john@yahoo.com", "123G#678", 20, &Address{"Street", "123456"}, []Address{{"Street", "123456"}, {"Street", "123456"}}}, true},
@@ -3239,10 +3323,45 @@ func TestValidateStructParamValidatorInt(t *testing.T) {
 	if err == nil {
 		t.Errorf("Test failed: nil")
 	}
+
+	type Test3 struct {
+		Int   int   `valid:"in(1|10),int"`
+		Int8  int8  `valid:"in(1|10),int8"`
+		Int16 int16 `valid:"in(1|10),int16"`
+		Int32 int32 `valid:"in(1|10),int32"`
+		Int64 int64 `valid:"in(1|10),int64"`
+
+		Uint   uint   `valid:"in(1|10),uint"`
+		Uint8  uint8  `valid:"in(1|10),uint8"`
+		Uint16 uint16 `valid:"in(1|10),uint16"`
+		Uint32 uint32 `valid:"in(1|10),uint32"`
+		Uint64 uint64 `valid:"in(1|10),uint64"`
+
+		Float32 float32 `valid:"in(1|10),float32"`
+		Float64 float64 `valid:"in(1|10),float64"`
+	}
+
+	test3Ok1 := &Test3{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+	test3Ok2 := &Test3{10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10}
+	test3NotOk := &Test3{2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
+
+	_, err = ValidateStruct(test3Ok1)
+	if err != nil {
+		t.Errorf("Test failed: %s", err)
+	}
+
+	_, err = ValidateStruct(test3Ok2)
+	if err != nil {
+		t.Errorf("Test failed: %s", err)
+	}
+
+	_, err = ValidateStruct(test3NotOk)
+	if err == nil {
+		t.Errorf("Test failed: nil")
+	}
 }
 
 func TestValidateStructUpperAndLowerCaseWithNumTypeCheck(t *testing.T) {
-
     type StructCapital struct {
         Total float32 `valid:"float,required"`
     }
@@ -3369,7 +3488,7 @@ func TestValidatorIncludedInError(t *testing.T) {
 		}
 	}
 
-	// check to make sure that validators with arguments (like length(1|10)) don't include the arguments
+	// checks to make sure that validators with arguments (like length(1|10)) don't include the arguments
 	// in the validator name
 	message := MessageWithSeveralFieldsStruct{
 		Title: "",
@@ -3449,6 +3568,28 @@ bQIDAQAB
 		actual := IsRsaPublicKey(test.rsastr, test.keylen)
 		if actual != test.expected {
 			t.Errorf("Expected TestIsRsaPublicKey(%d, %d) to be %v, got %v", i, test.keylen, test.expected, actual)
+		}
+	}
+}
+
+func TestIsIMSI(t *testing.T) {
+	tests := []struct {
+		param    string
+		expected bool
+	}{
+		{"234150999999999", true},
+		{"429011234567890", true},
+		{"310150123456789", true},
+		{"460001234567890", true},
+		{"4600012345678", false},
+		{"4600012345678901", false},
+		{"462001234567890", false},
+		{"1", false},
+	}
+	for _, test := range tests {
+		actual := IsIMSI(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsIMSI(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
 	}
 }
