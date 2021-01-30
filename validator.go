@@ -69,11 +69,6 @@ func IsEmail(str string) bool {
 	return rxEmail.MatchString(str)
 }
 
-// IsPhoneNumber if the string is a phone number
-func IsPhoneNumber(str string) bool{
-	return rxPhoneNumber.MatchString(str)
-}
-
 // IsExistingEmail checks if the string is an email of existing domain
 func IsExistingEmail(email string) bool {
 
