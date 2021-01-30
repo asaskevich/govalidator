@@ -3594,3 +3594,29 @@ func TestIsIMSI(t *testing.T) {
 		}
 	}
 }
+
+func TestIsPhoneNumber(t *testing.T) {
+	tests := []struct {
+		param    string
+		expected bool
+	}{
+		{"3979435680", true},
+		{"+3979435680", true},
+		{"+39 79435680", true},
+		{"(39) 79435680", true},
+		{"+(39)79435680", true},
+		{"+(39) 79435680", true},
+		{"+(39) 794-3568", true},
+		{"+(39) 794-335-6854", true},
+		{"+(39) 794 335 6854", true},
+		{"+ 39 794 335", false},
+		{"+(39 79435680", false},
+		{"+(39 7943568031231", false},
+	}
+	for _, test := range tests {
+		actual := IsPhoneNumber(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsPhoneNumber(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}

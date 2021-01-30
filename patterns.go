@@ -50,6 +50,7 @@ const (
 	hasWhitespaceOnly string = "^[[:space:]]+$"
 	IMEI              string = "^[0-9a-f]{14}$|^\\d{15}$|^\\d{18}$"
 	IMSI              string = "^\\d{14,15}$"
+	PhoneNumber		  string = `^((\+?[0-9]{1,3})|(\+?\([0-9]{1,3}\)))[\s-]?(?:\(0?[0-9]{1,5}\)|[0-9]{1,5})[-\s]?[0-9][\d\s-]{5,7}\s?(?:x[\d-]{0,4})?$`
 )
 
 // Used by IsFilePath func
@@ -104,4 +105,5 @@ var (
 	rxHasWhitespaceOnly = regexp.MustCompile(hasWhitespaceOnly)
 	rxIMEI              = regexp.MustCompile(IMEI)
 	rxIMSI              = regexp.MustCompile(IMSI)
+	rxPhoneNumber       = regexp.MustCompile(PhoneNumber)
 )
