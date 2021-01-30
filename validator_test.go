@@ -1430,6 +1430,10 @@ func TestIsCreditCard(t *testing.T) {
 	}{
 		{"empty", "", false},
 		{"not numbers", "credit card", false},
+		{"has alphabet character's", "26f71e56d2e54fabae2ca87e5c524fef", false},
+		{"has dashes stickied together", "26715--62542--875524", false},
+		{"has spaces stickied together", "26715  6254287  5524", false},
+		{"has spaces stickied with dash", "26715 62542- 875524", false},
 		{"invalid luhn algorithm", "4220855426213389", false},
 
 		{"visa", "4220855426222389", true},
