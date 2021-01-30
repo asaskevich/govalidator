@@ -27,6 +27,7 @@ var (
 	nilPtrAllowedByRequired = false
 	notNumberRegexp         = regexp.MustCompile("[^0-9]+")
 	whiteSpacesAndMinus     = regexp.MustCompile(`[\s-]+`)
+	whiteSpacesAndMinusMultiStickied = regexp.MustCompile(`[\s-]{2,}`)
 	paramsRegexp            = regexp.MustCompile(`\(.*\)$`)
 )
 
@@ -363,7 +364,10 @@ func IsUUID(str string) bool {
 
 // IsCreditCard checks if the string is a credit card.
 func IsCreditCard(str string) bool {
-	sanitized := notNumberRegexp.ReplaceAllString(str, "")
+	if whiteSpacesAndMinusMultiStickied.MatchString(str) {
+		return false
+	}
+	sanitized := whiteSpacesAndMinus.ReplaceAllString(str, "")
 	if !rxCreditCard.MatchString(sanitized) {
 		return false
 	}
