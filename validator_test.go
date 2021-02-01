@@ -3594,3 +3594,93 @@ func TestIsIMSI(t *testing.T) {
 		}
 	}
 }
+
+func TestHasLeastOneLowerCase(t *testing.T) {
+	tests := []struct {
+		param    string
+		expected bool
+	}{
+		{"KAJNSDbKLJLK", true},
+		{"123hkKJNKJK", true},
+		{"jjdjdskjfnd", true},
+		{"a", true},
+		{"KJNASKJFN8234", false},
+		{"1236", false},
+		{"KJANSKJDN", false},
+		{"8", false},
+	}
+	for _, test := range tests {
+		actual := HasLeastOneLowerCase(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsIMSI(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestHasLeastOneUpperCase(t *testing.T) {
+	tests := []struct {
+		param    string
+		expected bool
+	}{
+		{"KAJNSDbKLJLK", true},
+		{"123hkKJNKJK", true},
+		{"jjdjdskjfnd", false},
+		{"a", false},
+		{"B", true},
+		{"KJNASKJFN8234", true},
+		{"1236", false},
+		{"salam", false},
+		{"8878^^---=", false},
+	}
+	for _, test := range tests {
+		actual := HasLeastOneUpperCase(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsIMSI(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestHasLeastOneNumeric(t *testing.T) {
+	tests := []struct {
+		param    string
+		expected bool
+	}{
+		{"KAJNSDbKLJLK", false},
+		{"123hkKJNKJK", true},
+		{"jjdjdskjfnd", false},
+		{"1", true},
+		{"KJNASKJFN8234", true},
+		{"1236", true},
+		{"KJANSKJDsssN", false},
+		{"8", true},
+	}
+	for _, test := range tests {
+		actual := HasLeastOneNumeric(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsIMSI(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestHasLeastOneAlphabet(t *testing.T) {
+	tests := []struct {
+		param    string
+		expected bool
+	}{
+		{"KAJNSDbKLJLK", true},
+		{"123hkKJNKJK", true},
+		{"jjdjdskjfnd", true},
+		{"a", true},
+		{"456", false},
+		{"KJNASKJFN8234", true},
+		{"1236", false},
+		{"---++++279823", false},
+		{"8", false},
+	}
+	for _, test := range tests {
+		actual := HasLeastOneAlphabet(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsIMSI(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}

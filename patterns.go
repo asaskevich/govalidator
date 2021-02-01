@@ -30,6 +30,10 @@ const (
 	MagnetURI         string = "^magnet:\\?xt=urn:[a-zA-Z0-9]+:[a-zA-Z0-9]{32,40}&dn=.+&tr=.+$"
 	Latitude          string = "^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)$"
 	Longitude         string = "^[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$"
+	HasLeastLowerCase string = ".*[a-z]+.*"
+	HasLeastUpperCase string = ".*[A-Z]+.*"
+	HasLeastNumeric   string = ".*[0-9]+.*"
+	HasLeastAlphabet  string = ".*[a-z|A-Z]+.*"
 	DNSName           string = `^([a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62}){1}(\.[a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62})*[\._]?$`
 	IP                string = `(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))`
 	URLSchema         string = `((ftp|tcp|udp|wss?|https?):\/\/)`
@@ -92,6 +96,10 @@ var (
 	rxMagnetURI         = regexp.MustCompile(MagnetURI)
 	rxLatitude          = regexp.MustCompile(Latitude)
 	rxLongitude         = regexp.MustCompile(Longitude)
+	rxHasLeastLowerCase = regexp.MustCompile(HasLeastLowerCase)
+	rxHasLeastUpperCase = regexp.MustCompile(HasLeastUpperCase)
+	rxHasLeastNumeric   = regexp.MustCompile(HasLeastNumeric)
+	rxHasLeastAlphabet  = regexp.MustCompile(HasLeastAlphabet)
 	rxDNSName           = regexp.MustCompile(DNSName)
 	rxURL               = regexp.MustCompile(URL)
 	rxSSN               = regexp.MustCompile(SSN)

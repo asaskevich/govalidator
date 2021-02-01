@@ -1625,3 +1625,31 @@ func (sv stringValues) Len() int           { return len(sv) }
 func (sv stringValues) Swap(i, j int)      { sv[i], sv[j] = sv[j], sv[i] }
 func (sv stringValues) Less(i, j int) bool { return sv.get(i) < sv.get(j) }
 func (sv stringValues) get(i int) string   { return sv[i].String() }
+
+func HasLeastOneLowerCase(str string) bool {
+	if str == "" {
+		return false
+	}
+	return rxHasLeastLowerCase.MatchString(str)
+}
+
+func HasLeastOneUpperCase(str string) bool {
+	if str == "" {
+		return false
+	}
+	return rxHasUpperCase.MatchString(str)
+}
+
+func HasLeastOneNumeric(str string) bool {
+	if str == "" {
+		return false
+	}
+	return rxHasLeastNumeric.MatchString(str)
+}
+
+func HasLeastOneAlphabet(str string) bool {
+	if str == "" {
+		return false
+	}
+	return rxHasLeastAlphabet.MatchString(str)
+}
