@@ -22,7 +22,7 @@ func (es Errors) Error() string {
 	return strings.Join(errs, ";")
 }
 
-func (es Errors) firstError() string {
+func (es Errors) FirstError() string {
 	var errs []string
 	for _, e := range es {
 		errs = append(errs, e.Error())
@@ -33,7 +33,7 @@ func (es Errors) firstError() string {
 	return ""
 }
 
-func (es Errors) getErrorInIndex(index int) string {
+func (es Errors) GetErrorInIndex(index int) string {
 	var errs []string
 	for _, e := range es {
 		errs = append(errs, e.Error())
