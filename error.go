@@ -33,6 +33,21 @@ func (es Errors) firstError() string {
 	return ""
 }
 
+func (es Errors) getErrorInIndex(index int) string {
+	var errs []string
+	for _, e := range es {
+		errs = append(errs, e.Error())
+	}
+	if index >= len(errs) {
+		return ""
+	}
+
+	if errs != nil {
+		return errs[index]
+	}
+	return ""
+}
+
 // Error encapsulates a name, an error and whether there's a custom error message or not.
 type Error struct {
 	Name                     string
