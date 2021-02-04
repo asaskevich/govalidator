@@ -45,3 +45,9 @@ func (e Error) Error() string {
 
 	return errName + ": " + e.Err.Error()
 }
+
+// returns first error
+func FirstError(e error) error {
+	errs := e.(Errors)
+	return errs[0]
+}
