@@ -28,7 +28,7 @@ func TestErrorsToString(t *testing.T) {
 	}
 }
 
-func TestErrors_firstError(t *testing.T) {
+func TestErrors_FirstError(t *testing.T) {
 
 	t.Parallel()
 	customErr := &Error{Name: "Custom Error Name", Err: fmt.Errorf("stdlib error")}
@@ -46,7 +46,34 @@ func TestErrors_firstError(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual := test.param1.firstError()
+		actual := test.param1.FirstError()
+		if actual != test.expected {
+			t.Errorf("Expected Error() to return '%v', got '%v'", test.expected, actual)
+		}
+	}
+
+}
+
+func TestErrors_GetErrorInIndex(t *testing.T) {
+
+	t.Parallel()
+	customErr := &Error{Name: "Custom Error Name", Err: fmt.Errorf("stdlib error")}
+	customErrWithCustomErrorMessage := &Error{Name: "Custom Error Name 2", Err: fmt.Errorf("Bad stuff happened"), CustomErrorMessageExists: true}
+
+	tests := []struct {
+		param1   Errors
+		expected string
+		index    int
+	}{
+		{Errors{}, "", 0},
+		{Errors{fmt.Errorf("Error 1")}, "Error 1", 0},
+		{Errors{fmt.Errorf("Error 1"), fmt.Errorf("Error 2")}, "Error 2", 1},
+		{Errors{customErr, fmt.Errorf("Error 2")}, "Error 2", 1},
+		{Errors{fmt.Errorf("Error 123"), customErrWithCustomErrorMessage}, "Error 123", 0},
+	}
+
+	for _, test := range tests {
+		actual := test.param1.GetErrorInIndex(test.index)
 		if actual != test.expected {
 			t.Errorf("Expected Error() to return '%v', got '%v'", test.expected, actual)
 		}
