@@ -192,6 +192,18 @@ func IsUTFLetterNumeric(str string) bool {
 
 }
 
+// IsRegex checks if the string is a valid regex. Empty string is valid.
+func IsRegex(str string) bool {
+	if IsNull(str) {
+		return true
+	}
+	_, err := regexp.Compile(str)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
 // IsNumeric checks if the string contains only numbers. Empty string is valid.
 func IsNumeric(str string) bool {
 	if IsNull(str) {

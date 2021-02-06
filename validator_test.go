@@ -468,6 +468,32 @@ func TestIsLowerCase(t *testing.T) {
 	}
 }
 
+func TestIsRegex(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"", true},
+		{"p([a-z]+)ch", true},
+		{"//", true},
+		{"/[0-9]+/", true},
+		{"^a.b$", true},
+		{"[", false},
+		{"*", false},
+		{"+*^", false},
+		{"[0-9]++", false},
+		{"[)", false},
+	}
+	for _, test := range tests {
+		actual := IsRegex(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsRegex(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
 func TestIsUpperCase(t *testing.T) {
 	t.Parallel()
 
