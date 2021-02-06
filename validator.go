@@ -819,6 +819,7 @@ func IsRsaPublicKey(str string, keylen int) bool {
 	return bitlen == int(keylen)
 }
 
+// IsRegex checks if a give string is a valid regex with RE2 syntax or not
 func IsRegex(str string) bool {
 	if _, err := regexp.Compile(str); err == nil {
 		return true
