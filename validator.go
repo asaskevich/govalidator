@@ -819,6 +819,13 @@ func IsRsaPublicKey(str string, keylen int) bool {
 	return bitlen == int(keylen)
 }
 
+func IsRegex(str string) bool {
+	if _, err := regexp.Compile(str); err == nil {
+		return true
+	}
+	return false
+}
+
 func toJSONName(tag string) string {
 	if tag == "" {
 		return ""

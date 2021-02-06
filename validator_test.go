@@ -3573,6 +3573,74 @@ bQIDAQAB
 	}
 }
 
+func TestIsRegex(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"^$", true},
+		{"$^", true},
+		{"^^", true},
+		{"$$", true},
+		{"a+", true},
+		{"a++", false},
+		{"a*", true},
+		{"a**", false},
+		{"a+*", false},
+		{"a*+", false},
+		{"[a+]+", true},
+		{"\\w+", true},
+		{"\\y+", false},
+		{"[asdf][qwer]", true},
+		{"[asdf[", false},
+		{"[asdf[]", true},
+		{"[asdf[][]", false},
+		{"(group2)(group3)", true},
+		{"(invalid_paranthesis(asdf)", false},
+		{"a?", true},
+		{"a??", true},
+		{"a???", false},
+		{"a\\???", true},
+		{"asdf\\/", true},
+		{"asdf/", true},
+		{"\\x61", true},
+		{"\\xg1", false},
+		{"\\x6h", false},
+		{"[asdf[", false},
+		{"[A-z]+", true},
+		{"[z-A]+", false},
+		{"[a-z-A]", true},
+		{"a{3,6}", true},
+		{"a{6,3|3,6}", true},
+		{"a{6,3}", false},
+		{"a|b", true},
+		{"a|b|", true},
+		{"a|b||", true}, //But false in python RE
+		{"(?:)", true},
+		{"(?)", true}, //But false in python RE
+		{"?", false},
+		{"(?::?)", true},
+		{"(?:?)", false},
+		{"(()?)", true},
+		{"(?:?)", false},
+		{"(A conditional matching)? (?(1)matched|not matched)", false}, //But true in python RE
+		{"(A conditional matching)? (?(2)matched|not matched)", false},
+		{"(?:A conditional matching)? (?(1)matched|not matched)", false},
+		{"(?:[a-z]+)?", true},
+		{"(?#[a-z]+)?", false},
+		{"(?P<name>[a-z]+)", true},
+		{"(?P<name<>>[a-z]+)", false},
+	}
+	for _, test := range tests {
+		actual := IsRegex(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsNumeric(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
 func TestIsIMSI(t *testing.T) {
 	tests := []struct {
 		param    string
