@@ -567,6 +567,64 @@ func TestHasUpperCase(t *testing.T) {
 	}
 }
 
+func TestHasNumAndUpperAndLower(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"", true},
+		{"abc123", false},
+		{"abc", false},
+		{"AB12", false},
+		{"123", false},
+		{"ab12", false},
+		{"ABc1", true},
+		{"fooBar3", true},
+		{"123ABCd6", true},
+		{"ABC123ab", true},
+		{"ABc2", true},
+		{"S T 5aR", true},
+		{"foo2Bar", true},
+	}
+	for _, test := range tests {
+		actual := HasNumAndUpperAndLower(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected HasNumAndUpperAndLower(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestHasNumOrUpperOrLower(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"", true},
+		{"**", false},
+		{"  ", false},
+		{"__", false},
+		{"@_+", false},
+		{" ! $", false},
+		{"ASDF", true},
+		{"foohello", true},
+		{"_123 ", true},
+		{"ABC123ab", true},
+		{"ABc2", true},
+		{"S** !", true},
+		{" *!1 ", true},
+	}
+	for _, test := range tests {
+		actual := HasNumOrUpperOrLower(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected HasNumOrUpperOrLower(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
 func TestIsInt(t *testing.T) {
 	t.Parallel()
 
