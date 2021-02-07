@@ -13,6 +13,11 @@ func (es Errors) Errors() []error {
 	return es
 }
 
+// Errors returns first error.
+func (es Errors) FirstError() error {
+	return es[0]
+}
+
 func (es Errors) Error() string {
 	var errs []string
 	for _, e := range es {
