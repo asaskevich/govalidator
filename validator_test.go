@@ -2965,6 +2965,7 @@ type testByteMap map[byte]byte
 type testByteSlice []byte
 type testStringStringMap map[string]string
 type testStringIntMap map[string]int
+type testIntArray [8]int
 
 func TestRequired(t *testing.T) {
 
@@ -3026,6 +3027,14 @@ func TestRequired(t *testing.T) {
 		},
 		{
 			struct {
+				TestIntArray testIntArray `valid:"required"`
+			}{
+				testIntArray{0, 1, 2, 3, 4, 5, 6, 7},
+			},
+			true,
+		},
+		{
+			struct {
 				TestByteArray testByteArray `valid:"required"`
 			}{},
 			false,
@@ -3042,7 +3051,7 @@ func TestRequired(t *testing.T) {
 			struct {
 				TestByteArray testByteArray `valid:"required"`
 			}{
-				testByteArray{'1', '2', '3', '4', '5', '6', '7', 'A'},
+				testByteArray{0x00, '1', '2', '3', '4', '5', '6', '7'},
 			},
 			true,
 		},
