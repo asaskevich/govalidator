@@ -1232,6 +1232,11 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		options = parseTagIntoMap(tag)
 	}
 
+	// An optional and zero field should not be validated
+	if _, isOptional := options["optional"]; isOptional && v.IsZero() {
+		return true, nil
+	}
+
 	if !isFieldSet(v) {
 		// an empty value is not validated, check only required
 		isValid, resultErr = checkRequired(v, t, options)
