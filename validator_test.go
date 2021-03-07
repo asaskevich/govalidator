@@ -1421,6 +1421,45 @@ func TestIsUUID(t *testing.T) {
 	}
 }
 
+func TestIsULID(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"", false},
+		{"xxxa987fbc9-4bed-3078-cf07-9141ba07c9f3", false},
+		{"a987fbc9-4bed-3078-cf07-9141ba07c9f3xxx", false},
+		{"a987fbc94bed3078cf079141ba07c9f3", false},
+		{"934859", false},
+		{"987fbc9-4bed-3078-cf07a-9141ba07c9f3", false},
+		{"aaaaaaaa-1111-1111-aaag-111111111111", false},
+		{"0000000000zzzzzzzzzzzzzzzz", true},
+		{"0123456789zzzzzzzzzzzzzzzz", true},
+		{"0123456789abcdefghjkmnpqrs", true},
+		{"7zzzzzzzzzaaaaaaaaaaaaaaaa", true},
+		{"7zanmkqfpyaaaaaaaaaaaaaaaa", true},
+		{"7zanmkqfpyaaaaaaaaaaAAAAAA", true},
+		{"8000000000zzzzzzzzzzzzzzzz", false},
+		{"8000000001zzzzzzzzzzzzzzzz", false},
+		{"8123456789zzzzzzzzzzzzzzzz", false},
+		{"8123456789zzzzzzzzzzzzzzzL", false},
+		{"8123456789zzzzzzzzzzzzzzzO", false},
+		{"8123456789zzzzzzzzzzzzzzzu", false},
+		{"8123456789zzzzzzzzzzzzzzzI", false},
+	}
+	for _, test := range tests {
+		tc := test
+		t.Run(fmt.Sprintf("%26.26s", tc.param), func(t *testing.T) {
+			actual := IsULID(tc.param)
+			if actual != tc.expected {
+				t.Errorf("Expected IsULID(%q) to be %v, got %v", tc.param, tc.expected, actual)
+			}
+		})
+	}
+}
+
 func TestIsCreditCard(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
