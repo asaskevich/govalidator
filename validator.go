@@ -450,7 +450,7 @@ func IsULID(str string) bool {
 
 // IsCreditCard checks if the string is a credit card.
 func IsCreditCard(str string) bool {
-	sanitized := notNumberRegexp.ReplaceAllString(str, "")
+	sanitized := whiteSpacesAndMinus.ReplaceAllString(str, "")
 	if !rxCreditCard.MatchString(sanitized) {
 		return false
 	}
