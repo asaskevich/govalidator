@@ -3701,3 +3701,24 @@ func TestIsIMSI(t *testing.T) {
 		}
 	}
 }
+
+func TestIsE164(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"+14155552671", true},
+		{"+442071838750", true},
+		{"+551155256325", true},
+		{"+226071234567 ", false},
+		{"+06071234567 ", false},
+	}
+	for _, test := range tests {
+		actual := IsE164(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsURL(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
