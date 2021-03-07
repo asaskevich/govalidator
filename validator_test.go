@@ -2095,6 +2095,69 @@ func TestFilePath(t *testing.T) {
 	}
 }
 
+func TestIsWinFilePath(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"c:\\" + strings.Repeat("a", 32767), true}, //See http://msdn.microsoft.com/en-us/library/aa365247(VS.85).aspx#maxpath
+		{"c:\\" + strings.Repeat("a", 32768), false},
+		{"c:\\path\\file (x86)\\bar", true},
+		{"c:\\path\\file", true},
+		{"c:\\path\\file:exe", false},
+		{"C:\\", true},
+		{"c:\\path\\file\\", true},
+		{"..\\path\\file\\", true},
+		{"c:/path/file/", false},
+		{"a bc", true},
+		{"abc.jd", true},
+		{"abc.jd:$#%# dsd", false},
+	}
+	for _, test := range tests {
+		actual := IsWinFilePath(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsWinFilePath(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsUnixFilePath(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"c:/path/file/", true},    //relative path
+		{"../path/file/", true},    //relative path
+		{"../../path/file/", true}, //relative path
+		{"./path/file/", true},     //relative path
+		{"./file.dghdg", true},     //relative path
+		{"/path/file/", true},
+		{"/path/file:SAMPLE/", true},
+		{"/path/file:/.txt", true},
+		{"/path", true},
+		{"/path/__bc/file.txt", true},
+		{"/path/a--ac/file.txt", true},
+		{"/_path/file.txt", true},
+		{"/path/__bc/file.txt", true},
+		{"/path/a--ac/file.txt", true},
+		{"/__path/--file.txt", true},
+		{"/path/a bc", true},
+		{"a bc", true},
+		{"abc.jd", true},
+		{"abc.jd:$#%# dsd", true},
+	}
+	for _, test := range tests {
+		actual := IsUnixFilePath(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsUnixFilePath(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
 func TestIsLatitude(t *testing.T) {
 	t.Parallel()
 
