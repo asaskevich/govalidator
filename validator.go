@@ -118,7 +118,7 @@ func IsURL(str string) bool {
 	if strings.HasPrefix(u.Host, ".") {
 		return false
 	}
-	if u.Host == "" && (u.Path != "" && !strings.Contains(u.Path, ".")) {
+	if (u.Host == "" && u.Path != "" && !strings.Contains(u.Path, ".")) || (u.Host != "" && !strings.Contains(u.Host, ".")) {
 		return false
 	}
 	return rxURL.MatchString(str)
