@@ -177,6 +177,7 @@ func IsPrintableASCII(str string) bool
 func IsRFC3339(str string) bool
 func IsRFC3339WithoutZone(str string) bool
 func IsRGBcolor(str string) bool
+func IsRegex(str string) bool
 func IsRequestURI(rawurl string) bool
 func IsRequestURL(rawurl string) bool
 func IsRipeMD128(str string) bool
