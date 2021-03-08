@@ -290,6 +290,22 @@ func HasUpperCase(str string) bool {
 	return rxHasUpperCase.MatchString(str)
 }
 
+// HasNumAndUpperAndLower checks if the string contains at least 1 uppercase, 1 lowercase and 1 number. Empty string is valid
+func HasNumAndUpperAndLower(str string) bool {
+	if IsNull(str) {
+		return true
+	}
+	return (rxHasLowerCase.MatchString(str) && rxHasUpperCase.MatchString(str) && rxHasNumber.MatchString(str))
+}
+
+// HasNumOrUpperOrLower checks if the string contains at least 1 uppercase or 1 lowercase or 1 number. Empty string is valid
+func HasNumOrUpperOrLower(str string) bool {
+	if IsNull(str) {
+		return true
+	}
+	return (rxHasLowerCase.MatchString(str) || rxHasUpperCase.MatchString(str) || rxHasNumber.MatchString(str))
+}
+
 // IsInt checks if the string is an integer. Empty string is valid.
 func IsInt(str string) bool {
 	if IsNull(str) {
