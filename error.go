@@ -22,6 +22,32 @@ func (es Errors) Error() string {
 	return strings.Join(errs, ";")
 }
 
+func (es Errors) FirstError() string {
+	var errs []string
+	for _, e := range es {
+		errs = append(errs, e.Error())
+	}
+	if errs != nil {
+		return errs[0]
+	}
+	return ""
+}
+
+func (es Errors) GetErrorInIndex(index int) string {
+	var errs []string
+	for _, e := range es {
+		errs = append(errs, e.Error())
+	}
+	if index >= len(errs) {
+		return ""
+	}
+
+	if errs != nil {
+		return errs[index]
+	}
+	return ""
+}
+
 // Error encapsulates a name, an error and whether there's a custom error message or not.
 type Error struct {
 	Name                     string
