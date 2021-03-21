@@ -3780,7 +3780,7 @@ func TestIsRegex(t *testing.T) {
 		{"[asdf[]", true},
 		{"[asdf[][]", false},
 		{"(group2)(group3)", true},
-		{"(invalid_paranthesis(asdf)", false},
+		{"(invalid_parenthesis(asdf)", false},
 		{"a?", true},
 		{"a??", true},
 		{"a???", false},
