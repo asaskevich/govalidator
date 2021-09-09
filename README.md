@@ -84,12 +84,12 @@ This was changed to prevent data races when accessing custom validators.
 import "github.com/asaskevich/govalidator"
 
 // before
-govalidator.CustomTypeTagMap["customByteArrayValidator"] = func(i interface{}, o interface{}) bool {
+govalidator.CustomTypeTagMap["customByteArrayValidator"] = func(i interface{}, o interface{}) error {
   // ...
 }
 
 // after
-govalidator.CustomTypeTagMap.Set("customByteArrayValidator", func(i interface{}, o interface{}) bool {
+govalidator.CustomTypeTagMap.Set("customByteArrayValidator", func(i interface{}, o interface{}) error {
   // ...
 })
 ```
@@ -493,7 +493,7 @@ type StructWithCustomByteArray struct {
   CustomMinLength int             `valid:"-"`
 }
 
-govalidator.CustomTypeTagMap.Set("customByteArrayValidator", func(i interface{}, context interface{}) bool {
+govalidator.CustomTypeTagMap.Set("customByteArrayValidator", func(i interface{}, context interface{}) error {
   switch v := context.(type) { // you can type switch on the context interface being validated
   case StructWithCustomByteArray:
     // you can check and validate against some other field in the context,
@@ -514,7 +514,7 @@ govalidator.CustomTypeTagMap.Set("customByteArrayValidator", func(i interface{},
   }
   return false
 })
-govalidator.CustomTypeTagMap.Set("customMinLengthValidator", func(i interface{}, context interface{}) bool {
+govalidator.CustomTypeTagMap.Set("customMinLengthValidator", func(i interface{}, context interface{}) error {
   switch v := context.(type) { // this validates a field against the value in another field, i.e. dependent validation
   case StructWithCustomByteArray:
     return len(v.ID) >= v.CustomMinLength
