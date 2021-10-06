@@ -3440,6 +3440,27 @@ func ExampleValidateStruct() {
 	println(result)
 }
 
+func TestValidateStructRange(t *testing.T) {
+	type Test1 struct {
+		Range1 int `valid:"range(0|1)"`
+		Range2 int `valid:"range(1|10)"`
+		Range3 int `valid:"range(-10|10)"`
+		Range4 int `valid:"range(-10|-1)"`
+	}
+	test1Ok := &Test1{1, 1, -1, -1}
+	test1NotOk := &Test1{-1, -1, 11, 11}
+
+	_, err := ValidateStruct(test1Ok)
+	if err != nil {
+		t.Errorf("Test failed: %s", err)
+	}
+
+	_, err = ValidateStruct(test1NotOk)
+	if err == nil {
+		t.Errorf("Test failed: nil")
+	}
+}
+
 func TestValidateStructParamValidatorInt(t *testing.T) {
 	type Test1 struct {
 		Int   int   `valid:"range(1|10)"`
