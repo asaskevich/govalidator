@@ -3543,6 +3543,28 @@ func TestValidateStructParamValidatorInt(t *testing.T) {
 	}
 }
 
+func TestValidateStructPositive(t *testing.T) {
+	t.Parallel()
+	type Test struct {
+		Value int `valid:"positive"`
+	}
+
+	var tests = []struct {
+		test Test
+		err  bool
+	}{
+		{Test{1}, false},
+		{Test{-1}, true},
+		{Test{0}, false},
+	}
+	for _, test := range tests {
+		if _, err := ValidateStruct(test.test); (err != nil) != test.err {
+			t.Errorf("Expected ValidateStruct error to be %v, got %v", test.err, err)
+
+		}
+	}
+}
+
 func TestValidateStructUpperAndLowerCaseWithNumTypeCheck(t *testing.T) {
 
 	type StructCapital struct {
