@@ -1131,7 +1131,7 @@ func ValidateStruct(s interface{}) (bool, error) {
 		}
 		if (valueField.Kind() == reflect.Struct ||
 			(valueField.Kind() == reflect.Ptr && valueField.Elem().Kind() == reflect.Struct)) &&
-			typeField.Tag.Get(tagName) != "-" {
+			typeField.Tag.Get(tagName) != "-" { 
 			var err error
 			structResult, err = ValidateStruct(valueField.Interface())
 			if err != nil {
@@ -1679,6 +1679,11 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		// If the value is an interface then encode its element
 		if v.IsNil() {
 			return true, nil
+		}
+		// Fix https://github.com/asaskevich/govalidator/issues/454 -- check if the value/interface is not struct, like string
+		val := reflect.ValueOf(v.Interface())
+		if val.Kind() != reflect.Struct {
+			return typeCheck(val, t, o, options)
 		}
 		return ValidateStruct(v.Interface())
 	case reflect.Ptr:
