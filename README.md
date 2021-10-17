@@ -1,8 +1,8 @@
 govalidator
 ===========
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/asaskevich/govalidator?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![GoDoc](https://godoc.org/github.com/asaskevich/govalidator?status.png)](https://godoc.org/github.com/asaskevich/govalidator)
-[![Build Status](https://travis-ci.org/asaskevich/govalidator.svg?branch=master)](https://travis-ci.org/asaskevich/govalidator)
-[![Coverage](https://codecov.io/gh/asaskevich/govalidator/branch/master/graph/badge.svg)](https://codecov.io/gh/asaskevich/govalidator) [![Go Report Card](https://goreportcard.com/badge/github.com/asaskevich/govalidator)](https://goreportcard.com/report/github.com/asaskevich/govalidator) [![GoSearch](http://go-search.org/badge?id=github.com%2Fasaskevich%2Fgovalidator)](http://go-search.org/view?id=github.com%2Fasaskevich%2Fgovalidator) [![Backers on Open Collective](https://opencollective.com/govalidator/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/govalidator/sponsors/badge.svg)](#sponsors) [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fasaskevich%2Fgovalidator.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fasaskevich%2Fgovalidator?ref=badge_shield)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/sergeyglazyrindev/govalidator?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![GoDoc](https://godoc.org/github.com/sergeyglazyrindev/govalidator?status.png)](https://godoc.org/github.com/sergeyglazyrindev/govalidator)
+[![Build Status](https://travis-ci.org/sergeyglazyrindev/govalidator.svg?branch=master)](https://travis-ci.org/sergeyglazyrindev/govalidator)
+[![Coverage](https://codecov.io/gh/sergeyglazyrindev/govalidator/branch/master/graph/badge.svg)](https://codecov.io/gh/sergeyglazyrindev/govalidator) [![Go Report Card](https://goreportcard.com/badge/github.com/sergeyglazyrindev/govalidator)](https://goreportcard.com/report/github.com/sergeyglazyrindev/govalidator) [![GoSearch](http://go-search.org/badge?id=github.com%sergeyglazyrindev%2Fgovalidator)](http://go-search.org/view?id=github.com%sergeyglazyrindev%2Fgovalidator) [![Backers on Open Collective](https://opencollective.com/govalidator/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/govalidator/sponsors/badge.svg)](#sponsors) [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%sergeyglazyrindev%2Fgovalidator.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%sergeyglazyrindev%2Fgovalidator?ref=badge_shield)
 
 A package of validators and sanitizers for strings, structs and collections. Based on [validator.js](https://github.com/chriso/validator.js).
 
@@ -10,11 +10,11 @@ A package of validators and sanitizers for strings, structs and collections. Bas
 Make sure that Go is installed on your computer.
 Type the following command in your terminal:
 
-	go get github.com/asaskevich/govalidator
+	go get github.com/sergeyglazyrindev/govalidator
 
 or you can get specified release of the package with `gopkg.in`:
 
-	go get gopkg.in/asaskevich/govalidator.v10
+	go get gopkg.in/sergeyglazyrindev/govalidator.v10
 
 After it the package is ready to use.
 
@@ -22,12 +22,12 @@ After it the package is ready to use.
 #### Import package in your project
 Add following line in your `*.go` file:
 ```go
-import "github.com/asaskevich/govalidator"
+import "github.com/sergeyglazyrindev/govalidator"
 ```
 If you are unhappy to use long `govalidator`, you can do something like this:
 ```go
 import (
-  valid "github.com/asaskevich/govalidator"
+  valid "github.com/sergeyglazyrindev/govalidator"
 )
 ```
 
@@ -37,7 +37,7 @@ import (
 `SetNilPtrAllowedByRequired` causes validation to pass when struct fields marked by `required` are set to nil. This is disabled by default for consistency, but some packages that need to be able to determine between `nil` and `zero value` state can use this. If disabled, both `nil` and `zero` values cause validation errors.
 
 ```go
-import "github.com/asaskevich/govalidator"
+import "github.com/sergeyglazyrindev/govalidator"
 
 func init() {
   govalidator.SetFieldsRequiredByDefault(true)
@@ -65,11 +65,11 @@ type exampleStruct2 struct {
 }
 ```
 
-#### Recent breaking changes (see [#123](https://github.com/asaskevich/govalidator/pull/123))
+#### Recent breaking changes (see [#123](https://github.com/sergeyglazyrindev/govalidator/pull/123))
 ##### Custom validator function signature
 A context was added as the second parameter, for structs this is the object being validated – this makes dependent validation possible.
 ```go
-import "github.com/asaskevich/govalidator"
+import "github.com/sergeyglazyrindev/govalidator"
 
 // old signature
 func(i interface{}) bool
@@ -81,7 +81,7 @@ func(i interface{}, o interface{}) bool
 ##### Adding a custom validator
 This was changed to prevent data races when accessing custom validators.
 ```go
-import "github.com/asaskevich/govalidator"
+import "github.com/sergeyglazyrindev/govalidator"
 
 // before
 govalidator.CustomTypeTagMap["customByteArrayValidator"] = func(i interface{}, o interface{}) error {
@@ -322,7 +322,7 @@ var fn govalidator.ConditionIterator = func(value interface{}, index int) bool {
 _ = govalidator.Filter(data, fn) // result = []interface{}{2, 4, 6, 8, 10}
 _ = govalidator.Count(data, fn) // result = 5
 ```
-###### ValidateStruct [#2](https://github.com/asaskevich/govalidator/pull/2)
+###### ValidateStruct [#2](https://github.com/sergeyglazyrindev/govalidator/pull/2)
 If you want to validate structs, you can use tag `valid` for any field in your structure. All validators used with this field in one tag are separated by comma. If you want to skip validation, place `-` in your tag. If you need a validator that is not on the list below, you can add it like this:
 ```go
 govalidator.TagMap["duck"] = govalidator.Validator(func(str string) bool {
@@ -439,7 +439,7 @@ if err != nil {
 }
 println(result)
 ```
-###### ValidateMap [#2](https://github.com/asaskevich/govalidator/pull/338)
+###### ValidateMap [#2](https://github.com/sergeyglazyrindev/govalidator/pull/338)
 If you want to validate maps, you can use the map to be validated and a validation map that contain the same tags used in ValidateStruct, both maps have to be in the form `map[string]interface{}`
 
 So here is small example of usage:
@@ -483,7 +483,7 @@ println(govalidator.WhiteList("a3a43a5a4a3a2a23a4a5a4a3a4", "a-z") == "aaaaaaaaa
 ###### Custom validation functions
 Custom validation using your own domain specific validators is also available - here's an example of how to use it:
 ```go
-import "github.com/asaskevich/govalidator"
+import "github.com/sergeyglazyrindev/govalidator"
 
 type CustomByteArray [6]byte // custom types are supported and can be validated
 
@@ -544,8 +544,8 @@ type Ticket struct {
 ```
 
 #### Notes
-Documentation is available here: [godoc.org](https://godoc.org/github.com/asaskevich/govalidator).
-Full information about code coverage is also available here: [govalidator on gocover.io](http://gocover.io/github.com/asaskevich/govalidator).
+Documentation is available here: [godoc.org](https://godoc.org/github.com/sergeyglazyrindev/govalidator).
+Full information about code coverage is also available here: [govalidator on gocover.io](http://gocover.io/github.com/sergeyglazyrindev/govalidator).
 
 #### Support
 If you do have a contribution to the package, feel free to create a Pull Request or an Issue.
@@ -554,13 +554,13 @@ If you do have a contribution to the package, feel free to create a Pull Request
 If you don't know what to do, there are some features and functions that need to be done
 
 - [ ] Refactor code
-- [ ] Edit docs and [README](https://github.com/asaskevich/govalidator/README.md): spellcheck, grammar and typo check
+- [ ] Edit docs and [README](https://github.com/sergeyglazyrindev/govalidator/README.md): spellcheck, grammar and typo check
 - [ ] Create actual list of contributors and projects that currently using this package
-- [ ] Resolve [issues and bugs](https://github.com/asaskevich/govalidator/issues)
-- [ ] Update actual [list of functions](https://github.com/asaskevich/govalidator#list-of-functions)
-- [ ] Update [list of validators](https://github.com/asaskevich/govalidator#validatestruct-2) that available for `ValidateStruct` and add new
+- [ ] Resolve [issues and bugs](https://github.com/sergeyglazyrindev/govalidator/issues)
+- [ ] Update actual [list of functions](https://github.com/sergeyglazyrindev/govalidator#list-of-functions)
+- [ ] Update [list of validators](https://github.com/sergeyglazyrindev/govalidator#validatestruct-2) that available for `ValidateStruct` and add new
 - [ ] Implement new validators: `IsFQDN`, `IsIMEI`, `IsPostalCode`, `IsISIN`, `IsISRC` etc
-- [x] Implement [validation by maps](https://github.com/asaskevich/govalidator/issues/224)
+- [x] Implement [validation by maps](https://github.com/sergeyglazyrindev/govalidator/issues/224)
 - [ ] Implement fuzzing testing
 - [ ] Implement some struct/map/array utilities
 - [ ] Implement map/array validation
@@ -579,7 +579,7 @@ Feel free to create what you want, but keep in mind when you implement new featu
 
 This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
 
-#### Special thanks to [contributors](https://github.com/asaskevich/govalidator/graphs/contributors)
+#### Special thanks to [contributors](https://github.com/sergeyglazyrindev/govalidator/graphs/contributors)
 * [Daniel Lohse](https://github.com/annismckenzie)
 * [Attila Oláh](https://github.com/attilaolah)
 * [Daniel Korner](https://github.com/Dadie)
@@ -590,7 +590,7 @@ This project exists thanks to all the people who contribute. [[Contribute](CONTR
 * [Matt Sanford](https://github.com/mzsanford)
 * [Simon ccl1115](https://github.com/ccl1115)
 
-<a href="https://github.com/asaskevich/govalidator/graphs/contributors"><img src="https://opencollective.com/govalidator/contributors.svg?width=890" /></a>
+<a href="https://github.com/sergeyglazyrindev/govalidator/graphs/contributors"><img src="https://opencollective.com/govalidator/contributors.svg?width=890" /></a>
 
 
 ### Backers
@@ -619,4 +619,4 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 
 
 ## License
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fasaskevich%2Fgovalidator.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fasaskevich%2Fgovalidator?ref=badge_large)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%sergeyglazyrindev%2Fgovalidator.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%sergeyglazyrindev%2Fgovalidator?ref=badge_large)
