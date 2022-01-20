@@ -111,6 +111,7 @@ func IsURL(str string) bool {
 		// http:// is appended so url.Parse will succeed, strTemp used so it does not impact rxURL.MatchString
 		strTemp = "http://" + str
 	}
+	strTemp = strings.Replace(strTemp, "%", "\\", len(strTemp))
 	u, err := url.Parse(strTemp)
 	if err != nil {
 		return false
