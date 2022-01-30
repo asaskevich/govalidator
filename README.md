@@ -312,7 +312,7 @@ data := []interface{}{1, 2, 3, 4, 5}
 var fn govalidator.ResultIterator = func(value interface{}, index int) interface{} {
 	return value.(int) * 3
 }
-_ = govalidator.Map(data, fn) // result = []interface{}{1, 6, 9, 12, 15}
+_ = govalidator.Map(data, fn) // result = []interface{}{3, 6, 9, 12, 15}
 ```
 ```go
 data := []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
