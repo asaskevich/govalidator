@@ -274,6 +274,24 @@ func IsUpperCase(str string) bool {
 	return str == strings.ToUpper(str)
 }
 
+// IsWord Checks if the string is one word and starts with capital letter and continues with lower
+func IsWord(str string) bool {
+	if IsNull(str) {
+		return true
+	}
+
+	firstLetter := string(str[0])
+	otherExceptFirst := string(str[1:])
+
+	if firstLetter != strings.ToUpper(firstLetter) {
+		return false
+	}
+	if otherExceptFirst != strings.ToLower(otherExceptFirst) {
+		return false
+	}
+	return true
+}
+
 // HasLowerCase checks if the string contains at least 1 lowercase. Empty string is valid.
 func HasLowerCase(str string) bool {
 	if IsNull(str) {

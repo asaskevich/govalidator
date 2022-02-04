@@ -3865,3 +3865,23 @@ func TestIsE164(t *testing.T) {
 		}
 	}
 }
+
+func TestIsWord(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"Hello", true},
+		{"hello", false},
+		{"HelLoO", false},
+	}
+
+	for _, test := range tests {
+		actual := IsWord(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsWord(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
