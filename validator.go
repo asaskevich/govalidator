@@ -6,12 +6,14 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/base64"
+	"encoding/csv"
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
 	"net"
 	"net/url"
+	"os"
 	"reflect"
 	"regexp"
 	"sort"
@@ -336,6 +338,35 @@ func IsDivisibleBy(str, num string) bool {
 // IsNull checks if the string is null.
 func IsNull(str string) bool {
 	return len(str) == 0
+}
+
+// checks if the csv file contains the given string
+func IsInCSV(str string, address string) bool {
+	if IsNull(str) {
+		return true
+	}
+
+	f, err := os.Open(address)
+	if err != nil {
+		return false //could not read file
+	}
+	defer f.Close()
+
+	csvReader := csv.NewReader(f)
+	records, err := csvReader.ReadAll()
+	if err != nil {
+		return false //file is not csv
+	}
+
+	for _, row := range records {
+		for _, val := range row {
+			val_str := string(val)
+			if strings.Contains(val_str, str) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // IsNotNull checks if the string is not null.
