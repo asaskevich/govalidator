@@ -243,6 +243,23 @@ func IsUTFDigit(str string) bool {
 
 }
 
+func IsDecimal(str string) bool {
+	if IsNull(str) {
+		return true
+	}
+
+	if !strings.Contains(str, ".") {
+		return false
+	}
+
+	_, error := strconv.ParseFloat(str, 64)
+	if error != nil {
+		return false
+	}
+
+	return true
+}
+
 // IsHexadecimal checks if the string is a hexadecimal number.
 func IsHexadecimal(str string) bool {
 	return rxHexadecimal.MatchString(str)
