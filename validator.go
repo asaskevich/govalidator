@@ -6,12 +6,15 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/base64"
+	"encoding/csv"
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net"
 	"net/url"
+	"os"
 	"reflect"
 	"regexp"
 	"sort"
@@ -520,6 +523,41 @@ func IsISBN10(str string) bool {
 // IsISBN13 checks if the string is an ISBN version 13.
 func IsISBN13(str string) bool {
 	return IsISBN(str, 13)
+}
+
+func readCsvFile(filePath string) [][]string {
+	f, err := os.Open(filePath)
+	if err != nil {
+		log.Fatal("Unable to read input file "+filePath, err)
+	}
+	defer f.Close()
+
+	csvReader := csv.NewReader(f)
+	records, err := csvReader.ReadAll()
+	if err != nil {
+		log.Fatal("Unable to parse file as CSV for "+filePath, err)
+	}
+
+	return records
+}
+
+// checks if a string is contained in a csv file or not
+
+func IsInCSV(str string, address string) bool {
+	if IsNull(str) {
+		return true
+	}
+
+	records := readCsvFile(address)
+	for _, row := range records {
+		for _, val := range row {
+			my_str := string(val)
+			if strings.Contains(str, my_str) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // IsISBN checks if the string is an ISBN (version 10 or 13).
