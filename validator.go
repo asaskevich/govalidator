@@ -1233,8 +1233,13 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 	}
 
 	// An optional and zero field should not be validated
-	if _, isOptional := options["optional"]; isOptional && v.IsZero() {
-		return true, nil
+	if _, isOptional := options["optional"]; isOptional {
+		if v.IsZero() {
+			return true, nil
+		}
+		if v.Kind() == reflect.Slice && v.Len() == 0 {
+			return true, nil
+		}
 	}
 
 	if !isFieldSet(v) {
