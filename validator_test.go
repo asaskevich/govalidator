@@ -1,6 +1,7 @@
 package govalidator
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 	"strings"
@@ -9,10 +10,10 @@ import (
 )
 
 func init() {
-	CustomTypeTagMap.Set("customFalseValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+	CustomTypeTagMap.Set("customFalseValidator", CustomTypeValidator(func(ctx context.Context, i interface{}, o interface{}) bool {
 		return false
 	}))
-	CustomTypeTagMap.Set("customTrueValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+	CustomTypeTagMap.Set("customTrueValidator", CustomTypeValidator(func(ctx context.Context, i interface{}, o interface{}) bool {
 		return true
 	}))
 }
@@ -2345,6 +2346,8 @@ type MessageWithSeveralFieldsStruct struct {
 }
 
 func TestValidateMissingValidationDeclarationStruct(t *testing.T) {
+	ctx := context.Background()
+
 	var tests = []struct {
 		param    MissingValidationDeclarationStruct
 		expected bool
@@ -2354,11 +2357,11 @@ func TestValidateMissingValidationDeclarationStruct(t *testing.T) {
 	}
 	SetFieldsRequiredByDefault(true)
 	for _, test := range tests {
-		actual, err := ValidateStruct(test.param)
+		actual, err := ValidateStruct(ctx, test.param)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(ctx, %q) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+				t.Errorf("Got Error on ValidateStruct(ctx, %q): %s", test.param, err)
 			}
 		}
 	}
@@ -2395,6 +2398,8 @@ func structToMaps(in interface{}) (map[string]interface{}, map[string]interface{
 }
 
 func TestFieldRequiredByDefault(t *testing.T) {
+	ctx := context.Background()
+
 	var tests = []struct {
 		param    FieldRequiredByDefault
 		expected bool
@@ -2403,22 +2408,22 @@ func TestFieldRequiredByDefault(t *testing.T) {
 	}
 	SetFieldsRequiredByDefault(true)
 	for _, test := range tests {
-		actual, err := ValidateStruct(test.param)
+		actual, err := ValidateStruct(ctx, test.param)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(ctx, %q) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+				t.Errorf("Got Error on ValidateStruct(ctx, %q): %s", test.param, err)
 			}
 		}
 		mapParams, mapValidator, err := structToMaps(test.param)
 		if err != nil {
 			t.Errorf("Got Error on structToMaps(%q): %s", test.param, err)
 		} else {
-			actual, err := ValidateMap(mapParams, mapValidator)
+			actual, err := ValidateMap(ctx, mapParams, mapValidator)
 			if actual != test.expected {
-				t.Errorf("Expected ValidateMap(%q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
+				t.Errorf("Expected ValidateMap(ctx, %q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
 				if err != nil {
-					t.Errorf("Got Error on ValidateMap(%q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
+					t.Errorf("Got Error on ValidateMap(ctx, %q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
 				}
 			}
 		}
@@ -2427,6 +2432,8 @@ func TestFieldRequiredByDefault(t *testing.T) {
 }
 
 func TestMultipleFieldsRequiredByDefault(t *testing.T) {
+	ctx := context.Background()
+
 	var tests = []struct {
 		param    MultipleFieldsRequiredByDefault
 		expected bool
@@ -2435,22 +2442,22 @@ func TestMultipleFieldsRequiredByDefault(t *testing.T) {
 	}
 	SetFieldsRequiredByDefault(true)
 	for _, test := range tests {
-		actual, err := ValidateStruct(test.param)
+		actual, err := ValidateStruct(ctx, test.param)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(ctx, %q) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+				t.Errorf("Got Error on ValidateStruct(ctx, %q): %s", test.param, err)
 			}
 		}
 		mapParams, mapValidator, err := structToMaps(test.param)
 		if err != nil {
 			t.Errorf("Got Error on structToMaps(%q): %s", test.param, err)
 		} else {
-			actual, err := ValidateMap(mapParams, mapValidator)
+			actual, err := ValidateMap(ctx, mapParams, mapValidator)
 			if actual != test.expected {
-				t.Errorf("Expected ValidateMap(%q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
+				t.Errorf("Expected ValidateMap(ctx, %q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
 				if err != nil {
-					t.Errorf("Got Error on ValidateMap(%q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
+					t.Errorf("Got Error on ValidateMap(ctx, %q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
 				}
 			}
 		}
@@ -2459,6 +2466,8 @@ func TestMultipleFieldsRequiredByDefault(t *testing.T) {
 }
 
 func TestFieldsRequiredByDefaultButExemptStruct(t *testing.T) {
+	ctx := context.Background()
+
 	var tests = []struct {
 		param    FieldsRequiredByDefaultButExemptStruct
 		expected bool
@@ -2470,22 +2479,22 @@ func TestFieldsRequiredByDefaultButExemptStruct(t *testing.T) {
 	}
 	SetFieldsRequiredByDefault(true)
 	for _, test := range tests {
-		actual, err := ValidateStruct(test.param)
+		actual, err := ValidateStruct(ctx, test.param)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(ctx, %q) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+				t.Errorf("Got Error on ValidateStruct(ctx, %q): %s", test.param, err)
 			}
 		}
 		mapParams, mapValidator, err := structToMaps(test.param)
 		if err != nil {
 			t.Errorf("Got Error on structToMaps(%q): %s", test.param, err)
 		} else {
-			actual, err := ValidateMap(mapParams, mapValidator)
+			actual, err := ValidateMap(ctx, mapParams, mapValidator)
 			if actual != test.expected {
-				t.Errorf("Expected ValidateMap(%q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
+				t.Errorf("Expected ValidateMap(ctx, %q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
 				if err != nil {
-					t.Errorf("Got Error on ValidateMap(%q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
+					t.Errorf("Got Error on ValidateMap(ctx, %q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
 				}
 			}
 		}
@@ -2494,6 +2503,8 @@ func TestFieldsRequiredByDefaultButExemptStruct(t *testing.T) {
 }
 
 func TestFieldsRequiredByDefaultButExemptOrOptionalStruct(t *testing.T) {
+	ctx := context.Background()
+
 	var tests = []struct {
 		param    FieldsRequiredByDefaultButExemptOrOptionalStruct
 		expected bool
@@ -2506,22 +2517,22 @@ func TestFieldsRequiredByDefaultButExemptOrOptionalStruct(t *testing.T) {
 	}
 	SetFieldsRequiredByDefault(true)
 	for _, test := range tests {
-		actual, err := ValidateStruct(test.param)
+		actual, err := ValidateStruct(ctx, test.param)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(ctx, %q) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+				t.Errorf("Got Error on ValidateStruct(ctx, %q): %s", test.param, err)
 			}
 		}
 		mapParams, mapValidator, err := structToMaps(test.param)
 		if err != nil {
 			t.Errorf("Got Error on structToMaps(%q): %s", test.param, err)
 		} else {
-			actual, err := ValidateMap(mapParams, mapValidator)
+			actual, err := ValidateMap(ctx, mapParams, mapValidator)
 			if actual != test.expected {
-				t.Errorf("Expected ValidateMap(%q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
+				t.Errorf("Expected ValidateMap(ctx, %q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
 				if err != nil {
-					t.Errorf("Got Error on ValidateMap(%q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
+					t.Errorf("Got Error on ValidateMap(ctx, %q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
 				}
 			}
 		}
@@ -2530,6 +2541,8 @@ func TestFieldsRequiredByDefaultButExemptOrOptionalStruct(t *testing.T) {
 }
 
 func TestFieldsRequiredByDefaultButExemptOrOptionalStructWithPointers(t *testing.T) {
+	ctx := context.Background()
+
 	var tests = []struct {
 		param    FieldsRequiredByDefaultButExemptOrOptionalStructWithPointers
 		expected bool
@@ -2543,11 +2556,11 @@ func TestFieldsRequiredByDefaultButExemptOrOptionalStructWithPointers(t *testing
 	}
 	SetFieldsRequiredByDefault(true)
 	for _, test := range tests {
-		actual, err := ValidateStruct(test.param)
+		actual, err := ValidateStruct(ctx, test.param)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%#v) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(ctx, %#v) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateStruct(%#v): %s", test.param, err)
+				t.Errorf("Got Error on ValidateStruct(ctx, %#v): %s", test.param, err)
 			}
 		}
 	}
@@ -2555,12 +2568,14 @@ func TestFieldsRequiredByDefaultButExemptOrOptionalStructWithPointers(t *testing
 }
 
 func TestInvalidValidator(t *testing.T) {
+	ctx := context.Background()
+
 	type InvalidStruct struct {
 		Field int `valid:"someInvalidValidator"`
 	}
 
 	invalidStruct := InvalidStruct{1}
-	if valid, err := ValidateStruct(&invalidStruct); valid || err == nil ||
+	if valid, err := ValidateStruct(ctx, &invalidStruct); valid || err == nil ||
 		err.Error() != `Field: The following validator is invalid or can't be applied to the field: "someInvalidValidator"` {
 		t.Errorf("ValidateStruct: Got an unexpected result for struct with invalid validator: %t %s", valid, err)
 	}
@@ -2568,7 +2583,7 @@ func TestInvalidValidator(t *testing.T) {
 	if err != nil {
 		t.Errorf("Got Error on structToMaps(%q): %s", invalidStruct, err)
 	} else {
-		if valid, err := ValidateMap(mapParams, mapValidator); valid || err == nil ||
+		if valid, err := ValidateMap(ctx, mapParams, mapValidator); valid || err == nil ||
 			err.Error() != `Field: The following validator is invalid or can't be applied to the field: "someInvalidValidator"` {
 			t.Errorf("ValidateMap: Got an unexpected result for struct with invalid validator: %t %s", valid, err)
 		}
@@ -2576,6 +2591,8 @@ func TestInvalidValidator(t *testing.T) {
 }
 
 func TestCustomValidator(t *testing.T) {
+	ctx := context.Background()
+
 	type ValidStruct struct {
 		Field int `valid:"customTrueValidator"`
 	}
@@ -2588,19 +2605,19 @@ func TestCustomValidator(t *testing.T) {
 		Field *int `valid:"customTrueValidator,required"`
 	}
 
-	if valid, err := ValidateStruct(&ValidStruct{Field: 1}); !valid || err != nil {
+	if valid, err := ValidateStruct(ctx, &ValidStruct{Field: 1}); !valid || err != nil {
 		t.Errorf("ValidateStruct: Got an unexpected result for struct with custom always true validator: %t %s", valid, err)
 	}
 
 	if mapParams, mapValidator, err := structToMaps(&ValidStruct{Field: 1}); err != nil {
 		t.Errorf("Got Error on structToMaps(%q): %s", &ValidStruct{Field: 1}, err)
 	} else {
-		if valid, err := ValidateMap(mapParams, mapValidator); !valid || err != nil {
+		if valid, err := ValidateMap(ctx, mapParams, mapValidator); !valid || err != nil {
 			t.Errorf("ValidateMap: Got an unexpected result for struct with custom always true validator: %t %s", valid, err)
 		}
 	}
 
-	if valid, err := ValidateStruct(&InvalidStruct{Field: 1}); valid || err == nil || err.Error() != "Value: 1 Custom validator error: customFalseValidator" {
+	if valid, err := ValidateStruct(ctx, &InvalidStruct{Field: 1}); valid || err == nil || err.Error() != "Value: 1 Custom validator error: customFalseValidator" {
 		fmt.Println(err)
 		t.Errorf("ValidateStruct: Got an unexpected result for struct with custom always false validator: %t %s", valid, err)
 	}
@@ -2608,33 +2625,33 @@ func TestCustomValidator(t *testing.T) {
 	if mapParams, mapValidator, err := structToMaps(&InvalidStruct{Field: 1}); err != nil {
 		t.Errorf("Got Error on structToMaps(%q): %s", &ValidStruct{Field: 1}, err)
 	} else {
-		if valid, err := ValidateMap(mapParams, mapValidator); valid || err == nil || err.Error() != "Value: 1 Custom validator error: customFalseValidator" {
+		if valid, err := ValidateMap(ctx, mapParams, mapValidator); valid || err == nil || err.Error() != "Value: 1 Custom validator error: customFalseValidator" {
 			t.Errorf("ValidateMap: Got an unexpected result for struct with custom always false validator: %t %s", valid, err)
 		}
 	}
 
 	mixedStruct := StructWithCustomAndBuiltinValidator{}
-	if valid, err := ValidateStruct(&mixedStruct); valid || err == nil || err.Error() != "Field: non zero value required" {
+	if valid, err := ValidateStruct(ctx, &mixedStruct); valid || err == nil || err.Error() != "Field: non zero value required" {
 		t.Errorf("ValidateStruct: Got an unexpected result for invalid struct with custom and built-in validators: %t %s", valid, err)
 	}
 
 	if mapParams, mapValidator, err := structToMaps(&mixedStruct); err != nil {
 		t.Errorf("Got Error on structToMaps(%q): %s", &ValidStruct{Field: 1}, err)
 	} else {
-		if valid, err := ValidateMap(mapParams, mapValidator); valid || err == nil || err.Error() != "Field: non zero value required" {
+		if valid, err := ValidateMap(ctx, mapParams, mapValidator); valid || err == nil || err.Error() != "Field: non zero value required" {
 			t.Errorf("ValidateMap: Got an unexpected result for invalid struct with custom and built-in validators: %t %s", valid, err)
 		}
 	}
 
 	mixedStruct.Field = ptrInt(1)
-	if valid, err := ValidateStruct(&mixedStruct); !valid || err != nil {
+	if valid, err := ValidateStruct(ctx, &mixedStruct); !valid || err != nil {
 		t.Errorf("ValidateStruct: Got an unexpected result for valid struct with custom and built-in validators: %t %s", valid, err)
 	}
 
 	if mapParams, mapValidator, err := structToMaps(&mixedStruct); err != nil {
 		t.Errorf("Got Error on structToMaps(%q): %s", &ValidStruct{Field: 1}, err)
 	} else {
-		if valid, err := ValidateMap(mapParams, mapValidator); !valid || err != nil {
+		if valid, err := ValidateMap(ctx, mapParams, mapValidator); !valid || err != nil {
 			t.Errorf("ValidateMap: Got an unexpected result for valid struct with custom and built-in validators: %t %s", valid, err)
 		}
 	}
@@ -2651,8 +2668,10 @@ type StructWithCustomByteArray struct {
 func TestStructWithCustomByteArray(t *testing.T) {
 	t.Parallel()
 
+	ctx := context.Background()
+
 	// add our custom byte array validator that fails when the byte array is pristine (all zeroes)
-	CustomTypeTagMap.Set("customByteArrayValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+	CustomTypeTagMap.Set("customByteArrayValidator", CustomTypeValidator(func(ctx context.Context, i interface{}, o interface{}) bool {
 		switch v := o.(type) {
 		case StructWithCustomByteArray:
 			if len(v.Email) > 0 {
@@ -2681,7 +2700,7 @@ func TestStructWithCustomByteArray(t *testing.T) {
 		}
 		return false
 	}))
-	CustomTypeTagMap.Set("customMinLengthValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+	CustomTypeTagMap.Set("customMinLengthValidator", CustomTypeValidator(func(ctx context.Context, i interface{}, o interface{}) bool {
 		switch v := o.(type) {
 		case StructWithCustomByteArray:
 			return len(v.ID) >= v.CustomMinLength
@@ -2703,22 +2722,22 @@ func TestStructWithCustomByteArray(t *testing.T) {
 	}
 	SetFieldsRequiredByDefault(true)
 	for _, test := range tests {
-		actual, err := ValidateStruct(test.param)
+		actual, err := ValidateStruct(ctx, test.param)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(ctx, %q) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+				t.Errorf("Got Error on ValidateStruct(ctx, %q): %s", test.param, err)
 			}
 		}
 		mapParams, mapValidator, err := structToMaps(test.param)
 		if err != nil {
 			t.Errorf("Got Error on structToMaps(%q): %s", test.param, err)
 		} else {
-			actual, err := ValidateMap(mapParams, mapValidator)
+			actual, err := ValidateMap(ctx, mapParams, mapValidator)
 			if actual != test.expected {
-				t.Errorf("Expected ValidateMap(%q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
+				t.Errorf("Expected ValidateMap(ctx, %q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
 				if err != nil {
-					t.Errorf("Got Error on ValidateMap(%q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
+					t.Errorf("Got Error on ValidateMap(ctx, %q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
 				}
 			}
 		}
@@ -2727,6 +2746,8 @@ func TestStructWithCustomByteArray(t *testing.T) {
 }
 
 func TestValidateNegationStruct(t *testing.T) {
+	ctx := context.Background()
+
 	var tests = []struct {
 		param    NegationStruct
 		expected bool
@@ -2741,22 +2762,22 @@ func TestValidateNegationStruct(t *testing.T) {
 		{NegationStruct{"11", "11"}, false},
 	}
 	for _, test := range tests {
-		actual, err := ValidateStruct(test.param)
+		actual, err := ValidateStruct(ctx, test.param)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(ctx, %q) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+				t.Errorf("Got Error on ValidateStruct(ctx, %q): %s", test.param, err)
 			}
 		}
 		mapParams, mapValidator, err := structToMaps(test.param)
 		if err != nil {
 			t.Errorf("Got Error on structToMaps(%q): %s", test.param, err)
 		} else {
-			actual, err := ValidateMap(mapParams, mapValidator)
+			actual, err := ValidateMap(ctx, mapParams, mapValidator)
 			if actual != test.expected {
-				t.Errorf("Expected ValidateMap(%q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
+				t.Errorf("Expected ValidateMap(ctx, %q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
 				if err != nil {
-					t.Errorf("Got Error on ValidateMap(%q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
+					t.Errorf("Got Error on ValidateMap(ctx, %q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
 				}
 			}
 		}
@@ -2764,6 +2785,8 @@ func TestValidateNegationStruct(t *testing.T) {
 }
 
 func TestLengthStruct(t *testing.T) {
+	ctx := context.Background()
+
 	var tests = []struct {
 		param    interface{}
 		expected bool
@@ -2774,22 +2797,22 @@ func TestLengthStruct(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual, err := ValidateStruct(test.param)
+		actual, err := ValidateStruct(ctx, test.param)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(ctx, %q) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+				t.Errorf("Got Error on ValidateStruct(ctx, %q): %s", test.param, err)
 			}
 		}
 		mapParams, mapValidator, err := structToMaps(test.param)
 		if err != nil {
 			t.Errorf("Got Error on structToMaps(%q): %s", test.param, err)
 		} else {
-			actual, err := ValidateMap(mapParams, mapValidator)
+			actual, err := ValidateMap(ctx, mapParams, mapValidator)
 			if actual != test.expected {
-				t.Errorf("Expected ValidateMap(%q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
+				t.Errorf("Expected ValidateMap(ctx, %q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
 				if err != nil {
-					t.Errorf("Got Error on ValidateMap(%q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
+					t.Errorf("Got Error on ValidateMap(ctx, %q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
 				}
 			}
 		}
@@ -2797,6 +2820,8 @@ func TestLengthStruct(t *testing.T) {
 }
 
 func TestStringLengthStruct(t *testing.T) {
+	ctx := context.Background()
+
 	var tests = []struct {
 		param    interface{}
 		expected bool
@@ -2811,22 +2836,22 @@ func TestStringLengthStruct(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual, err := ValidateStruct(test.param)
+		actual, err := ValidateStruct(ctx, test.param)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(ctx, %q) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+				t.Errorf("Got Error on ValidateStruct(ctx, %q): %s", test.param, err)
 			}
 		}
 		mapParams, mapValidator, err := structToMaps(test.param)
 		if err != nil {
 			t.Errorf("Got Error on structToMaps(%q): %s", test.param, err)
 		} else {
-			actual, err := ValidateMap(mapParams, mapValidator)
+			actual, err := ValidateMap(ctx, mapParams, mapValidator)
 			if actual != test.expected {
-				t.Errorf("Expected ValidateMap(%q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
+				t.Errorf("Expected ValidateMap(ctx, %q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
 				if err != nil {
-					t.Errorf("Got Error on ValidateMap(%q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
+					t.Errorf("Got Error on ValidateMap(ctx, %q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
 				}
 			}
 		}
@@ -2834,6 +2859,8 @@ func TestStringLengthStruct(t *testing.T) {
 }
 
 func TestStringMatchesStruct(t *testing.T) {
+	ctx := context.Background()
+
 	var tests = []struct {
 		param    interface{}
 		expected bool
@@ -2844,22 +2871,22 @@ func TestStringMatchesStruct(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual, err := ValidateStruct(test.param)
+		actual, err := ValidateStruct(ctx, test.param)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(ctx, %q) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+				t.Errorf("Got Error on ValidateStruct(ctx, %q): %s", test.param, err)
 			}
 		}
 		mapParams, mapValidator, err := structToMaps(test.param)
 		if err != nil {
 			t.Errorf("Got Error on structToMaps(%q): %s", test.param, err)
 		} else {
-			actual, err := ValidateMap(mapParams, mapValidator)
+			actual, err := ValidateMap(ctx, mapParams, mapValidator)
 			if actual != test.expected {
-				t.Errorf("Expected ValidateMap(%q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
+				t.Errorf("Expected ValidateMap(ctx, %q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
 				if err != nil {
-					t.Errorf("Got Error on ValidateMap(%q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
+					t.Errorf("Got Error on ValidateMap(ctx, %q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
 				}
 			}
 		}
@@ -2867,6 +2894,8 @@ func TestStringMatchesStruct(t *testing.T) {
 }
 
 func TestIsInStruct(t *testing.T) {
+	ctx := context.Background()
+
 	var tests = []struct {
 		param    interface{}
 		expected bool
@@ -2882,22 +2911,22 @@ func TestIsInStruct(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual, err := ValidateStruct(test.param)
+		actual, err := ValidateStruct(ctx, test.param)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(ctx, %q) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+				t.Errorf("Got Error on ValidateStruct(ctx, %q): %s", test.param, err)
 			}
 		}
 		mapParams, mapValidator, err := structToMaps(test.param)
 		if err != nil {
 			t.Errorf("Got Error on structToMaps(%q): %s", test.param, err)
 		} else {
-			actual, err := ValidateMap(mapParams, mapValidator)
+			actual, err := ValidateMap(ctx, mapParams, mapValidator)
 			if actual != test.expected {
-				t.Errorf("Expected ValidateMap(%q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
+				t.Errorf("Expected ValidateMap(ctx, %q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
 				if err != nil {
-					t.Errorf("Got Error on ValidateMap(%q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
+					t.Errorf("Got Error on ValidateMap(ctx, %q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
 				}
 			}
 		}
@@ -2905,6 +2934,8 @@ func TestIsInStruct(t *testing.T) {
 }
 
 func TestRequiredIsInStruct(t *testing.T) {
+	ctx := context.Background()
+
 	type RequiredIsInStruct struct {
 		IsIn string `valid:"in(PRESENT|PRÉSENTE|NOTABSENT),required"`
 	}
@@ -2927,22 +2958,22 @@ func TestRequiredIsInStruct(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual, err := ValidateStruct(test.param)
+		actual, err := ValidateStruct(ctx, test.param)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(ctx, %q) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+				t.Errorf("Got Error on ValidateStruct(ctx, %q): %s", test.param, err)
 			}
 		}
 		mapParams, mapValidator, err := structToMaps(test.param)
 		if err != nil {
 			t.Errorf("Got Error on structToMaps(%q): %s", test.param, err)
 		} else {
-			actual, err := ValidateMap(mapParams, mapValidator)
+			actual, err := ValidateMap(ctx, mapParams, mapValidator)
 			if actual != test.expected {
-				t.Errorf("Expected ValidateMap(%q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
+				t.Errorf("Expected ValidateMap(ctx, %q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
 				if err != nil {
-					t.Errorf("Got Error on ValidateMap(%q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
+					t.Errorf("Got Error on ValidateMap(ctx, %q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
 				}
 			}
 		}
@@ -2950,6 +2981,8 @@ func TestRequiredIsInStruct(t *testing.T) {
 }
 
 func TestEmptyRequiredIsInStruct(t *testing.T) {
+	ctx := context.Background()
+
 	type EmptyRequiredIsInStruct struct {
 		IsIn string `valid:"in(),required"`
 	}
@@ -2971,22 +3004,22 @@ func TestEmptyRequiredIsInStruct(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual, err := ValidateStruct(test.param)
+		actual, err := ValidateStruct(ctx, test.param)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(ctx, %q) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+				t.Errorf("Got Error on ValidateStruct(ctx, %q): %s", test.param, err)
 			}
 		}
 		mapParams, mapValidator, err := structToMaps(test.param)
 		if err != nil {
 			t.Errorf("Got Error on structToMaps(%q): %s", test.param, err)
 		} else {
-			actual, err := ValidateMap(mapParams, mapValidator)
+			actual, err := ValidateMap(ctx, mapParams, mapValidator)
 			if actual != test.expected {
-				t.Errorf("Expected ValidateMap(%q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
+				t.Errorf("Expected ValidateMap(ctx, %q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
 				if err != nil {
-					t.Errorf("Got Error on ValidateMap(%q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
+					t.Errorf("Got Error on ValidateMap(ctx, %q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
 				}
 			}
 		}
@@ -2994,6 +3027,8 @@ func TestEmptyRequiredIsInStruct(t *testing.T) {
 }
 
 func TestEmptyStringPtr(t *testing.T) {
+	ctx := context.Background()
+
 	type EmptyIsInStruct struct {
 		IsIn *string `valid:"length(3|5),required"`
 	}
@@ -3015,33 +3050,33 @@ func TestEmptyStringPtr(t *testing.T) {
 
 	SetNilPtrAllowedByRequired(true)
 	for _, test := range tests {
-		actual, err := ValidateStruct(test.param)
+		actual, err := ValidateStruct(ctx, test.param)
 
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%#v) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(ctx, %#v) to be %v, got %v", test.param, test.expected, actual)
 		}
 		if err != nil {
 			if err.Error() != test.expectedErr {
-				t.Errorf("Got Error on ValidateStruct(%#v). Expected: %s Actual: %s", test.param, test.expectedErr, err)
+				t.Errorf("Got Error on ValidateStruct(ctx, %#v). Expected: %s Actual: %s", test.param, test.expectedErr, err)
 			}
 		} else if test.expectedErr != "" {
-			t.Errorf("Expected error on ValidateStruct(%#v).", test.param)
+			t.Errorf("Expected error on ValidateStruct(ctx, %#v).", test.param)
 		}
 		mapParams, mapValidator, err := structToMaps(test.param)
 		if err != nil {
 			t.Errorf("Got Error on structToMaps(%q): %s", test.param, err)
 		} else {
-			actual, err := ValidateMap(mapParams, mapValidator)
+			actual, err := ValidateMap(ctx, mapParams, mapValidator)
 			if actual != test.expected {
-				t.Errorf("Expected ValidateMap(%q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
+				t.Errorf("Expected ValidateMap(ctx, %q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
 			}
 			if err != nil {
 				if err.Error() != test.expectedErr {
-					t.Errorf("Got Error on ValidateMap(%q, %q) of %q. Expected: %s Actual: %s",
+					t.Errorf("Got Error on ValidateMap(ctx, %q, %q) of %q. Expected: %s Actual: %s",
 						mapParams, mapValidator, test.param, test.expectedErr, err)
 				}
 			} else if test.expectedErr != "" {
-				t.Errorf("Expected error on ValidateMap(%q, %q) of %q.", mapParams, mapValidator, test.param)
+				t.Errorf("Expected error on ValidateMap(ctx, %q, %q) of %q.", mapParams, mapValidator, test.param)
 			}
 		}
 	}
@@ -3049,6 +3084,8 @@ func TestEmptyStringPtr(t *testing.T) {
 }
 
 func TestNestedStruct(t *testing.T) {
+	ctx := context.Background()
+
 	type EvenMoreNestedStruct struct {
 		Bar string `valid:"length(3|5)"`
 	}
@@ -3113,39 +3150,41 @@ func TestNestedStruct(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual, err := ValidateStruct(test.param)
+		actual, err := ValidateStruct(ctx, test.param)
 
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(ctx, %q) to be %v, got %v", test.param, test.expected, actual)
 		}
 		if err != nil {
 			if err.Error() != test.expectedErr {
-				t.Errorf("Got Error on ValidateStruct(%q). Expected: %s Actual: %s", test.param, test.expectedErr, err)
+				t.Errorf("Got Error on ValidateStruct(ctx, %q). Expected: %s Actual: %s", test.param, test.expectedErr, err)
 			}
 		} else if test.expectedErr != "" {
-			t.Errorf("Expected error on ValidateStruct(%q).", test.param)
+			t.Errorf("Expected error on ValidateStruct(ctx, %q).", test.param)
 		}
 		mapParams, mapValidator, err := structToMaps(test.param)
 		if err != nil {
 			t.Errorf("Got Error on structToMaps(%q): %s", test.param, err)
 		} else {
-			actual, err := ValidateMap(mapParams, mapValidator)
+			actual, err := ValidateMap(ctx, mapParams, mapValidator)
 			if actual != test.expected {
-				t.Errorf("Expected ValidateMap(%q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
+				t.Errorf("Expected ValidateMap(ctx, %q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
 			}
 			if err != nil {
 				if err.Error() != test.expectedErr {
-					t.Errorf("Got Error on ValidateMap(%q, %q) of %q. Expected: %s Actual: %s",
+					t.Errorf("Got Error on ValidateMap(ctx, %q, %q) of %q. Expected: %s Actual: %s",
 						mapParams, mapValidator, test.param, test.expectedErr, err)
 				}
 			} else if test.expectedErr != "" {
-				t.Errorf("Expected error on ValidateMap(%q, %q) of %q.", mapParams, mapValidator, test.param)
+				t.Errorf("Expected error on ValidateMap(ctx, %q, %q) of %q.", mapParams, mapValidator, test.param)
 			}
 		}
 	}
 }
 
 func TestFunkyIsInStruct(t *testing.T) {
+	ctx := context.Background()
+
 	type FunkyIsInStruct struct {
 		IsIn string `valid:"in(PRESENT|| |PRÉSENTE|NOTABSENT)"`
 	}
@@ -3161,11 +3200,11 @@ func TestFunkyIsInStruct(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual, err := ValidateStruct(test.param)
+		actual, err := ValidateStruct(ctx, test.param)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(ctx, %q) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+				t.Errorf("Got Error on ValidateStruct(ctx, %q): %s", test.param, err)
 			}
 		}
 	}
@@ -3186,22 +3225,22 @@ func TestFunkyIsInStruct(t *testing.T) {
 // 	}
 
 // 	for _, test := range tests {
-// 		actual, err := ValidateStruct(test.param)
+// 		actual, err := ValidateStruct(ctx, test.param)
 // 		if actual != test.expected {
-// 			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+// 			t.Errorf("Expected ValidateStruct(ctx, %q) to be %v, got %v", test.param, test.expected, actual)
 // 			if err != nil {
-// 				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+// 				t.Errorf("Got Error on ValidateStruct(ctx, %q): %s", test.param, err)
 // 			}
 // 		}
 //		mapParams, mapValidator, err := structToMaps(test.param)
 //		if err != nil {
 //			t.Errorf("Got Error on structToMaps(%q): %s", test.param, err)
 //		} else {
-//			actual, err := ValidateMap(mapParams, mapValidator)
+//			actual, err := ValidateMap(ctx, mapParams, mapValidator)
 //			if actual != test.expected {
-//				t.Errorf("Expected ValidateMap(%q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
+//				t.Errorf("Expected ValidateMap(ctx, %q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
 //				if err != nil {
-//					t.Errorf("Got Error on ValidateMap(%q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
+//					t.Errorf("Got Error on ValidateMap(ctx, %q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
 //				}
 //			}
 //		}
@@ -3209,6 +3248,8 @@ func TestFunkyIsInStruct(t *testing.T) {
 // }
 
 func TestValidateStruct(t *testing.T) {
+	ctx := context.Background()
+
 	var tests = []struct {
 		param    interface{}
 		expected bool
@@ -3231,11 +3272,11 @@ func TestValidateStruct(t *testing.T) {
 		{SlicePtrAddress{[]*Address{{"Street", "123456"}, {"Street", "ABC456D89"}}}, false},
 	}
 	for _, test := range tests {
-		actual, err := ValidateStruct(test.param)
+		actual, err := ValidateStruct(ctx, test.param)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%#v) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(ctx, %#v) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateStruct(%#v): %s", test.param, err)
+				t.Errorf("Got Error on ValidateStruct(ctx, %#v): %s", test.param, err)
 			}
 		}
 	}
@@ -3243,7 +3284,7 @@ func TestValidateStruct(t *testing.T) {
 	TagMap["d_k"] = Validator(func(str string) bool {
 		return str == "d_k"
 	})
-	result, err := ValidateStruct(PrivateStruct{"d_k", 0, []int{1, 2}, []string{"hi", "super"}, [2]Address{{"Street", "123456"},
+	result, err := ValidateStruct(ctx, PrivateStruct{"d_k", 0, []int{1, 2}, []string{"hi", "super"}, [2]Address{{"Street", "123456"},
 		{"Street", "123456"}}, Address{"Street", "123456"}, map[string]Address{"address": {"Street", "123456"}}})
 	if !result {
 		t.Log("Case ", 6, ": expected ", true, " when result is ", result)
@@ -3259,7 +3300,7 @@ type testStringStringMap map[string]string
 type testStringIntMap map[string]int
 
 func TestRequired(t *testing.T) {
-
+	ctx := context.Background()
 	testString := "foobar"
 	testEmptyString := ""
 	var tests = []struct {
@@ -3362,22 +3403,22 @@ func TestRequired(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		actual, err := ValidateStruct(test.param)
+		actual, err := ValidateStruct(ctx, test.param)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%#v) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(ctx, %#v) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateStruct(%#v): %s", test.param, err)
+				t.Errorf("Got Error on ValidateStruct(ctx, %#v): %s", test.param, err)
 			}
 		}
 		mapParams, mapValidator, err := structToMaps(test.param)
 		if err != nil {
 			t.Errorf("Got Error on structToMaps(%q): %s", test.param, err)
 		} else {
-			actual, err := ValidateMap(mapParams, mapValidator)
+			actual, err := ValidateMap(ctx, mapParams, mapValidator)
 			if actual != test.expected {
-				t.Errorf("Expected ValidateMap(%q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
+				t.Errorf("Expected ValidateMap(ctx, %q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
 				if err != nil {
-					t.Errorf("Got Error on ValidateMap(%q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
+					t.Errorf("Got Error on ValidateMap(ctx, %q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
 				}
 			}
 		}
@@ -3386,6 +3427,8 @@ func TestRequired(t *testing.T) {
 
 func TestErrorByField(t *testing.T) {
 	t.Parallel()
+
+	ctx := context.Background()
 
 	var tests = []struct {
 		param    string
@@ -3398,7 +3441,7 @@ func TestErrorByField(t *testing.T) {
 		{"AuthorIP", "123 does not validate as ipv4"},
 	}
 	post := &Post{"My123", "duck13126", "123"}
-	_, err := ValidateStruct(post)
+	_, err := ValidateStruct(ctx, post)
 
 	for _, test := range tests {
 		actual := ErrorByField(err, test.param)
@@ -3411,6 +3454,8 @@ func TestErrorByField(t *testing.T) {
 func TestErrorsByField(t *testing.T) {
 	t.Parallel()
 
+	ctx := context.Background()
+
 	var tests = []struct {
 		param    string
 		expected string
@@ -3419,7 +3464,7 @@ func TestErrorsByField(t *testing.T) {
 		{"AuthorIP", "123 does not validate as ipv4"},
 	}
 	post := &Post{Title: "My123", Message: "duck13126", AuthorIP: "123"}
-	_, err := ValidateStruct(post)
+	_, err := ValidateStruct(ctx, post)
 	errs := ErrorsByField(err)
 	if len(errs) != 2 {
 		t.Errorf("There should only be 2 errors but got %v", len(errs))
@@ -3440,7 +3485,7 @@ func TestErrorsByField(t *testing.T) {
 	}
 
 	message := &MessageWithSeveralFieldsStruct{Title: ";:;message;:;", Body: ";:;message;:;"}
-	_, err = ValidateStruct(message)
+	_, err = ValidateStruct(ctx, message)
 	errs = ErrorsByField(err)
 	if len(errs) != 2 {
 		t.Errorf("There should only be 2 errors but got %v", len(errs))
@@ -3477,7 +3522,7 @@ func TestErrorsByField(t *testing.T) {
 		ID    string `valid:"falseValidation"`
 	}
 
-	CustomTypeTagMap.Set("falseValidation", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+	CustomTypeTagMap.Set("falseValidation", CustomTypeValidator(func(ctx context.Context, i interface{}, o interface{}) bool {
 		return false
 	}))
 
@@ -3489,7 +3534,7 @@ func TestErrorsByField(t *testing.T) {
 		{"ID", "duck13126 does not validate as falseValidation"},
 	}
 	s := &StructWithCustomValidation{Email: "My123", ID: "duck13126"}
-	_, err = ValidateStruct(s)
+	_, err = ValidateStruct(ctx, s)
 	errs = ErrorsByField(err)
 	if len(errs) != 2 {
 		t.Errorf("There should only be 2 errors but got %v", len(errs))
@@ -3503,6 +3548,8 @@ func TestErrorsByField(t *testing.T) {
 }
 
 func TestValidateStructPointers(t *testing.T) {
+	ctx := context.Background()
+
 	// Struct which uses pointers for values
 	type UserWithPointers struct {
 		Name         *string `valid:"-"`
@@ -3526,7 +3573,7 @@ func TestValidateStructPointers(t *testing.T) {
 	food := "Pizza"
 	nerd := true
 	user := &UserWithPointers{&name, &email, &food, &nerd}
-	_, err := ValidateStruct(user)
+	_, err := ValidateStruct(ctx, user)
 
 	for _, test := range tests {
 		actual := ErrorByField(err, test.param)
@@ -3537,6 +3584,8 @@ func TestValidateStructPointers(t *testing.T) {
 }
 
 func TestValidateMapPointers(t *testing.T) {
+	ctx := context.Background()
+
 	// Struct which uses pointers for values
 	type UserWithPointers struct {
 		Name         *string `valid:"-"`
@@ -3565,7 +3614,7 @@ func TestValidateMapPointers(t *testing.T) {
 	if err != nil {
 		t.Errorf("Got Error on structToMaps(%+v): %s", user, err)
 	} else {
-		_, err = ValidateMap(mapParams, mapValidator)
+		_, err = ValidateMap(ctx, mapParams, mapValidator)
 	}
 
 	for _, test := range tests {
@@ -3577,6 +3626,7 @@ func TestValidateMapPointers(t *testing.T) {
 }
 
 func ExampleValidateStruct() {
+	ctx := context.Background()
 	type Post struct {
 		Title    string `valid:"alphanum,required"`
 		Message  string `valid:"duck,ascii"`
@@ -3589,7 +3639,7 @@ func ExampleValidateStruct() {
 		return str == "duck"
 	})
 
-	result, err := ValidateStruct(post)
+	result, err := ValidateStruct(ctx, post)
 	if err != nil {
 		println("error: " + err.Error())
 	}
@@ -3597,6 +3647,8 @@ func ExampleValidateStruct() {
 }
 
 func TestValidateStructParamValidatorInt(t *testing.T) {
+	ctx := context.Background()
+
 	type Test1 struct {
 		Int   int   `valid:"range(1|10)"`
 		Int8  int8  `valid:"range(1|10)"`
@@ -3616,12 +3668,12 @@ func TestValidateStructParamValidatorInt(t *testing.T) {
 	test1Ok := &Test1{5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5}
 	test1NotOk := &Test1{11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11}
 
-	_, err := ValidateStruct(test1Ok)
+	_, err := ValidateStruct(ctx, test1Ok)
 	if err != nil {
 		t.Errorf("Test failed: %s", err)
 	}
 
-	_, err = ValidateStruct(test1NotOk)
+	_, err = ValidateStruct(ctx, test1NotOk)
 	if err == nil {
 		t.Errorf("Test failed: nil")
 	}
@@ -3647,17 +3699,17 @@ func TestValidateStructParamValidatorInt(t *testing.T) {
 	test2Ok2 := &Test2{10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10}
 	test2NotOk := &Test2{2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
 
-	_, err = ValidateStruct(test2Ok1)
+	_, err = ValidateStruct(ctx, test2Ok1)
 	if err != nil {
 		t.Errorf("Test failed: %s", err)
 	}
 
-	_, err = ValidateStruct(test2Ok2)
+	_, err = ValidateStruct(ctx, test2Ok2)
 	if err != nil {
 		t.Errorf("Test failed: %s", err)
 	}
 
-	_, err = ValidateStruct(test2NotOk)
+	_, err = ValidateStruct(ctx, test2NotOk)
 	if err == nil {
 		t.Errorf("Test failed: nil")
 	}
@@ -3683,30 +3735,31 @@ func TestValidateStructParamValidatorInt(t *testing.T) {
 	test3Ok2 := &Test2{10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10}
 	test3NotOk := &Test2{2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
 
-	_, err = ValidateStruct(test3Ok1)
+	_, err = ValidateStruct(ctx, test3Ok1)
 	if err != nil {
 		t.Errorf("Test failed: %s", err)
 	}
 
-	_, err = ValidateStruct(test3Ok2)
+	_, err = ValidateStruct(ctx, test3Ok2)
 	if err != nil {
 		t.Errorf("Test failed: %s", err)
 	}
 
-	_, err = ValidateStruct(test3NotOk)
+	_, err = ValidateStruct(ctx, test3NotOk)
 	if err == nil {
 		t.Errorf("Test failed: nil")
 	}
 }
 
 func TestValidateStructUpperAndLowerCaseWithNumTypeCheck(t *testing.T) {
+	ctx := context.Background()
 
 	type StructCapital struct {
 		Total float32 `valid:"float,required"`
 	}
 
 	structCapital := &StructCapital{53.3535}
-	_, err := ValidateStruct(structCapital)
+	_, err := ValidateStruct(ctx, structCapital)
 	if err != nil {
 		t.Errorf("Test failed: nil")
 		fmt.Println(err)
@@ -3717,7 +3770,7 @@ func TestValidateStructUpperAndLowerCaseWithNumTypeCheck(t *testing.T) {
 	}
 
 	structLower := &StructLower{53.3535}
-	_, err = ValidateStruct(structLower)
+	_, err = ValidateStruct(ctx, structLower)
 	if err != nil {
 		t.Errorf("Test failed: nil")
 		fmt.Println(err)
@@ -3747,8 +3800,9 @@ func TestIsCIDR(t *testing.T) {
 }
 
 func TestOptionalCustomValidators(t *testing.T) {
+	ctx := context.Background()
 
-	CustomTypeTagMap.Set("f2", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+	CustomTypeTagMap.Set("f2", CustomTypeValidator(func(ctx context.Context, i interface{}, o interface{}) bool {
 		return false
 	}))
 
@@ -3758,7 +3812,7 @@ func TestOptionalCustomValidators(t *testing.T) {
 		OptionalFirst      string `valid:"optional,f2"`
 	}
 
-	ok, err := ValidateStruct(val)
+	ok, err := ValidateStruct(ctx, val)
 
 	if err == nil {
 		t.Error("Expected non-nil err with optional validation, got nil")
@@ -3770,8 +3824,9 @@ func TestOptionalCustomValidators(t *testing.T) {
 }
 
 func TestOptionalCustomValidatorsWithPointers(t *testing.T) {
+	ctx := context.Background()
 
-	CustomTypeTagMap.Set("f2", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+	CustomTypeTagMap.Set("f2", CustomTypeValidator(func(ctx context.Context, i interface{}, o interface{}) bool {
 		return false
 	}))
 
@@ -3781,7 +3836,7 @@ func TestOptionalCustomValidatorsWithPointers(t *testing.T) {
 		OptionalFirst      *string `valid:"optional,f2"`
 	}
 
-	ok, err := ValidateStruct(val)
+	ok, err := ValidateStruct(ctx, val)
 
 	if err != nil {
 		t.Errorf("Expected nil err with optional validation, got %v", err)
@@ -3793,6 +3848,7 @@ func TestOptionalCustomValidatorsWithPointers(t *testing.T) {
 }
 
 func TestJSONValidator(t *testing.T) {
+	ctx := context.Background()
 
 	var val struct {
 		WithJSONName      string `json:"with_json_name" valid:"-,required"`
@@ -3802,7 +3858,7 @@ func TestJSONValidator(t *testing.T) {
 		WithEmptyJSONName string `json:"-" valid:"-,required"`
 	}
 
-	_, err := ValidateStruct(val)
+	_, err := ValidateStruct(ctx, val)
 
 	if err == nil {
 		t.Error("Expected error but got no error")
@@ -3826,6 +3882,8 @@ func TestJSONValidator(t *testing.T) {
 }
 
 func TestValidatorIncludedInError(t *testing.T) {
+	ctx := context.Background()
+
 	post := Post{
 		Title:    "",
 		Message:  "👍",
@@ -3838,7 +3896,7 @@ func TestValidatorIncludedInError(t *testing.T) {
 		"AuthorIP": "ipv4",
 	}
 
-	ok, errors := ValidateStruct(post)
+	ok, errors := ValidateStruct(ctx, post)
 	if ok {
 		t.Errorf("expected validation to fail %v", ok)
 	}
@@ -3862,7 +3920,7 @@ func TestValidatorIncludedInError(t *testing.T) {
 		"Body":  "length",
 	}
 
-	ok, errors = ValidateStruct(message)
+	ok, errors = ValidateStruct(ctx, message)
 	if ok {
 		t.Errorf("expected validation to fail, %v", ok)
 	}
@@ -3880,7 +3938,7 @@ func TestValidatorIncludedInError(t *testing.T) {
 	}
 	cs := CustomMessage{Text: "asdfasdfasdfasdf"}
 
-	ok, errors = ValidateStruct(&cs)
+	ok, errors = ValidateStruct(ctx, &cs)
 	if ok {
 		t.Errorf("expected validation to fail, %v", ok)
 	}
@@ -3938,6 +3996,8 @@ func ptrString(s string) *string { return &s }
 func ptrInt(i int) *int          { return &i }
 
 func TestDoNotRepeatStructErrors(t *testing.T) {
+	ctx := context.Background()
+
 	// based on the code provided by @apremalal
 	type TestB struct {
 		B string `valid:"required,matches(B)"`
@@ -3953,7 +4013,7 @@ func TestDoNotRepeatStructErrors(t *testing.T) {
 		},
 	}
 
-	ok, errors := ValidateStruct(r)
+	ok, errors := ValidateStruct(ctx, r)
 	if ok {
 		t.Errorf("expected validation to fail, %v", ok)
 	}
@@ -3970,6 +4030,9 @@ func TestDoNotRepeatStructErrors(t *testing.T) {
 
 func TestValidateMap(t *testing.T) {
 	t.Parallel()
+
+	ctx := context.Background()
+
 	var tests = []struct {
 		params    map[string]interface{}
 		validator map[string]interface{}
@@ -4049,11 +4112,11 @@ func TestValidateMap(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual, err := ValidateMap(test.params, test.validator)
+		actual, err := ValidateMap(ctx, test.params, test.validator)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateMap(%q, %q) to be %v, got %v", test.params, test.validator, test.expected, actual)
+			t.Errorf("Expected ValidateMap(ctx, %q, %q) to be %v, got %v", test.params, test.validator, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateMap(%q, %q): %s", test.params, test.validator, err)
+				t.Errorf("Got Error on ValidateMap(ctx, %q, %q): %s", test.params, test.validator, err)
 			}
 		}
 	}
@@ -4061,6 +4124,8 @@ func TestValidateMap(t *testing.T) {
 
 func TestValidateMapMissing(t *testing.T) {
 	t.Parallel()
+	ctx := context.Background()
+
 	var tests = []struct {
 		params    map[string]interface{}
 		validator map[string]interface{}
@@ -4095,11 +4160,11 @@ func TestValidateMapMissing(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual, err := ValidateMap(test.params, test.validator)
+		actual, err := ValidateMap(ctx, test.params, test.validator)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateMap(%q, %q) to be %v, got %v", test.params, test.validator, test.expected, actual)
+			t.Errorf("Expected ValidateMap(ctx, %q, %q) to be %v, got %v", test.params, test.validator, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateMap(%q, %q): %s", test.params, test.validator, err)
+				t.Errorf("Got Error on ValidateMap(ctx, %q, %q): %s", test.params, test.validator, err)
 			}
 		}
 	}
@@ -4107,6 +4172,8 @@ func TestValidateMapMissing(t *testing.T) {
 
 func TestValidateMapMissingValidator(t *testing.T) {
 	t.Parallel()
+	ctx := context.Background()
+
 	var tests = []struct {
 		params    map[string]interface{}
 		validator map[string]interface{}
@@ -4141,11 +4208,11 @@ func TestValidateMapMissingValidator(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual, err := ValidateMap(test.params, test.validator)
+		actual, err := ValidateMap(ctx, test.params, test.validator)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateMap(%q, %q) to be %v, got %v", test.params, test.validator, test.expected, actual)
+			t.Errorf("Expected ValidateMap(ctx, %q, %q) to be %v, got %v", test.params, test.validator, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateMap(%q, %q): %s", test.params, test.validator, err)
+				t.Errorf("Got Error on ValidateMap(ctx, %q, %q): %s", test.params, test.validator, err)
 			}
 		}
 	}
@@ -4153,6 +4220,7 @@ func TestValidateMapMissingValidator(t *testing.T) {
 
 func TestIsType(t *testing.T) {
 	t.Parallel()
+	ctx := context.Background()
 	i := 1
 	ptr := &i
 	var tests = []struct {
@@ -4225,22 +4293,22 @@ func TestIsType(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual, err := ValidateStruct(test.param)
+		actual, err := ValidateStruct(ctx, test.param)
 		if actual != test.expected {
-			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+			t.Errorf("Expected ValidateStruct(ctx, %q) to be %v, got %v", test.param, test.expected, actual)
 			if err != nil {
-				t.Errorf("Got Error on ValidateStruct(%q): %s", test.param, err)
+				t.Errorf("Got Error on ValidateStruct(ctx, %q): %s", test.param, err)
 			}
 		}
 		mapParams, mapValidator, err := structToMaps(test.param)
 		if err != nil {
 			t.Errorf("Got Error on structToMaps(%q): %s", test.param, err)
 		} else {
-			actual, err := ValidateMap(mapParams, mapValidator)
+			actual, err := ValidateMap(ctx, mapParams, mapValidator)
 			if actual != test.expected {
-				t.Errorf("Expected ValidateMap(%q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
+				t.Errorf("Expected ValidateMap(ctx, %q, %q) of %q to be %v, got %v", mapParams, mapValidator, test.param, test.expected, actual)
 				if err != nil {
-					t.Errorf("Got Error on ValidateMap(%q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
+					t.Errorf("Got Error on ValidateMap(ctx, %q, %q) of %q: %s", mapParams, mapValidator, test.param, err)
 				}
 			}
 		}
