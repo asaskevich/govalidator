@@ -1,6 +1,7 @@
 package govalidator
 
 import (
+	"context"
 	"reflect"
 	"regexp"
 	"sort"
@@ -12,7 +13,7 @@ type Validator func(str string) bool
 
 // CustomTypeValidator is a wrapper for validator functions that returns bool and accepts any type.
 // The second parameter should be the context (in the case of validating a struct: the whole object being validated).
-type CustomTypeValidator func(i interface{}, o interface{}) bool
+type CustomTypeValidator func(ctx context.Context, i interface{}, o interface{}) bool
 
 // ParamValidator is a wrapper for validator functions that accepts additional parameters.
 type ParamValidator func(str string, params ...string) bool
@@ -72,13 +73,13 @@ var ParamTagMap = map[string]ParamValidator{
 
 // ParamTagRegexMap maps param tags to their respective regexes.
 var ParamTagRegexMap = map[string]*regexp.Regexp{
-	"range":        regexp.MustCompile("^range\\((\\d+)\\|(\\d+)\\)$"),
-	"length":       regexp.MustCompile("^length\\((\\d+)\\|(\\d+)\\)$"),
-	"runelength":   regexp.MustCompile("^runelength\\((\\d+)\\|(\\d+)\\)$"),
-	"stringlength": regexp.MustCompile("^stringlength\\((\\d+)\\|(\\d+)\\)$"),
-	"in":           regexp.MustCompile(`^in\((.*)\)`),
-	"matches":      regexp.MustCompile(`^matches\((.+)\)$`),
-	"rsapub":       regexp.MustCompile("^rsapub\\((\\d+)\\)$"),
+	"range":           regexp.MustCompile("^range\\((\\d+)\\|(\\d+)\\)$"),
+	"length":          regexp.MustCompile("^length\\((\\d+)\\|(\\d+)\\)$"),
+	"runelength":      regexp.MustCompile("^runelength\\((\\d+)\\|(\\d+)\\)$"),
+	"stringlength":    regexp.MustCompile("^stringlength\\((\\d+)\\|(\\d+)\\)$"),
+	"in":              regexp.MustCompile(`^in\((.*)\)`),
+	"matches":         regexp.MustCompile(`^matches\((.+)\)$`),
+	"rsapub":          regexp.MustCompile("^rsapub\\((\\d+)\\)$"),
 	"minstringlength": regexp.MustCompile("^minstringlength\\((\\d+)\\)$"),
 	"maxstringlength": regexp.MustCompile("^maxstringlength\\((\\d+)\\)$"),
 }
