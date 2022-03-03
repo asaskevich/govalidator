@@ -1,6 +1,7 @@
 package govalidator
 
 import (
+	"context"
 	"math"
 	"reflect"
 )
@@ -42,10 +43,10 @@ func IsNonPositive(value float64) bool {
 }
 
 // InRange returns true if value lies between left and right border
-func InRangeInt(value, left, right interface{}) bool {
-	value64, _ := ToInt(value)
-	left64, _ := ToInt(left)
-	right64, _ := ToInt(right)
+func InRangeInt(ctx context.Context, value, left, right interface{}) bool {
+	value64, _ := ToInt(ctx, value)
+	left64, _ := ToInt(ctx, left)
+	right64, _ := ToInt(ctx, right)
 	if left64 > right64 {
 		left64, right64 = right64, left64
 	}
@@ -69,14 +70,14 @@ func InRangeFloat64(value, left, right float64) bool {
 }
 
 // InRange returns true if value lies between left and right border, generic type to handle int, float32 or float64, all types must the same type
-func InRange(value interface{}, left interface{}, right interface{}) bool {
+func InRange(ctx context.Context, value interface{}, left interface{}, right interface{}) bool {
 
 	reflectValue := reflect.TypeOf(value).Kind()
 	reflectLeft := reflect.TypeOf(left).Kind()
 	reflectRight := reflect.TypeOf(right).Kind()
 
 	if reflectValue == reflect.Int && reflectLeft == reflect.Int && reflectRight == reflect.Int {
-		return InRangeInt(value.(int), left.(int), right.(int))
+		return InRangeInt(ctx, value.(int), left.(int), right.(int))
 	} else if reflectValue == reflect.Float32 && reflectLeft == reflect.Float32 && reflectRight == reflect.Float32 {
 		return InRangeFloat32(value.(float32), left.(float32), right.(float32))
 	} else if reflectValue == reflect.Float64 && reflectLeft == reflect.Float64 && reflectRight == reflect.Float64 {

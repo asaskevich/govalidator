@@ -1,6 +1,7 @@
 package govalidator
 
 import (
+	"context"
 	"fmt"
 	"testing"
 )
@@ -9,7 +10,7 @@ func TestToInt(t *testing.T) {
 	tests := []string{"1000", "-123", "abcdef", "100000000000000000000000000000000000000000000"}
 	expected := []int64{1000, -123, 0, 0}
 	for i := 0; i < len(tests); i++ {
-		result, _ := ToInt(tests[i])
+		result, _ := ToInt(context.Background(), tests[i])
 		if result != expected[i] {
 			t.Log("Case ", i, ": expected ", expected[i], " when result is ", result)
 			t.FailNow()

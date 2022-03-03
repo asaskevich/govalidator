@@ -1,6 +1,7 @@
 package govalidator
 
 import (
+	"context"
 	"reflect"
 	"testing"
 )
@@ -400,7 +401,7 @@ func TestNormalizeEmail(t *testing.T) {
 		{`hans`, ``},
 	}
 	for _, test := range tests {
-		actual, err := NormalizeEmail(test.param)
+		actual, err := NormalizeEmail(context.Background(), test.param)
 		if actual != test.expected {
 			t.Errorf("Expected NormalizeEmail(%q) to be %v, got %v, err %v", test.param, test.expected, actual, err)
 		}

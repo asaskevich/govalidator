@@ -1,6 +1,7 @@
 package govalidator
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"reflect"
@@ -32,7 +33,7 @@ func ToFloat(str string) (float64, error) {
 }
 
 // ToInt convert the input string or any int type to an integer type 64, or 0 if the input is not an integer.
-func ToInt(value interface{}) (res int64, err error) {
+func ToInt(ctx context.Context, value interface{}) (res int64, err error) {
 	val := reflect.ValueOf(value)
 
 	switch value.(type) {
@@ -41,7 +42,7 @@ func ToInt(value interface{}) (res int64, err error) {
 	case uint, uint8, uint16, uint32, uint64:
 		res = int64(val.Uint())
 	case string:
-		if IsInt(val.String()) {
+		if IsInt(ctx, val.String()) {
 			res, err = strconv.ParseInt(val.String(), 0, 64)
 			if err != nil {
 				res = 0
