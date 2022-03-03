@@ -1,6 +1,9 @@
 package govalidator
 
-import "testing"
+import (
+	"context"
+	"testing"
+)
 
 func TestAbs(t *testing.T) {
 	t.Parallel()
@@ -197,7 +200,7 @@ func TestInRangeInt(t *testing.T) {
 		{0, 10, 5, false},
 	}
 	for _, test := range testAsInts {
-		actual := InRangeInt(test.param, test.left, test.right)
+		actual := InRangeInt(context.Background(), test.param, test.left, test.right)
 		if actual != test.expected {
 			t.Errorf("Expected InRangeInt(%v, %v, %v) to be %v, got %v using type int", test.param, test.left, test.right, test.expected, actual)
 		}
@@ -219,7 +222,7 @@ func TestInRangeInt(t *testing.T) {
 		{0, 10, 5, false},
 	}
 	for _, test := range testAsInt8s {
-		actual := InRangeInt(test.param, test.left, test.right)
+		actual := InRangeInt(context.Background(), test.param, test.left, test.right)
 		if actual != test.expected {
 			t.Errorf("Expected InRangeInt(%v, %v, %v) to be %v, got %v using type int8", test.param, test.left, test.right, test.expected, actual)
 		}
@@ -241,7 +244,7 @@ func TestInRangeInt(t *testing.T) {
 		{0, 10, 5, false},
 	}
 	for _, test := range testAsInt16s {
-		actual := InRangeInt(test.param, test.left, test.right)
+		actual := InRangeInt(context.Background(), test.param, test.left, test.right)
 		if actual != test.expected {
 			t.Errorf("Expected InRangeInt(%v, %v, %v) to be %v, got %v using type int16", test.param, test.left, test.right, test.expected, actual)
 		}
@@ -263,7 +266,7 @@ func TestInRangeInt(t *testing.T) {
 		{0, 10, 5, false},
 	}
 	for _, test := range testAsInt32s {
-		actual := InRangeInt(test.param, test.left, test.right)
+		actual := InRangeInt(context.Background(), test.param, test.left, test.right)
 		if actual != test.expected {
 			t.Errorf("Expected InRangeInt(%v, %v, %v) to be %v, got %v using type int32", test.param, test.left, test.right, test.expected, actual)
 		}
@@ -285,7 +288,7 @@ func TestInRangeInt(t *testing.T) {
 		{0, 10, 5, false},
 	}
 	for _, test := range testAsInt64s {
-		actual := InRangeInt(test.param, test.left, test.right)
+		actual := InRangeInt(context.Background(), test.param, test.left, test.right)
 		if actual != test.expected {
 			t.Errorf("Expected InRangeInt(%v, %v, %v) to be %v, got %v using type int64", test.param, test.left, test.right, test.expected, actual)
 		}
@@ -303,7 +306,7 @@ func TestInRangeInt(t *testing.T) {
 		{0, 10, 5, false},
 	}
 	for _, test := range testAsUInts {
-		actual := InRangeInt(test.param, test.left, test.right)
+		actual := InRangeInt(context.Background(), test.param, test.left, test.right)
 		if actual != test.expected {
 			t.Errorf("Expected InRangeInt(%v, %v, %v) to be %v, got %v using type uint", test.param, test.left, test.right, test.expected, actual)
 		}
@@ -321,7 +324,7 @@ func TestInRangeInt(t *testing.T) {
 		{0, 10, 5, false},
 	}
 	for _, test := range testAsUInt8s {
-		actual := InRangeInt(test.param, test.left, test.right)
+		actual := InRangeInt(context.Background(), test.param, test.left, test.right)
 		if actual != test.expected {
 			t.Errorf("Expected InRangeInt(%v, %v, %v) to be %v, got %v using type uint", test.param, test.left, test.right, test.expected, actual)
 		}
@@ -339,7 +342,7 @@ func TestInRangeInt(t *testing.T) {
 		{0, 10, 5, false},
 	}
 	for _, test := range testAsUInt16s {
-		actual := InRangeInt(test.param, test.left, test.right)
+		actual := InRangeInt(context.Background(), test.param, test.left, test.right)
 		if actual != test.expected {
 			t.Errorf("Expected InRangeInt(%v, %v, %v) to be %v, got %v using type uint", test.param, test.left, test.right, test.expected, actual)
 		}
@@ -357,7 +360,7 @@ func TestInRangeInt(t *testing.T) {
 		{0, 10, 5, false},
 	}
 	for _, test := range testAsUInt32s {
-		actual := InRangeInt(test.param, test.left, test.right)
+		actual := InRangeInt(context.Background(), test.param, test.left, test.right)
 		if actual != test.expected {
 			t.Errorf("Expected InRangeInt(%v, %v, %v) to be %v, got %v using type uint", test.param, test.left, test.right, test.expected, actual)
 		}
@@ -375,7 +378,7 @@ func TestInRangeInt(t *testing.T) {
 		{0, 10, 5, false},
 	}
 	for _, test := range testAsUInt64s {
-		actual := InRangeInt(test.param, test.left, test.right)
+		actual := InRangeInt(context.Background(), test.param, test.left, test.right)
 		if actual != test.expected {
 			t.Errorf("Expected InRangeInt(%v, %v, %v) to be %v, got %v using type uint", test.param, test.left, test.right, test.expected, actual)
 		}
@@ -397,7 +400,7 @@ func TestInRangeInt(t *testing.T) {
 		{"0", "10", "5", false},
 	}
 	for _, test := range testAsStrings {
-		actual := InRangeInt(test.param, test.left, test.right)
+		actual := InRangeInt(context.Background(), test.param, test.left, test.right)
 		if actual != test.expected {
 			t.Errorf("Expected InRangeInt(%v, %v, %v) to be %v, got %v using type string", test.param, test.left, test.right, test.expected, actual)
 		}
@@ -475,7 +478,7 @@ func TestInRange(t *testing.T) {
 		{0, 10, 5, false},
 	}
 	for _, test := range testsInt {
-		actual := InRange(test.param, test.left, test.right)
+		actual := InRange(context.Background(), test.param, test.left, test.right)
 		if actual != test.expected {
 			t.Errorf("Expected InRange(%v, %v, %v) to be %v, got %v", test.param, test.left, test.right, test.expected, actual)
 		}
@@ -497,7 +500,7 @@ func TestInRange(t *testing.T) {
 		{0, 10, 5, false},
 	}
 	for _, test := range testsFloat32 {
-		actual := InRange(test.param, test.left, test.right)
+		actual := InRange(context.Background(), test.param, test.left, test.right)
 		if actual != test.expected {
 			t.Errorf("Expected InRange(%v, %v, %v) to be %v, got %v", test.param, test.left, test.right, test.expected, actual)
 		}
@@ -519,7 +522,7 @@ func TestInRange(t *testing.T) {
 		{0, 10, 5, false},
 	}
 	for _, test := range testsFloat64 {
-		actual := InRange(test.param, test.left, test.right)
+		actual := InRange(context.Background(), test.param, test.left, test.right)
 		if actual != test.expected {
 			t.Errorf("Expected InRange(%v, %v, %v) to be %v, got %v", test.param, test.left, test.right, test.expected, actual)
 		}
@@ -541,7 +544,7 @@ func TestInRange(t *testing.T) {
 		{0, 10, 5, false},
 	}
 	for _, test := range testsTypeMix {
-		actual := InRange(test.param, test.left, test.right)
+		actual := InRange(context.Background(), test.param, test.left, test.right)
 		if actual != test.expected {
 			t.Errorf("Expected InRange(%v, %v, %v) to be %v, got %v", test.param, test.left, test.right, test.expected, actual)
 		}

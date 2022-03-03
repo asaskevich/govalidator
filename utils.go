@@ -1,6 +1,7 @@
 package govalidator
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"html"
@@ -173,8 +174,8 @@ func SafeFileName(str string) string {
 // Normalization follows special rules for known providers: currently, GMail addresses have dots removed in the local part and
 // are stripped of tags (e.g. some.one+tag@gmail.com becomes someone@gmail.com) and all @googlemail.com addresses are
 // normalized to @gmail.com.
-func NormalizeEmail(str string) (string, error) {
-	if !IsEmail(str) {
+func NormalizeEmail(ctx context.Context, str string) (string, error) {
+	if !IsEmail(ctx, str) {
 		return "", fmt.Errorf("%s is not an email", str)
 	}
 	parts := strings.Split(str, "@")

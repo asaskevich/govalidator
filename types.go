@@ -9,15 +9,15 @@ import (
 )
 
 // Validator is a wrapper for a validator function that returns bool and accepts string.
-type Validator func(str string) bool
+type Validator func(ctx context.Context, str string) bool
 
 // CustomTypeValidator is a wrapper for validator functions that returns bool and accepts any type.
 // The second parameter should be the context (in the case of validating a struct: the whole object being validated).
 type CustomTypeValidator func(ctx context.Context, i interface{}, o interface{}) bool
 
 // ParamValidator is a wrapper for validator functions that accepts additional parameters.
-type ParamValidator func(str string, params ...string) bool
-type InterfaceParamValidator func(in interface{}, params ...string) bool
+type ParamValidator func(ctx context.Context, str string, params ...string) bool
+type InterfaceParamValidator func(ctx context.Context, in interface{}, params ...string) bool
 type tagOptionsMap map[string]tagOption
 
 func (t tagOptionsMap) orderedKeys() []string {
