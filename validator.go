@@ -96,7 +96,7 @@ func IsPrivateIP(ip string) bool {
 	if oIp == nil {
 		return false
 	}
-	if oIp.IsLoopback() || oIp.IsLinkLocalUnicast() || oIp.IsLinkLocalMulticast() {
+	if oIp.IsLoopback() || oIp.IsLinkLocalUnicast() || oIp.IsLinkLocalMulticast() || oIp.IsPrivate() {
 		return true
 	}
 	for _, s := range aPrivateIP {
