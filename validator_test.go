@@ -3865,3 +3865,30 @@ func TestIsE164(t *testing.T) {
 		}
 	}
 }
+
+func TestIsPrivateIP(t *testing.T) {
+	t.Parallel()
+	// Without version
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"", false},
+		{"127.0.0.1", true},
+		{"127.0.2.1", true},
+		{"172.16.0.19", true},
+		{"fe80::b8:6771:9e7c:f6f1", true},
+		{"ee80::b8:6771:9e7c:f6f1", false},
+		{"fe80::1", true},
+		{"192.168.10.1", true},
+		{"::1", true},
+		{"2001:db8:0000:1:1:1:1:1", false},
+		{"300.0.0.0", false},
+	}
+	for _, test := range tests {
+		actual := IsPrivateIP(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsPrivateIP(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}

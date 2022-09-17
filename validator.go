@@ -69,6 +69,44 @@ func IsEmail(str string) bool {
 	return rxEmail.MatchString(str)
 }
 
+// private ip lists
+var aPrivateIP []*net.IPNet
+
+// IsPrivateIP check if the string is an private IP
+func IsPrivateIP(ip string) bool {
+	if 0 == len(aPrivateIP) {
+		for _, cidr := range []string{
+			"127.0.0.0/8",    // IPv4 loopback
+			"10.0.0.0/8",     // RFC1918
+			"172.16.0.0/12",  // RFC1918
+			"192.168.0.0/16", // RFC1918
+			"169.254.0.0/16", // RFC3927 link-local
+			"::1/128",        // IPv6 loopback
+			"fe80::/10",      // IPv6 link-local
+			"fc00::/7",       // IPv6 unique local addr
+		} {
+			_, block, err := net.ParseCIDR(cidr)
+			if err != nil {
+				continue
+			}
+			aPrivateIP = append(aPrivateIP, block)
+		}
+	}
+	oIp := net.ParseIP(ip)
+	if oIp == nil {
+		return false
+	}
+	if oIp.IsLoopback() || oIp.IsLinkLocalUnicast() || oIp.IsLinkLocalMulticast() {
+		return true
+	}
+	for _, s := range aPrivateIP {
+		if s.Contains(oIp) {
+			return true
+		}
+	}
+	return false
+}
+
 // IsExistingEmail checks if the string is an email of existing domain
 func IsExistingEmail(email string) bool {
 
