@@ -18,6 +18,7 @@ type CustomTypeValidator func(ctx context.Context, i interface{}, o interface{})
 // ParamValidator is a wrapper for validator functions that accepts additional parameters.
 type ParamValidator func(ctx context.Context, str string, params ...string) bool
 type InterfaceParamValidator func(ctx context.Context, in interface{}, params ...string) bool
+
 type tagOptionsMap map[string]tagOption
 
 func (t tagOptionsMap) orderedKeys() []string {
@@ -163,6 +164,8 @@ var TagMap = map[string]Validator{
 	"ISO3166Alpha2":      IsISO3166Alpha2,
 	"ISO3166Alpha3":      IsISO3166Alpha3,
 	"ISO4217":            IsISO4217,
+	"IMEI":               IsIMEI,
+	"ulid":               IsULID,
 }
 
 // ISO3166Entry stores country codes
@@ -174,7 +177,7 @@ type ISO3166Entry struct {
 	Numeric          string
 }
 
-//ISO3166List based on https://www.iso.org/obp/ui/#search/code/ Code Type "Officially Assigned Codes"
+// ISO3166List based on https://www.iso.org/obp/ui/#search/code/ Code Type "Officially Assigned Codes"
 var ISO3166List = []ISO3166Entry{
 	{"Afghanistan", "Afghanistan (l')", "AF", "AFG", "004"},
 	{"Albania", "Albanie (l')", "AL", "ALB", "008"},
@@ -447,10 +450,10 @@ var ISO4217List = []string{
 	"PAB", "PEN", "PGK", "PHP", "PKR", "PLN", "PYG",
 	"QAR",
 	"RON", "RSD", "RUB", "RWF",
-	"SAR", "SBD", "SCR", "SDG", "SEK", "SGD", "SHP", "SLL", "SOS", "SRD", "SSP", "STD", "SVC", "SYP", "SZL",
+	"SAR", "SBD", "SCR", "SDG", "SEK", "SGD", "SHP", "SLL", "SOS", "SRD", "SSP", "STD", "STN", "SVC", "SYP", "SZL",
 	"THB", "TJS", "TMT", "TND", "TOP", "TRY", "TTD", "TWD", "TZS",
-	"UAH", "UGX", "USD", "USN", "UYI", "UYU", "UZS",
-	"VEF", "VND", "VUV",
+	"UAH", "UGX", "USD", "USN", "UYI", "UYU", "UYW", "UZS",
+	"VEF", "VES", "VND", "VUV",
 	"WST",
 	"XAF", "XAG", "XAU", "XBA", "XBB", "XBC", "XBD", "XCD", "XDR", "XOF", "XPD", "XPF", "XPT", "XSU", "XTS", "XUA", "XXX",
 	"YER",
@@ -464,7 +467,7 @@ type ISO693Entry struct {
 	English     string
 }
 
-//ISO693List based on http://data.okfn.org/data/core/language-codes/r/language-codes-3b2.json
+// ISO693List based on http://data.okfn.org/data/core/language-codes/r/language-codes-3b2.json
 var ISO693List = []ISO693Entry{
 	{Alpha3bCode: "aar", Alpha2Code: "aa", English: "Afar"},
 	{Alpha3bCode: "abk", Alpha2Code: "ab", English: "Abkhazian"},

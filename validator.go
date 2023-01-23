@@ -33,30 +33,37 @@ var (
 
 const maxURLRuneCount = 2083
 const minURLRuneCount = 3
-const RF3339WithoutZone = "2006-01-02T15:04:05"
+const rfc3339WithoutZone = "2006-01-02T15:04:05"
 
 // SetFieldsRequiredByDefault causes validation to fail when struct fields
 // do not include validations or are not explicitly marked as exempt (using `valid:"-"` or `valid:"email,optional"`).
 // This struct definition will fail govalidator.ValidateStruct() (and the field values do not matter):
-//     type exampleStruct struct {
-//         Name  string ``
-//         Email string `valid:"email"`
+//
+//	type exampleStruct struct {
+//	    Name  string ``
+//	    Email string `valid:"email"`
+//
 // This, however, will only fail when Email is empty or an invalid email address:
-//     type exampleStruct2 struct {
-//         Name  string `valid:"-"`
-//         Email string `valid:"email"`
+//
+//	type exampleStruct2 struct {
+//	    Name  string `valid:"-"`
+//	    Email string `valid:"email"`
+//
 // Lastly, this will only fail when Email is an invalid email address but not when it's empty:
-//     type exampleStruct2 struct {
-//         Name  string `valid:"-"`
-//         Email string `valid:"email,optional"`
+//
+//	type exampleStruct2 struct {
+//	    Name  string `valid:"-"`
+//	    Email string `valid:"email,optional"`
 func SetFieldsRequiredByDefault(value bool) {
 	fieldsRequiredByDefault = value
 }
 
 // SetNilPtrAllowedByRequired causes validation to pass for nil ptrs when a field is set to required.
 // The validation will still reject ptr fields in their zero value state. Example with this enabled:
-//     type exampleStruct struct {
-//         Name  *string `valid:"required"`
+//
+//	type exampleStruct struct {
+//	    Name  *string `valid:"required"`
+//
 // With `Name` set to "", this will be considered invalid input and will cause a validation error.
 // With `Name` set to nil, this will be considered valid by validation.
 // By default this is disabled.
@@ -85,12 +92,12 @@ func IsExistingEmail(ctx context.Context, email string) bool {
 	if len(user) > 64 {
 		return false
 	}
-	if userDotRegexp.MatchString(user) || !userRegexp.MatchString(user) || !hostRegexp.MatchString(host) {
-		return false
-	}
 	switch host {
 	case "localhost", "example.com":
 		return true
+	}
+	if userDotRegexp.MatchString(user) || !userRegexp.MatchString(user) || !hostRegexp.MatchString(host) {
+		return false
 	}
 	if _, err := net.LookupMX(host); err != nil {
 		if _, err := net.LookupIP(host); err != nil {
@@ -125,7 +132,7 @@ func IsURL(ctx context.Context, str string) bool {
 	return rxURL.MatchString(str)
 }
 
-// IsRequestURL check if the string rawurl, assuming
+// IsRequestURL checks if the string rawurl, assuming
 // it was received in an HTTP request, is a valid
 // URL confirm to RFC 3986
 func IsRequestURL(ctx context.Context, rawurl string) bool {
@@ -139,7 +146,7 @@ func IsRequestURL(ctx context.Context, rawurl string) bool {
 	return true
 }
 
-// IsRequestURI check if the string rawurl, assuming
+// IsRequestURI checks if the string rawurl, assuming
 // it was received in an HTTP request, is an
 // absolute URI or an absolute path.
 func IsRequestURI(ctx context.Context, rawurl string) bool {
@@ -155,8 +162,8 @@ func IsAlpha(ctx context.Context, str string) bool {
 	return rxAlpha.MatchString(str)
 }
 
-//IsUTFLetter check if the string contains only unicode letter characters.
-//Similar to IsAlpha but for all languages. Empty string is valid.
+// IsUTFLetter checks if the string contains only unicode letter characters.
+// Similar to IsAlpha but for all languages. Empty string is valid.
 func IsUTFLetter(ctx context.Context, str string) bool {
 	if IsNull(ctx, str) {
 		return true
@@ -201,7 +208,7 @@ func IsNumeric(ctx context.Context, str string) bool {
 	return rxNumeric.MatchString(str)
 }
 
-// IsUTFNumeric check if the string contains only unicode numbers of any kind.
+// IsUTFNumeric checks if the string contains only unicode numbers of any kind.
 // Numbers can be 0-9 but also Fractions ¾,Roman Ⅸ and Hangzhou 〩. Empty string is valid.
 func IsUTFNumeric(ctx context.Context, str string) bool {
 	if IsNull(ctx, str) {
@@ -304,7 +311,7 @@ func IsFloat(ctx context.Context, str string) bool {
 	return str != "" && rxFloat.MatchString(str)
 }
 
-// IsDivisibleBy check if the string is a number that's divisible by another.
+// IsDivisibleBy checks if the string is a number that's divisible by another.
 // If second argument is not valid integer or zero, it's return false.
 // Otherwise, if first argument is not valid integer or zero, it's return true (Invalid string converts to zero).
 func IsDivisibleBy(ctx context.Context, str, num string) bool {
@@ -324,6 +331,7 @@ func IsNull(ctx context.Context, str string) bool {
 
 // IsNotNull check if the string is not null.
 func IsNotNull(ctx context.Context, str string) bool {
+	return !IsNull(ctx, str)
 	return !IsNull(ctx, str)
 }
 
@@ -362,9 +370,96 @@ func IsUUID(ctx context.Context, str string) bool {
 	return rxUUID.MatchString(str)
 }
 
+// Byte to index table for O(1) lookups when unmarshaling.
+// We use 0xFF as sentinel value for invalid indexes.
+var ulidDec = [...]byte{
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x01,
+	0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E,
+	0x0F, 0x10, 0x11, 0xFF, 0x12, 0x13, 0xFF, 0x14, 0x15, 0xFF,
+	0x16, 0x17, 0x18, 0x19, 0x1A, 0xFF, 0x1B, 0x1C, 0x1D, 0x1E,
+	0x1F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0A, 0x0B, 0x0C,
+	0x0D, 0x0E, 0x0F, 0x10, 0x11, 0xFF, 0x12, 0x13, 0xFF, 0x14,
+	0x15, 0xFF, 0x16, 0x17, 0x18, 0x19, 0x1A, 0xFF, 0x1B, 0x1C,
+	0x1D, 0x1E, 0x1F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+}
+
+// EncodedSize is the length of a text encoded ULID.
+const ulidEncodedSize = 26
+
+// IsULID checks if the string is a ULID.
+//
+// Implementation got from:
+//
+//	https://github.com/oklog/ulid (Apache-2.0 License)
+func IsULID(ctx context.Context, str string) bool {
+	// Check if a base32 encoded ULID is the right length.
+	if len(str) != ulidEncodedSize {
+		return false
+	}
+
+	// Check if all the characters in a base32 encoded ULID are part of the
+	// expected base32 character set.
+	if ulidDec[str[0]] == 0xFF ||
+		ulidDec[str[1]] == 0xFF ||
+		ulidDec[str[2]] == 0xFF ||
+		ulidDec[str[3]] == 0xFF ||
+		ulidDec[str[4]] == 0xFF ||
+		ulidDec[str[5]] == 0xFF ||
+		ulidDec[str[6]] == 0xFF ||
+		ulidDec[str[7]] == 0xFF ||
+		ulidDec[str[8]] == 0xFF ||
+		ulidDec[str[9]] == 0xFF ||
+		ulidDec[str[10]] == 0xFF ||
+		ulidDec[str[11]] == 0xFF ||
+		ulidDec[str[12]] == 0xFF ||
+		ulidDec[str[13]] == 0xFF ||
+		ulidDec[str[14]] == 0xFF ||
+		ulidDec[str[15]] == 0xFF ||
+		ulidDec[str[16]] == 0xFF ||
+		ulidDec[str[17]] == 0xFF ||
+		ulidDec[str[18]] == 0xFF ||
+		ulidDec[str[19]] == 0xFF ||
+		ulidDec[str[20]] == 0xFF ||
+		ulidDec[str[21]] == 0xFF ||
+		ulidDec[str[22]] == 0xFF ||
+		ulidDec[str[23]] == 0xFF ||
+		ulidDec[str[24]] == 0xFF ||
+		ulidDec[str[25]] == 0xFF {
+		return false
+	}
+
+	// Check if the first character in a base32 encoded ULID will overflow. This
+	// happens because the base32 representation encodes 130 bits, while the
+	// ULID is only 128 bits.
+	//
+	// See https://github.com/oklog/ulid/issues/9 for details.
+	if str[0] > '7' {
+		return false
+	}
+	return true
+}
+
 // IsCreditCard check if the string is a credit card.
 func IsCreditCard(ctx context.Context, str string) bool {
-	sanitized := notNumberRegexp.ReplaceAllString(str, "")
+	sanitized := whiteSpacesAndMinus.ReplaceAllString(str, "")
 	if !rxCreditCard.MatchString(sanitized) {
 		return false
 	}
@@ -378,7 +473,7 @@ func IsCreditCard(ctx context.Context, str string) bool {
 		if shouldDouble {
 			tmpNum *= 2
 			if tmpNum >= 10 {
-				sum += ((tmpNum % 10) + 1)
+				sum += (tmpNum % 10) + 1
 			} else {
 				sum += tmpNum
 			}
@@ -510,6 +605,27 @@ func IsFilePath(ctx context.Context, str string) (bool, int) {
 	return false, Unknown
 }
 
+// IsWinFilePath checks both relative & absolute paths in Windows
+func IsWinFilePath(str string) bool {
+	if rxARWinPath.MatchString(str) {
+		//check windows path limit see:
+		//  http://msdn.microsoft.com/en-us/library/aa365247(VS.85).aspx#maxpath
+		if len(str[3:]) > 32767 {
+			return false
+		}
+		return true
+	}
+	return false
+}
+
+// IsUnixFilePath checks both relative & absolute paths in Unix
+func IsUnixFilePath(str string) bool {
+	if rxARUnixPath.MatchString(str) {
+		return true
+	}
+	return false
+}
+
 // IsDataURI checks if a string is base64 encoded data URI such as an image
 func IsDataURI(ctx context.Context, str string) bool {
 	dataURI := strings.Split(str, ",")
@@ -576,7 +692,7 @@ func IsDNSName(ctx context.Context, str string) bool {
 // IsHash checks if a string is a hash of type algorithm.
 // Algorithm is one of ['md4', 'md5', 'sha1', 'sha256', 'sha384', 'sha512', 'ripemd128', 'ripemd160', 'tiger128', 'tiger160', 'tiger192', 'crc32', 'crc32b']
 func IsHash(ctx context.Context, str string, algorithm string) bool {
-	len := "0"
+	var len string
 	algo := strings.ToLower(algorithm)
 
 	if algo == "crc32" || algo == "crc32b" {
@@ -587,17 +703,39 @@ func IsHash(ctx context.Context, str string, algorithm string) bool {
 		len = "40"
 	} else if algo == "tiger192" {
 		len = "48"
-	} else if algo == "sha256" {
+	} else if algo == "sha3-224" {
+		len = "56"
+	} else if algo == "sha256" || algo == "sha3-256" {
 		len = "64"
-	} else if algo == "sha384" {
+	} else if algo == "sha384" || algo == "sha3-384" {
 		len = "96"
-	} else if algo == "sha512" {
+	} else if algo == "sha512" || algo == "sha3-512" {
 		len = "128"
 	} else {
 		return false
 	}
 
 	return Matches(str, "^[a-f0-9]{"+len+"}$")
+}
+
+// IsSHA3224 checks is a string is a SHA3-224 hash. Alias for `IsHash(str, "sha3-224")`
+func IsSHA3224(ctx context.Context, str string) bool {
+	return IsHash(ctx, str, "sha3-224")
+}
+
+// IsSHA3256 checks is a string is a SHA3-256 hash. Alias for `IsHash(str, "sha3-256")`
+func IsSHA3256(ctx context.Context, str string) bool {
+	return IsHash(ctx, str, "sha3-256")
+}
+
+// IsSHA3384 checks is a string is a SHA3-384 hash. Alias for `IsHash(str, "sha3-384")`
+func IsSHA3384(ctx context.Context, str string) bool {
+	return IsHash(ctx, str, "sha3-384")
+}
+
+// IsSHA3512 checks is a string is a SHA3-512 hash. Alias for `IsHash(str, "sha3-512")`
+func IsSHA3512(ctx context.Context, str string) bool {
+	return IsHash(ctx, str, "sha3-512")
 }
 
 // IsSHA512 checks is a string is a SHA512 hash. Alias for `IsHash(str, "sha512")`
@@ -705,7 +843,7 @@ func IsCIDR(ctx context.Context, str string) bool {
 	return err == nil
 }
 
-// IsMAC check if a string is valid MAC address.
+// IsMAC checks if a string is valid MAC address.
 // Possible MAC formats:
 // 01:23:45:67:89:ab
 // 01:23:45:67:89:ab:cd:ef
@@ -738,7 +876,55 @@ func IsLongitude(ctx context.Context, str string) bool {
 	return rxLongitude.MatchString(str)
 }
 
-// IsRsaPublicKey check if a string is valid public key with provided length
+// IsIMEI checks if a string is valid IMEI
+func IsIMEI(ctx context.Context, str string) bool {
+	return rxIMEI.MatchString(str)
+}
+
+// IsIMSI checks if a string is valid IMSI
+func IsIMSI(str string) bool {
+	if !rxIMSI.MatchString(str) {
+		return false
+	}
+
+	mcc, err := strconv.ParseInt(str[0:3], 10, 32)
+	if err != nil {
+		return false
+	}
+
+	switch mcc {
+	case 202, 204, 206, 208, 212, 213, 214, 216, 218, 219:
+	case 220, 221, 222, 226, 228, 230, 231, 232, 234, 235:
+	case 238, 240, 242, 244, 246, 247, 248, 250, 255, 257:
+	case 259, 260, 262, 266, 268, 270, 272, 274, 276, 278:
+	case 280, 282, 283, 284, 286, 288, 289, 290, 292, 293:
+	case 294, 295, 297, 302, 308, 310, 311, 312, 313, 314:
+	case 315, 316, 330, 332, 334, 338, 340, 342, 344, 346:
+	case 348, 350, 352, 354, 356, 358, 360, 362, 363, 364:
+	case 365, 366, 368, 370, 372, 374, 376, 400, 401, 402:
+	case 404, 405, 406, 410, 412, 413, 414, 415, 416, 417:
+	case 418, 419, 420, 421, 422, 424, 425, 426, 427, 428:
+	case 429, 430, 431, 432, 434, 436, 437, 438, 440, 441:
+	case 450, 452, 454, 455, 456, 457, 460, 461, 466, 467:
+	case 470, 472, 502, 505, 510, 514, 515, 520, 525, 528:
+	case 530, 536, 537, 539, 540, 541, 542, 543, 544, 545:
+	case 546, 547, 548, 549, 550, 551, 552, 553, 554, 555:
+	case 602, 603, 604, 605, 606, 607, 608, 609, 610, 611:
+	case 612, 613, 614, 615, 616, 617, 618, 619, 620, 621:
+	case 622, 623, 624, 625, 626, 627, 628, 629, 630, 631:
+	case 632, 633, 634, 635, 636, 637, 638, 639, 640, 641:
+	case 642, 643, 645, 646, 647, 648, 649, 650, 651, 652:
+	case 653, 654, 655, 657, 658, 659, 702, 704, 706, 708:
+	case 710, 712, 714, 716, 722, 724, 730, 732, 734, 736:
+	case 738, 740, 742, 744, 746, 748, 750, 995:
+		return true
+	default:
+		return false
+	}
+	return true
+}
+
+// IsRsaPublicKey checks if a string is valid public key with provided length
 func IsRsaPublicKey(ctx context.Context, str string, keylen int) bool {
 	bb := bytes.NewBufferString(str)
 	pemBytes, err := ioutil.ReadAll(bb)
@@ -772,6 +958,14 @@ func IsRsaPublicKey(ctx context.Context, str string, keylen int) bool {
 	return bitlen == int(keylen)
 }
 
+// IsRegex checks if a give string is a valid regex with RE2 syntax or not
+func IsRegex(str string) bool {
+	if _, err := regexp.Compile(str); err == nil {
+		return true
+	}
+	return false
+}
+
 func toJSONName(tag string) string {
 	if tag == "" {
 		return ""
@@ -792,7 +986,7 @@ func toJSONName(tag string) string {
 	return name
 }
 
-func PrependPathToErrors(err error, path string) error {
+func prependPathToErrors(err error, path string) error {
 	switch err2 := err.(type) {
 	case Error:
 		err2.Path = append([]string{path}, err2.Path...)
@@ -800,11 +994,16 @@ func PrependPathToErrors(err error, path string) error {
 	case Errors:
 		errors := err2.Errors()
 		for i, err3 := range errors {
-			errors[i] = PrependPathToErrors(err3, path)
+			errors[i] = prependPathToErrors(err3, path)
 		}
 		return err2
 	}
 	return err
+}
+
+// ValidateArray performs validation according to condition iterator that validates every element of the array
+func ValidateArray(array []interface{}, iterator ConditionIterator) bool {
+	return Every(array, iterator)
 }
 
 // ValidateMap use validation map for fields.
@@ -827,7 +1026,7 @@ func ValidateMap(ctx context.Context, s map[string]interface{}, m map[string]int
 			presentResult = false
 			var err error
 			err = fmt.Errorf("all map keys has to be present in the validation map; got %s", key)
-			err = PrependPathToErrors(err, key)
+			err = prependPathToErrors(err, key)
 			errs = append(errs, err)
 		}
 		valueField := reflect.ValueOf(value)
@@ -841,13 +1040,13 @@ func ValidateMap(ctx context.Context, s map[string]interface{}, m map[string]int
 			if v, ok := value.(map[string]interface{}); !ok {
 				mapResult = false
 				err = fmt.Errorf("map validator has to be for the map type only; got %s", valueField.Type().String())
-				err = PrependPathToErrors(err, key)
+				err = prependPathToErrors(err, key)
 				errs = append(errs, err)
 			} else {
 				mapResult, err = ValidateMap(ctx, v, subValidator)
 				if err != nil {
 					mapResult = false
-					err = PrependPathToErrors(err, key)
+					err = prependPathToErrors(err, key)
 					errs = append(errs, err)
 				}
 			}
@@ -858,7 +1057,7 @@ func ValidateMap(ctx context.Context, s map[string]interface{}, m map[string]int
 				var err error
 				structResult, err = ValidateStruct(ctx, valueField.Interface())
 				if err != nil {
-					err = PrependPathToErrors(err, key)
+					err = prependPathToErrors(err, key)
 					errs = append(errs, err)
 				}
 			}
@@ -879,13 +1078,13 @@ func ValidateMap(ctx context.Context, s map[string]interface{}, m map[string]int
 		default:
 			typeResult = false
 			err = fmt.Errorf("map validator has to be either map[string]interface{} or string; got %s", valueField.Type().String())
-			err = PrependPathToErrors(err, key)
+			err = prependPathToErrors(err, key)
 			errs = append(errs, err)
 		}
 		result = result && presentResult && typeResult && resultField && structResult && mapResult
 		index++
 	}
-	// check required keys
+	// checks required keys
 	requiredResult := true
 	for key, value := range m {
 		if schema, ok := value.(string); ok {
@@ -944,7 +1143,7 @@ func ValidateStruct(ctx context.Context, s interface{}) (bool, error) {
 			var err error
 			structResult, err = ValidateStruct(ctx, valueField.Interface())
 			if err != nil {
-				err = PrependPathToErrors(err, typeField.Name)
+				err = prependPathToErrors(err, typeField.Name)
 				errs = append(errs, err)
 			}
 		}
@@ -979,6 +1178,42 @@ func ValidateStruct(ctx context.Context, s interface{}) (bool, error) {
 		err = errs
 	}
 	return result, err
+}
+
+// ValidateStructAsync performs async validation of the struct and returns results through the channels
+func ValidateStructAsync(ctx context.Context, s interface{}) (<-chan bool, <-chan error) {
+	res := make(chan bool)
+	errors := make(chan error)
+
+	go func() {
+		defer close(res)
+		defer close(errors)
+
+		isValid, isFailed := ValidateStruct(ctx, s)
+
+		res <- isValid
+		errors <- isFailed
+	}()
+
+	return res, errors
+}
+
+// ValidateMapAsync performs async validation of the map and returns results through the channels
+func ValidateMapAsync(ctx context.Context, s map[string]interface{}, m map[string]interface{}) (<-chan bool, <-chan error) {
+	res := make(chan bool)
+	errors := make(chan error)
+
+	go func() {
+		defer close(res)
+		defer close(errors)
+
+		isValid, isFailed := ValidateMap(ctx, s, m)
+
+		res <- isValid
+		errors <- isFailed
+	}()
+
+	return res, errors
 }
 
 // parseTagIntoMap parses a struct tag `valid:required~Some error message,length(2|3)` into map[string]string{"required": "Some error message", "length(2|3)": ""}
@@ -1049,7 +1284,7 @@ func IsTime(ctx context.Context, str string, format string) bool {
 	return err == nil
 }
 
-// IsUnixTime check if string is valid unix timestamp value
+// IsUnixTime checks if string is valid unix timestamp value
 func IsUnixTime(str string) bool {
 	if _, err := strconv.Atoi(str); err == nil {
 		return true
@@ -1064,7 +1299,7 @@ func IsRFC3339(ctx context.Context, str string) bool {
 
 // IsRFC3339WithoutZone check if string is valid timestamp value according to RFC3339 which excludes the timezone.
 func IsRFC3339WithoutZone(ctx context.Context, str string) bool {
-	return IsTime(ctx, str, RF3339WithoutZone)
+	return IsTime(ctx, str, rfc3339WithoutZone)
 }
 
 // IsISO4217 check if string is valid ISO currency code
@@ -1089,13 +1324,13 @@ func ByteLength(ctx context.Context, str string, params ...string) bool {
 	return false
 }
 
-// RuneLength check string's length
+// RuneLength checks string's length
 // Alias for StringLength
 func RuneLength(ctx context.Context, str string, params ...string) bool {
 	return StringLength(ctx, str, params...)
 }
 
-// IsRsaPub check whether string is valid RSA key
+// IsRsaPub checks whether string is valid RSA key
 // Alias for IsRsaPublicKey
 func IsRsaPub(ctx context.Context, str string, params ...string) bool {
 	if len(params) == 1 {
@@ -1176,7 +1411,7 @@ func IsInRaw(ctx context.Context, str string, params ...string) bool {
 	return false
 }
 
-// IsIn check if string str is a member of the set of strings params
+// IsIn checks if string str is a member of the set of strings params
 func IsIn(str string, params ...string) bool {
 	for _, param := range params {
 		if str == param {
@@ -1214,7 +1449,7 @@ func typeCheck(ctx context.Context, v reflect.Value, t reflect.StructField, o re
 
 	tag := t.Tag.Get(tagName)
 
-	// Check if the field should be ignored
+	// checks if the field should be ignored
 	switch tag {
 	case "":
 		if v.Kind() != reflect.Slice && v.Kind() != reflect.Map {
@@ -1243,8 +1478,7 @@ func typeCheck(ctx context.Context, v reflect.Value, t reflect.StructField, o re
 		}
 	}
 
-	if !isFieldSet(v) {
-		// an empty value is not validated, check only required
+	if isEmptyValue(v) {
 		isValid, resultErr = checkRequired(v, t, options)
 		for key := range options {
 			delete(options, key)
@@ -1297,13 +1531,13 @@ func typeCheck(ctx context.Context, v reflect.Value, t reflect.StructField, o re
 		validator := validatorSpec
 		customMsgExists := len(validatorStruct.customErrorMessage) > 0
 
-		// Check whether the tag looks like '!something' or 'something'
+		// checks whether the tag looks like '!something' or 'something'
 		if validator[0] == '!' {
 			validator = validator[1:]
 			negate = true
 		}
 
-		// Check for interface param validators
+		// checks for interface param validators
 		for key, value := range InterfaceParamTagRegexMap {
 			ps := value.FindStringSubmatch(validator)
 			if len(ps) == 0 {
@@ -1336,20 +1570,20 @@ func typeCheck(ctx context.Context, v reflect.Value, t reflect.StructField, o re
 		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
 		reflect.Float32, reflect.Float64,
 		reflect.String:
-		// for each tag option check the map of validator functions
+		// for each tag option checks the map of validator functions
 		for _, validatorSpec := range optionsOrder {
 			validatorStruct := options[validatorSpec]
 			var negate bool
 			validator := validatorSpec
 			customMsgExists := len(validatorStruct.customErrorMessage) > 0
 
-			// Check whether the tag looks like '!something' or 'something'
+			// checks whether the tag looks like '!something' or 'something'
 			if validator[0] == '!' {
 				validator = validator[1:]
 				negate = true
 			}
 
-			// Check for param validators
+			// checks for param validators
 			for key, value := range ParamTagRegexMap {
 				ps := value.FindStringSubmatch(validator)
 				if len(ps) == 0 {
@@ -1430,7 +1664,7 @@ func typeCheck(ctx context.Context, v reflect.Value, t reflect.StructField, o re
 			} else {
 				resultItem, err = ValidateStruct(ctx, v.MapIndex(k).Interface())
 				if err != nil {
-					err = PrependPathToErrors(err, t.Name+"."+sv[i].Interface().(string))
+					err = prependPathToErrors(err, t.Name+"."+sv[i].Interface().(string))
 					return false, err
 				}
 			}
@@ -1451,7 +1685,7 @@ func typeCheck(ctx context.Context, v reflect.Value, t reflect.StructField, o re
 			} else {
 				resultItem, err = ValidateStruct(ctx, v.Index(i).Interface())
 				if err != nil {
-					err = PrependPathToErrors(err, t.Name+"."+strconv.Itoa(i))
+					err = prependPathToErrors(err, t.Name+"."+strconv.Itoa(i))
 					return false, err
 				}
 			}
@@ -1465,7 +1699,7 @@ func typeCheck(ctx context.Context, v reflect.Value, t reflect.StructField, o re
 		}
 		return ValidateStruct(ctx, v.Interface())
 	case reflect.Ptr:
-		// If the value is a pointer then check its element
+		// If the value is a pointer then checks its element
 		if v.IsNil() {
 			return true, nil
 		}
@@ -1481,14 +1715,26 @@ func stripParams(validatorString string) string {
 	return paramsRegexp.ReplaceAllString(validatorString, "")
 }
 
-// isFieldSet returns false for nil pointers, interfaces, maps, and slices. For all other values, it returns true.
-func isFieldSet(v reflect.Value) bool {
+// isEmptyValue checks whether value empty or not
+func isEmptyValue(v reflect.Value) bool {
 	switch v.Kind() {
-	case reflect.Map, reflect.Slice, reflect.Interface, reflect.Ptr:
-		return !v.IsNil()
+	case reflect.String, reflect.Array:
+		return v.Len() == 0
+	case reflect.Map, reflect.Slice:
+		return v.Len() == 0 || v.IsNil()
+	case reflect.Bool:
+		return !v.Bool()
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return v.Int() == 0
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		return v.Uint() == 0
+	case reflect.Float32, reflect.Float64:
+		return v.Float() == 0
+	case reflect.Interface, reflect.Ptr:
+		return v.IsNil()
 	}
 
-	return true
+	return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
 }
 
 // ErrorByField returns error for specified field of the struct
@@ -1510,11 +1756,11 @@ func ErrorsByField(e error) map[string]string {
 	}
 	// prototype for ValidateStruct
 
-	switch e.(type) {
+	switch e := e.(type) {
 	case Error:
-		m[e.(Error).Name] = e.(Error).Err.Error()
+		m[e.Name] = e.Err.Error()
 	case Errors:
-		for _, item := range e.(Errors).Errors() {
+		for _, item := range e.Errors() {
 			n := ErrorsByField(item)
 			for k, v := range n {
 				m[k] = v
@@ -1534,3 +1780,7 @@ func (sv stringValues) Len() int           { return len(sv) }
 func (sv stringValues) Swap(i, j int)      { sv[i], sv[j] = sv[j], sv[i] }
 func (sv stringValues) Less(i, j int) bool { return sv.get(i) < sv.get(j) }
 func (sv stringValues) get(i int) string   { return sv[i].String() }
+
+func IsE164(str string) bool {
+	return rxE164.MatchString(str)
+}
