@@ -166,6 +166,7 @@ var TagMap = map[string]Validator{
 	"ISO4217":            IsISO4217,
 	"IMEI":               IsIMEI,
 	"ulid":               IsULID,
+	"e164":               IsE164,
 }
 
 // ISO3166Entry stores country codes

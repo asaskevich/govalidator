@@ -385,6 +385,7 @@ Here is a list of available validators for struct fields (validator - used funct
 "ISO3166Alpha2":      IsISO3166Alpha2,
 "ISO3166Alpha3":      IsISO3166Alpha3,
 "ulid":               IsULID,
+"e164":               IsE164,
 ```
 Validators with parameters
 
