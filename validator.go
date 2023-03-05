@@ -6,12 +6,14 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/base64"
+	"encoding/csv"
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
 	"net"
 	"net/url"
+	"os"
 	"reflect"
 	"regexp"
 	"sort"
@@ -198,6 +200,35 @@ func IsNumeric(str string) bool {
 		return true
 	}
 	return rxNumeric.MatchString(str)
+}
+
+// checks if the csv file contains the given string
+func IsInCSV(str string, address string) bool {
+	if IsNull(str) {
+		return true
+	}
+
+	f, err := os.Open(address)
+	if err != nil {
+		return false //could not read file
+	}
+	defer f.Close()
+
+	csvReader := csv.NewReader(f)
+	records, err := csvReader.ReadAll()
+	if err != nil {
+		return false //file is not csv
+	}
+
+	for _, row := range records {
+		for _, val := range row {
+			val_str := string(val)
+			if strings.Contains(val_str, str) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // IsUTFNumeric checks if the string contains only unicode numbers of any kind.
