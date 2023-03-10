@@ -1100,6 +1100,34 @@ func ValidateMap(s map[string]interface{}, m map[string]interface{}) (bool, erro
 	return result && requiredResult, err
 }
 
+// generate tags from AND of OR clause
+func generateTags(tag string) []string {
+	// split tags in lists of or clause
+	tagSplited := strings.Split(tag, ",")
+	// split or clause
+	var tagParts [][]string
+	for _, s := range tagSplited {
+		sp := strings.Split(s, "|")
+		tagParts = append(tagParts, sp)
+	}
+	// generate tags. in each or clause select on for every tag
+	tags := []string{""}
+	for i := 0; i < len(tagParts); i++ {
+		var tagsTmp []string
+		for _, tag := range tags {
+			for _, s := range tagParts[i] {
+				tagsTmp = append(tagsTmp, tag+s+",")
+			}
+		}
+		tags = tagsTmp
+	}
+	// trim last extra ','
+	for i, _ := range tags {
+		tags[i] = strings.TrimRight(tags[i], ",")
+	}
+	return tags
+}
+
 // ValidateStruct use tags for fields.
 // result will be equal to `false` if there are any errors.
 // todo currently there is no guarantee that errors will be returned in predictable order (tests may to fail)
@@ -1138,30 +1166,37 @@ func ValidateStruct(s interface{}) (bool, error) {
 				errs = append(errs, err)
 			}
 		}
-		resultField, err2 := typeCheck(valueField, typeField, val, nil)
-		if err2 != nil {
+		rawTag := typeField.Tag.Get(tagName)
+		tags := generateTags(rawTag)
+		var resultField = true
+		// check for each generated tag
+		for _, tag := range tags {
+			tagResultField, err2 := typeCheckTagInput(valueField, typeField, tag, val, nil)
+			resultField = tagResultField || resultField
+			if err2 != nil {
 
-			// Replace structure name with JSON name if there is a tag on the variable
-			jsonTag := toJSONName(typeField.Tag.Get("json"))
-			if jsonTag != "" {
-				switch jsonError := err2.(type) {
-				case Error:
-					jsonError.Name = jsonTag
-					err2 = jsonError
-				case Errors:
-					for i2, err3 := range jsonError {
-						switch customErr := err3.(type) {
-						case Error:
-							customErr.Name = jsonTag
-							jsonError[i2] = customErr
+				// Replace structure name with JSON name if there is a tag on the variable
+				jsonTag := toJSONName(typeField.Tag.Get("json"))
+				if jsonTag != "" {
+					switch jsonError := err2.(type) {
+					case Error:
+						jsonError.Name = jsonTag
+						err2 = jsonError
+					case Errors:
+						for i2, err3 := range jsonError {
+							switch customErr := err3.(type) {
+							case Error:
+								customErr.Name = jsonTag
+								jsonError[i2] = customErr
+							}
 						}
+
+						err2 = jsonError
 					}
-
-					err2 = jsonError
 				}
-			}
 
-			errs = append(errs, err2)
+				errs = append(errs, err2)
+			}
 		}
 		result = result && resultField && structResult
 	}
@@ -1433,13 +1468,12 @@ func checkRequired(v reflect.Value, t reflect.StructField, options tagOptionsMap
 	// not required and empty is valid
 	return true, nil
 }
-
-func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options tagOptionsMap) (isValid bool, resultErr error) {
+func typeCheckTagInput(v reflect.Value, t reflect.StructField, tag string, o reflect.Value, options tagOptionsMap) (isValid bool, resultErr error) {
 	if !v.IsValid() {
 		return false, nil
 	}
 
-	tag := t.Tag.Get(tagName)
+	//tag := t.Tag.Get(tagName)
 
 	// checks if the field should be ignored
 	switch tag {
@@ -1691,6 +1725,9 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 	default:
 		return false, &UnsupportedTypeError{v.Type()}
 	}
+}
+func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options tagOptionsMap) (isValid bool, resultErr error) {
+	return typeCheckTagInput(v, t, t.Tag.Get(tagName), o, options)
 }
 
 func stripParams(validatorString string) string {
