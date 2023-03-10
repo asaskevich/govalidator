@@ -8,11 +8,11 @@ import (
 )
 
 func init() {
-	CustomTypeTagMap.Set("customFalseValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
-		return false
+	CustomTypeTagMap.Set("customFalseValidator", CustomTypeValidator(func(i interface{}, o interface{}) error {
+		return fmt.Errorf("invalid")
 	}))
-	CustomTypeTagMap.Set("customTrueValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
-		return true
+	CustomTypeTagMap.Set("customTrueValidator", CustomTypeValidator(func(i interface{}, o interface{}) error {
+		return nil
 	}))
 }
 
@@ -2715,7 +2715,7 @@ func TestStructWithCustomByteArray(t *testing.T) {
 	t.Parallel()
 
 	// add our custom byte array validator that fails when the byte array is pristine (all zeroes)
-	CustomTypeTagMap.Set("customByteArrayValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+	CustomTypeTagMap.Set("customByteArrayValidator", CustomTypeValidator(func(i interface{}, o interface{}) error {
 		switch v := o.(type) {
 		case StructWithCustomByteArray:
 			if len(v.Email) > 0 {
@@ -2731,18 +2731,20 @@ func TestStructWithCustomByteArray(t *testing.T) {
 		case CustomByteArray:
 			for _, e := range v { // checks if v is empty, i.e. all zeroes
 				if e != 0 {
-					return true
+					return nil
 				}
 			}
 		}
-		return false
+		return fmt.Errorf("all zeros")
 	}))
-	CustomTypeTagMap.Set("customMinLengthValidator", CustomTypeValidator(func(i interface{}, o interface{}) bool {
+	CustomTypeTagMap.Set("customMinLengthValidator", CustomTypeValidator(func(i interface{}, o interface{}) error {
 		switch v := o.(type) {
 		case StructWithCustomByteArray:
-			return len(v.ID) >= v.CustomMinLength
+			if len(v.ID) >= v.CustomMinLength {
+				return nil
+			}
 		}
-		return false
+		return fmt.Errorf("byte is too short")
 	}))
 	testCustomByteArray := CustomByteArray{'1', '2', '3', '4', '5', '6'}
 	var tests = []struct {
@@ -3361,8 +3363,8 @@ func TestErrorsByField(t *testing.T) {
 		ID    string `valid:"falseValidation"`
 	}
 
-	CustomTypeTagMap.Set("falseValidation", CustomTypeValidator(func(i interface{}, o interface{}) bool {
-		return false
+	CustomTypeTagMap.Set("falseValidation", CustomTypeValidator(func(i interface{}, o interface{}) error {
+		return fmt.Errorf("validation failed")
 	}))
 
 	tests = []struct {
@@ -3370,7 +3372,7 @@ func TestErrorsByField(t *testing.T) {
 		expected string
 	}{
 		{"Email", "My123 does not validate as email"},
-		{"ID", "duck13126 does not validate as falseValidation"},
+		{"ID", "validation failed"},
 	}
 	s := &StructWithCustomValidation{Email: "My123", ID: "duck13126"}
 	_, err = ValidateStruct(s)
@@ -3592,8 +3594,8 @@ func TestIsCIDR(t *testing.T) {
 
 func TestOptionalCustomValidators(t *testing.T) {
 
-	CustomTypeTagMap.Set("f2", CustomTypeValidator(func(i interface{}, o interface{}) bool {
-		return false
+	CustomTypeTagMap.Set("f2", CustomTypeValidator(func(i interface{}, o interface{}) error {
+		return fmt.Errorf("didn't pass validation")
 	}))
 
 	var val struct {
