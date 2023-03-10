@@ -143,6 +143,7 @@ func IsHost(str string) bool
 func IsIP(str string) bool
 func IsIPv4(str string) bool
 func IsIPv6(str string) bool
+func IsPrivateIP(ip string) bool
 func IsISBN(str string, version int) bool
 func IsISBN10(str string) bool
 func IsISBN13(str string) bool
@@ -370,6 +371,7 @@ Here is a list of available validators for struct fields (validator - used funct
 "base64":             IsBase64,
 "datauri":            IsDataURI,
 "ip":                 IsIP,
+"ip":                 IsPrivateIP
 "port":               IsPort,
 "ipv4":               IsIPv4,
 "ipv6":               IsIPv6,
