@@ -30,7 +30,7 @@ var (
 	paramsRegexp            = regexp.MustCompile(`\(.*\)$`)
 )
 
-const maxURLRuneCount = 2083
+// const maxURLRuneCount = 2083 // do not put any limit on maximum URL length
 const minURLRuneCount = 3
 const rfc3339WithoutZone = "2006-01-02T15:04:05"
 
@@ -102,7 +102,7 @@ func IsExistingEmail(email string) bool {
 
 // IsURL checks if the string is an URL.
 func IsURL(str string) bool {
-	if str == "" || utf8.RuneCountInString(str) >= maxURLRuneCount || len(str) <= minURLRuneCount || strings.HasPrefix(str, ".") {
+	if str == "" || len(str) <= minURLRuneCount || strings.HasPrefix(str, ".") {
 		return false
 	}
 	strTemp := str
