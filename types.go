@@ -74,15 +74,15 @@ var ParamTagMap = map[string]ParamValidator{
 
 // ParamTagRegexMap maps param tags to their respective regexes.
 var ParamTagRegexMap = map[string]*regexp.Regexp{
-	"range":           regexp.MustCompile("^range\\((\\d+)\\|(\\d+)\\)$"),
-	"length":          regexp.MustCompile("^length\\((\\d+)\\|(\\d+)\\)$"),
-	"runelength":      regexp.MustCompile("^runelength\\((\\d+)\\|(\\d+)\\)$"),
-	"stringlength":    regexp.MustCompile("^stringlength\\((\\d+)\\|(\\d+)\\)$"),
+	"range":           regexp.MustCompile(`^range\((\d+)\|(\d+)\)$`),
+	"length":          regexp.MustCompile(`^length\((\d+)\|(\d+)\)$`),
+	"runelength":      regexp.MustCompile(`^runelength\((\d+)\|(\d+)\)$`),
+	"stringlength":    regexp.MustCompile(`^stringlength\((\d+)\|(\d+)\)$`),
 	"in":              regexp.MustCompile(`^in\((.*)\)`),
 	"matches":         regexp.MustCompile(`^matches\((.+)\)$`),
-	"rsapub":          regexp.MustCompile("^rsapub\\((\\d+)\\)$"),
-	"minstringlength": regexp.MustCompile("^minstringlength\\((\\d+)\\)$"),
-	"maxstringlength": regexp.MustCompile("^maxstringlength\\((\\d+)\\)$"),
+	"rsapub":          regexp.MustCompile(`rsapub\((\d+)\)$`),
+	"minstringlength": regexp.MustCompile(`^minstringlength\((\d+)\)$`),
+	"maxstringlength": regexp.MustCompile(`^maxstringlength\((\d+)\)$`),
 }
 
 type customTypeTagMap struct {
@@ -177,7 +177,7 @@ type ISO3166Entry struct {
 	Numeric          string
 }
 
-//ISO3166List based on https://www.iso.org/obp/ui/#search/code/ Code Type "Officially Assigned Codes"
+// ISO3166List based on https://www.iso.org/obp/ui/#search/code/ Code Type "Officially Assigned Codes"
 var ISO3166List = []ISO3166Entry{
 	{"Afghanistan", "Afghanistan (l')", "AF", "AFG", "004"},
 	{"Albania", "Albanie (l')", "AL", "ALB", "008"},
@@ -467,7 +467,7 @@ type ISO693Entry struct {
 	English     string
 }
 
-//ISO693List based on http://data.okfn.org/data/core/language-codes/r/language-codes-3b2.json
+// ISO693List based on http://data.okfn.org/data/core/language-codes/r/language-codes-3b2.json
 var ISO693List = []ISO693Entry{
 	{Alpha3bCode: "aar", Alpha2Code: "aa", English: "Afar"},
 	{Alpha3bCode: "abk", Alpha2Code: "ab", English: "Abkhazian"},
