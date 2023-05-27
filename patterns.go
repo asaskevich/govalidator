@@ -67,7 +67,7 @@ const (
 
 var (
 	userRegexp          = regexp.MustCompile("^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~.-]+$")
-	hostRegexp          = regexp.MustCompile("^[^\\s]+\\.[^\\s]+$")
+	hostRegexp          = regexp.MustCompile(`^[^\s]+\.[^\s]+$`)
 	userDotRegexp       = regexp.MustCompile("(^[.]{1})|([.]{1}$)|([.]{2,})")
 	rxEmail             = regexp.MustCompile(Email)
 	rxCreditCard        = regexp.MustCompile(CreditCard)
