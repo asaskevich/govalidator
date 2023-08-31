@@ -577,7 +577,7 @@ func IsVariableWidth(str string) bool {
 
 // IsBase64 checks if a string is base64 encoded.
 func IsBase64(str string) bool {
-	return rxBase64.MatchString(str)
+	return str == "" || rxBase64.MatchString(str)
 }
 
 // IsFilePath checks is a string is Win or Unix file path and returns it's type.
