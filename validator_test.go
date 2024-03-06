@@ -3865,3 +3865,23 @@ func TestIsE164(t *testing.T) {
 		}
 	}
 }
+
+func TestIsYYYYMMDD(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"2000-01-01", true},
+		{"2000-13-01", false},
+		{"20000-01-01", false},
+		{"2000-01-32", false},
+	}
+	for _, test := range tests {
+		actual := IsYYYYMMDD(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsYYYYMMDD(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
