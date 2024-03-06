@@ -1766,3 +1766,10 @@ func (sv stringValues) get(i int) string   { return sv[i].String() }
 func IsE164(str string) bool {
 	return rxE164.MatchString(str)
 }
+
+// IsDateString checks if a string is in the "YYYY-MM-DD" date format and returns true if valid.
+func IsDateString(str string) bool {
+	layout := "2006-01-02"
+	_, err := time.Parse(layout, str)
+	return err == nil
+}
