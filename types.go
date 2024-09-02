@@ -296,6 +296,8 @@ var ISO3166List = []ISO3166Entry{
 	{"Kenya", "Kenya (le)", "KE", "KEN", "404"},
 	{"Korea (the Democratic People's Republic of)", "Corée (la République populaire démocratique de)", "KP", "PRK", "408"},
 	{"Korea (the Republic of)", "Corée (la République de)", "KR", "KOR", "410"},
+	// Kosovo is not yet part of the ISO3166 standard, but is informally assigned the code XK/XXK in many other systems based on ISO3166
+	{"Kosovo", "Kosovo (le)", "XK", "XXK", "383"},
 	{"Kuwait", "Koweït (le)", "KW", "KWT", "414"},
 	{"Kyrgyzstan", "Kirghizistan (le)", "KG", "KGZ", "417"},
 	{"Lao People's Democratic Republic (the)", "Lao, République démocratique populaire", "LA", "LAO", "418"},
