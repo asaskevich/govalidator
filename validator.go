@@ -454,26 +454,26 @@ func IsCreditCard(str string) bool {
 	if !rxCreditCard.MatchString(sanitized) {
 		return false
 	}
-	
+
 	number, _ := ToInt(sanitized)
-	number, lastDigit := number / 10, number % 10	
+	number, lastDigit := number/10, number%10
 
 	var sum int64
-	for i:=0; number > 0; i++ {
+	for i := 0; number > 0; i++ {
 		digit := number % 10
-		
-		if i % 2 == 0 {
+
+		if i%2 == 0 {
 			digit *= 2
 			if digit > 9 {
 				digit -= 9
 			}
 		}
-		
+
 		sum += digit
 		number = number / 10
 	}
-	
-	return (sum + lastDigit) % 10 == 0
+
+	return (sum+lastDigit)%10 == 0
 }
 
 // IsISBN10 checks if the string is an ISBN version 10.
@@ -1765,4 +1765,11 @@ func (sv stringValues) get(i int) string   { return sv[i].String() }
 
 func IsE164(str string) bool {
 	return rxE164.MatchString(str)
+}
+
+// IsYYYYMMDD checks if a string is in the "YYYY-MM-DD" date format and returns true if valid.
+func IsYYYYMMDD(str string) bool {
+	layout := "2006-01-02"
+	_, err := time.Parse(layout, str)
+	return err == nil
 }
