@@ -3523,9 +3523,9 @@ func TestValidateStructParamValidatorInt(t *testing.T) {
 		Float64 float64 `valid:"in(1|10),float64"`
 	}
 
-	test3Ok1 := &Test2{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-	test3Ok2 := &Test2{10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10}
-	test3NotOk := &Test2{2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
+	test3Ok1 := &Test3{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+	test3Ok2 := &Test3{10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10}
+	test3NotOk := &Test3{2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
 
 	_, err = ValidateStruct(test3Ok1)
 	if err != nil {
