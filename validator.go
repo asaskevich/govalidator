@@ -1659,7 +1659,8 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		for i := 0; i < v.Len(); i++ {
 			var resultItem bool
 			var err error
-			if v.Index(i).Kind() != reflect.Struct {
+			if v.Index(i).Kind() != reflect.Struct &&
+				!(v.Index(i).Kind() == reflect.Ptr && v.Index(i).Elem().Kind() == reflect.Struct) {
 				resultItem, err = typeCheck(v.Index(i), t, o, options)
 				if err != nil {
 					return false, err
