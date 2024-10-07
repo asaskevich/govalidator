@@ -3865,3 +3865,45 @@ func TestIsE164(t *testing.T) {
 		}
 	}
 }
+
+func TestIsWord(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"Hello", true},
+		{"hello", false},
+		{"HelLoO", false},
+	}
+
+	for _, test := range tests {
+		actual := IsWord(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsWord(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
+func TestIsDecimal(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		expected bool
+	}{
+		{"1.23", true},
+		{"5", false},
+		{"0", false},
+		{"abc", false},
+		{"0.64", true},
+	}
+
+	for _, test := range tests {
+		actual := IsDecimal(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected IsDecimal(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
