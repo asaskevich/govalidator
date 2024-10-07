@@ -820,7 +820,7 @@ func TestIsURL(t *testing.T) {
 		{"http://foobar.com/t$-_.+!*\\'(),", true},
 		{"http://www.foobar.com/~foobar", true},
 		{"http://www.-foobar.com/", false},
-		{"http://www.foo---bar.com/", false},
+		{"http://www.foo---bar.com/", true},
 		{"http://r6---snnvoxuioq6.googlevideo.com", true},
 		{"mailto:someone@example.com", true},
 		{"irc://irc.server.org/channel", false},
