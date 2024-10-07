@@ -3646,6 +3646,50 @@ func TestJSONValidator(t *testing.T) {
 	}
 }
 
+func TestNestedStructWithJson(t *testing.T) {
+	type Details struct {
+		Email string `json:"email" valid:"email"`
+	}
+
+	type Address struct {
+		CountryCode string `json:"country_code" valid:"ISO3166Alpha3"`
+	}
+
+	type Person struct {
+		Details   Details   `json:"details"`
+		Addresses []Address `json:"addresses"`
+	}
+
+	var tests = []struct {
+		param    interface{}
+		expected bool
+		expectedErr string
+	}{
+		{Person{
+			Details: Details{Email: "gogopher@example-com"},
+			Addresses: []Address{
+				{CountryCode: "GBP"},
+				{CountryCode: "AUS"},
+			},
+		}, false, "Addresses.0.country_code: GBP does not validate as ISO3166Alpha3;" +
+			"Details.email: gogopher@example-com does not validate as email"},
+	}
+
+	for _, test := range tests {
+		actual, err := ValidateStruct(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected ValidateStruct(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+		if err != nil {
+			if err.Error() != test.expectedErr {
+				t.Errorf("Got Error on ValidateStruct(%q). Expected: %s Actual: %s", test.param, test.expectedErr, err)
+			}
+		} else if test.expectedErr != "" {
+			t.Errorf("Expected error on ValidateStruct(%q).", test.param)
+		}
+	}
+}
+
 func TestValidatorIncludedInError(t *testing.T) {
 	post := Post{
 		Title:    "",
