@@ -222,6 +222,12 @@ func IsUTFNumeric(str string) bool {
 
 }
 
+// Positive checks if the a positive numeric value.
+func Positive(str string) bool {
+	value, _ := ToFloat(str)
+	return IsPositive(value)
+}
+
 // IsUTFDigit checks if the string contains only unicode radix-10 decimal digits. Empty string is valid.
 func IsUTFDigit(str string) bool {
 	if IsNull(str) {
