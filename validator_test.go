@@ -3442,11 +3442,12 @@ func ExampleValidateStruct() {
 
 func TestValidateStructParamValidatorInt(t *testing.T) {
 	type Test1 struct {
-		Int   int   `valid:"range(1|10)"`
-		Int8  int8  `valid:"range(1|10)"`
-		Int16 int16 `valid:"range(1|10)"`
-		Int32 int32 `valid:"range(1|10)"`
-		Int64 int64 `valid:"range(1|10)"`
+		Int    int   `valid:"range(1|10)"`
+		Int8   int8  `valid:"range(1|10)"`
+		Int16  int16 `valid:"range(1|10)"`
+		Int32  int32 `valid:"range(1|10)"`
+		Int64  int64 `valid:"range(1|10)"`
+		NegInt int   `valid:"range(-1|-10)"`
 
 		Uint   uint   `valid:"range(1|10)"`
 		Uint8  uint8  `valid:"range(1|10)"`
@@ -3457,8 +3458,8 @@ func TestValidateStructParamValidatorInt(t *testing.T) {
 		Float32 float32 `valid:"range(1|10)"`
 		Float64 float64 `valid:"range(1|10)"`
 	}
-	test1Ok := &Test1{5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5}
-	test1NotOk := &Test1{11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11}
+	test1Ok := &Test1{5, 5, 5, 5, 5, -5, 5, 5, 5, 5, 5, 5, 5}
+	test1NotOk := &Test1{11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11}
 
 	_, err := ValidateStruct(test1Ok)
 	if err != nil {
