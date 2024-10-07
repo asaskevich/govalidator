@@ -1679,6 +1679,11 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		if v.IsNil() {
 			return true, nil
 		}
+		// Fix https://github.com/asaskevich/govalidator/issues/454 -- check if the value/interface is not struct, like string
+		val := reflect.ValueOf(v.Interface())
+		if val.Kind() != reflect.Struct {
+			return typeCheck(val, t, o, options)
+		}
 		return ValidateStruct(v.Interface())
 	case reflect.Ptr:
 		// If the value is a pointer then checks its element
