@@ -208,6 +208,7 @@ func IsULID(str string) bool
 func IsUnixTime(str string) bool
 func IsUpperCase(str string) bool
 func IsVariableWidth(str string) bool
+func IsYYYYMMDD(str string) bool
 func IsWhole(value float64) bool
 func LeftTrim(str, chars string) string
 func Map(array []interface{}, iterator ResultIterator) []interface{}
@@ -385,6 +386,7 @@ Here is a list of available validators for struct fields (validator - used funct
 "ISO3166Alpha2":      IsISO3166Alpha2,
 "ISO3166Alpha3":      IsISO3166Alpha3,
 "ulid":               IsULID,
+"yyyymmdd":           IsYYYYMMDD,
 ```
 Validators with parameters
 
