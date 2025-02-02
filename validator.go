@@ -24,6 +24,7 @@ import (
 
 var (
 	fieldsRequiredByDefault bool
+	jsonTag string
 	nilPtrAllowedByRequired = false
 	notNumberRegexp         = regexp.MustCompile("[^0-9]+")
 	whiteSpacesAndMinus     = regexp.MustCompile(`[\s-]+`)
@@ -1142,7 +1143,6 @@ func ValidateStruct(s interface{}) (bool, error) {
 		if err2 != nil {
 
 			// Replace structure name with JSON name if there is a tag on the variable
-			jsonTag := toJSONName(typeField.Tag.Get("json"))
 			if jsonTag != "" {
 				switch jsonError := err2.(type) {
 				case Error:
@@ -1439,6 +1439,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		return false, nil
 	}
 
+	jsonTag = toJSONName(t.Tag.Get("json"))
 	tag := t.Tag.Get(tagName)
 
 	// checks if the field should be ignored
