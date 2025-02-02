@@ -1763,6 +1763,7 @@ func (sv stringValues) Swap(i, j int)      { sv[i], sv[j] = sv[j], sv[i] }
 func (sv stringValues) Less(i, j int) bool { return sv.get(i) < sv.get(j) }
 func (sv stringValues) get(i int) string   { return sv[i].String() }
 
+// IsE164 checks if the string is a valid E.164 phone number.
 func IsE164(str string) bool {
 	return rxE164.MatchString(str)
 }
