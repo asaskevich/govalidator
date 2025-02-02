@@ -1060,7 +1060,7 @@ func ValidateMap(s map[string]interface{}, m map[string]interface{}) (bool, erro
 				Offset:    0,
 				Index:     []int{index},
 				Anonymous: false,
-			}, val, nil)
+			}, val, nil, val)
 			if err != nil {
 				errs = append(errs, err)
 			}
@@ -1138,7 +1138,7 @@ func ValidateStruct(s interface{}) (bool, error) {
 				errs = append(errs, err)
 			}
 		}
-		resultField, err2 := typeCheck(valueField, typeField, val, nil)
+		resultField, err2 := typeCheck(valueField, typeField, val, nil, val)
 		if err2 != nil {
 
 			// Replace structure name with JSON name if there is a tag on the variable
@@ -1434,7 +1434,7 @@ func checkRequired(v reflect.Value, t reflect.StructField, options tagOptionsMap
 	return true, nil
 }
 
-func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options tagOptionsMap) (isValid bool, resultErr error) {
+func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options tagOptionsMap, p reflect.Value) (isValid bool, resultErr error) {
 	if !v.IsValid() {
 		return false, nil
 	}
@@ -1461,10 +1461,15 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 	}
 
 	if isEmptyValue(v) {
-		// an empty value is not validated, checks only required
-		isValid, resultErr = checkRequired(v, t, options)
-		for key := range options {
-			delete(options, key)
+		if p.Kind() == reflect.Slice || p.Kind() == reflect.Array && p.Len() > 0 {
+			// empty values are allowed for elements of arrays/slices, the parent has already been checked against the zero type
+			return true, nil
+		} else {
+			// an empty value is not validated, checks only required
+			isValid, resultErr = checkRequired(v, t, options)
+			for key := range options {
+				delete(options, key)
+			}
 		}
 		return isValid, resultErr
 	}
@@ -1640,7 +1645,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 			var resultItem bool
 			var err error
 			if v.MapIndex(k).Kind() != reflect.Struct {
-				resultItem, err = typeCheck(v.MapIndex(k), t, o, options)
+				resultItem, err = typeCheck(v.MapIndex(k), t, o, options, v)
 				if err != nil {
 					return false, err
 				}
@@ -1660,7 +1665,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 			var resultItem bool
 			var err error
 			if v.Index(i).Kind() != reflect.Struct {
-				resultItem, err = typeCheck(v.Index(i), t, o, options)
+				resultItem, err = typeCheck(v.Index(i), t, o, options, v)
 				if err != nil {
 					return false, err
 				}
@@ -1685,7 +1690,7 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		if v.IsNil() {
 			return true, nil
 		}
-		return typeCheck(v.Elem(), t, o, options)
+		return typeCheck(v.Elem(), t, o, options, v)
 	case reflect.Struct:
 		return true, nil
 	default:
@@ -1700,7 +1705,7 @@ func stripParams(validatorString string) string {
 // isEmptyValue checks whether value empty or not
 func isEmptyValue(v reflect.Value) bool {
 	switch v.Kind() {
-	case reflect.String, reflect.Array:
+	case reflect.String:
 		return v.Len() == 0
 	case reflect.Map, reflect.Slice:
 		return v.Len() == 0 || v.IsNil()
