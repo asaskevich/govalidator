@@ -132,6 +132,7 @@ var TagMap = map[string]Validator{
 	"float":              IsFloat,
 	"null":               IsNull,
 	"notnull":            IsNotNull,
+	"positive":           Positive,
 	"uuid":               IsUUID,
 	"uuidv3":             IsUUIDv3,
 	"uuidv4":             IsUUIDv4,
