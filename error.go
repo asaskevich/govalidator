@@ -35,7 +35,7 @@ type Error struct {
 
 func (e Error) Error() string {
 	if e.CustomErrorMessageExists {
-		return e.Err.Error()
+		return e.Name + ": " + e.Err.Error()
 	}
 
 	errName := e.Name
