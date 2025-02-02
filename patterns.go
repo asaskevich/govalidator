@@ -50,6 +50,7 @@ const (
 	hasUpperCase      string = ".*[[:upper:]]"
 	hasWhitespace     string = ".*[[:space:]]"
 	hasWhitespaceOnly string = "^[[:space:]]+$"
+	hasNumber         string = ".*[0-9].*"
 	IMEI              string = "^[0-9a-f]{14}$|^\\d{15}$|^\\d{18}$"
 	IMSI              string = "^\\d{14,15}$"
 	E164              string = `^\+?[1-9]\d{1,14}$`
@@ -107,6 +108,7 @@ var (
 	rxHasUpperCase      = regexp.MustCompile(hasUpperCase)
 	rxHasWhitespace     = regexp.MustCompile(hasWhitespace)
 	rxHasWhitespaceOnly = regexp.MustCompile(hasWhitespaceOnly)
+	rxHasNumber         = regexp.MustCompile(hasNumber)
 	rxIMEI              = regexp.MustCompile(IMEI)
 	rxIMSI              = regexp.MustCompile(IMSI)
 	rxE164              = regexp.MustCompile(E164)
