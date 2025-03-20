@@ -1779,42 +1779,29 @@ func IsYYYYMMDD(str string) bool {
 // and that each part is a valid base64url-encoded value. It also ensures the header and payload
 // decode to valid JSON objects.
 func IsJWT(str string) bool {
-    // Check for empty string or missing dots
     if str == "" || strings.Count(str, ".") != 2 {
         return false
     }
-
-    // Split into parts: header, payload, signature
     parts := strings.Split(str, ".")
     if len(parts) != 3 {
         return false
     }
-
-    // Check each part
-    for i, part := range parts[:2] { // Only header and payload need to be JSON
-        // Check if part is empty
+    for i, part := range parts[:2] {
         if part == "" {
             return false
         }
-
-        // Decode base64url
         decoded, err := base64.RawURLEncoding.DecodeString(part)
         if err != nil {
             return false
         }
-
-        // Ensure decoded part is valid JSON
         if !json.Valid(decoded) {
             return false
         }
-
-        // Use i to avoid "declared and not used" error (e.g., logging or additional checks)
-        if i > 1 { // This condition is always false here, just to use i
+        if i > 1 {
             return false
         }
     }
 
-    // Signature part must be non-empty and base64url-encoded
     if parts[2] == "" {
         return false
     }
