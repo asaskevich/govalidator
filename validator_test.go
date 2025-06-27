@@ -2634,6 +2634,18 @@ func TestFieldsRequiredByDefaultButExemptStruct(t *testing.T) {
 	SetFieldsRequiredByDefault(false)
 }
 
+func TestIsJWT(t *testing.T) {
+    validJWT := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+    invalidJWT := "not.a.valid.jwt"
+
+    if !IsJWT(validJWT) {
+        t.Errorf("Expected IsJWT(%v) to be true", validJWT)
+    }
+    if IsJWT(invalidJWT) {
+        t.Errorf("Expected IsJWT(%v) to be false", invalidJWT)
+    }
+}
+
 func TestFieldsRequiredByDefaultButExemptOrOptionalStruct(t *testing.T) {
 	var tests = []struct {
 		param    FieldsRequiredByDefaultButExemptOrOptionalStruct

@@ -28,6 +28,7 @@ var (
 	notNumberRegexp         = regexp.MustCompile("[^0-9]+")
 	whiteSpacesAndMinus     = regexp.MustCompile(`[\s-]+`)
 	paramsRegexp            = regexp.MustCompile(`\(.*\)$`)
+	rxJWT                   = regexp.MustCompile(`^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$`)
 )
 
 const maxURLRuneCount = 2083
@@ -578,6 +579,10 @@ func IsVariableWidth(str string) bool {
 // IsBase64 checks if a string is base64 encoded.
 func IsBase64(str string) bool {
 	return rxBase64.MatchString(str)
+}
+// `IsJWT(str string)` – Check if the string is a valid JSON Web Token
+func IsJWT(str string) bool {
+    return rxJWT.MatchString(str)
 }
 
 // IsFilePath checks is a string is Win or Unix file path and returns it's type.

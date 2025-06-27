@@ -155,6 +155,7 @@ func IsIn(str string, params ...string) bool
 func IsInRaw(str string, params ...string) bool
 func IsInt(str string) bool
 func IsJSON(str string) bool
+func IsJWT(str string) bool
 func IsLatitude(str string) bool
 func IsLongitude(str string) bool
 func IsLowerCase(str string) bool
