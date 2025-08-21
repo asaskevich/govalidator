@@ -876,6 +876,9 @@ func TestIsURL(t *testing.T) {
 		{"foo_bar-fizz-buzz:1313", true},
 		{"foo_bar-fizz-buzz:13:13", false},
 		{"foo_bar-fizz-buzz://1313", false},
+		{"http://ñandú.com.ar", true},
+		{"https://ñandú.com.ar", true},
+		{"http://xn--and-6ma2c.com.ar", true},
 	}
 	for _, test := range tests {
 		actual := IsURL(test.param)
