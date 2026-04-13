@@ -876,6 +876,9 @@ func TestIsURL(t *testing.T) {
 		{"foo_bar-fizz-buzz:1313", true},
 		{"foo_bar-fizz-buzz:13:13", false},
 		{"foo_bar-fizz-buzz://1313", false},
+		// Missing colon in scheme (#494)
+		{"http//abc.com", false},
+		{"https//abc.com", false},
 	}
 	for _, test := range tests {
 		actual := IsURL(test.param)

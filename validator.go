@@ -105,6 +105,11 @@ func IsURL(str string) bool {
 	if str == "" || utf8.RuneCountInString(str) >= maxURLRuneCount || len(str) <= minURLRuneCount || strings.HasPrefix(str, ".") {
 		return false
 	}
+	// Reject strings that look like a scheme but are missing the colon,
+	// e.g. "http//example.com" or "https//example.com".
+	if (strings.HasPrefix(str, "http//") || strings.HasPrefix(str, "https//")) {
+		return false
+	}
 	strTemp := str
 	if strings.Contains(str, ":") && !strings.Contains(str, "://") {
 		// support no indicated urlscheme but with colon for port number
