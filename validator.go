@@ -28,6 +28,7 @@ var (
 	notNumberRegexp         = regexp.MustCompile("[^0-9]+")
 	whiteSpacesAndMinus     = regexp.MustCompile(`[\s-]+`)
 	paramsRegexp            = regexp.MustCompile(`\(.*\)$`)
+	rxJWT                   = regexp.MustCompile(`^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$`)
 )
 
 const maxURLRuneCount = 2083
@@ -104,6 +105,13 @@ func IsExistingEmail(email string) bool {
 func IsURL(str string) bool {
 	if str == "" || utf8.RuneCountInString(str) >= maxURLRuneCount || len(str) <= minURLRuneCount || strings.HasPrefix(str, ".") {
 		return false
+	}
+
+	// Reject strings that look like a scheme without the colon (e.g. "http//")
+	for _, scheme := range []string{"http//", "https//", "ftp//", "tcp//", "udp//", "ws//", "wss//"} {
+		if strings.HasPrefix(strings.ToLower(str), scheme) {
+			return false
+		}
 	}
 	strTemp := str
 	if strings.Contains(str, ":") && !strings.Contains(str, "://") {
@@ -521,10 +529,9 @@ func IsISBN(str string, version int) bool {
 	return IsISBN(str, 10) || IsISBN(str, 13)
 }
 
-// IsJSON checks if the string is valid JSON (note: uses json.Unmarshal).
+// IsJSON checks if the string is valid JSON.
 func IsJSON(str string) bool {
-	var js json.RawMessage
-	return json.Unmarshal([]byte(str), &js) == nil
+	return json.Valid([]byte(str))
 }
 
 // IsMultibyte checks if the string contains one or more multibyte chars. Empty string is valid.
@@ -578,6 +585,10 @@ func IsVariableWidth(str string) bool {
 // IsBase64 checks if a string is base64 encoded.
 func IsBase64(str string) bool {
 	return rxBase64.MatchString(str)
+}
+// `IsJWT(str string)` – Check if the string is a valid JSON Web Token
+func IsJWT(str string) bool {
+    return rxJWT.MatchString(str)
 }
 
 // IsFilePath checks is a string is Win or Unix file path and returns it's type.
