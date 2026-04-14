@@ -105,6 +105,7 @@ func IsURL(str string) bool {
 	if str == "" || utf8.RuneCountInString(str) >= maxURLRuneCount || len(str) <= minURLRuneCount || strings.HasPrefix(str, ".") {
 		return false
 	}
+
 	// Reject strings that look like a scheme without the colon (e.g. "http//")
 	for _, scheme := range []string{"http//", "https//", "ftp//", "tcp//", "udp//", "ws//", "wss//"} {
 		if strings.HasPrefix(strings.ToLower(str), scheme) {
