@@ -2641,15 +2641,15 @@ func TestFieldsRequiredByDefaultButExemptStruct(t *testing.T) {
 }
 
 func TestIsJWT(t *testing.T) {
-    validJWT := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-    invalidJWT := "not.a.valid.jwt"
+	validJWT := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+	invalidJWT := "not.a.valid.jwt"
 
-    if !IsJWT(validJWT) {
-        t.Errorf("Expected IsJWT(%v) to be true", validJWT)
-    }
-    if IsJWT(invalidJWT) {
-        t.Errorf("Expected IsJWT(%v) to be false", invalidJWT)
-    }
+	if !IsJWT(validJWT) {
+		t.Errorf("Expected IsJWT(%v) to be true", validJWT)
+	}
+	if IsJWT(invalidJWT) {
+		t.Errorf("Expected IsJWT(%v) to be false", invalidJWT)
+	}
 }
 
 func TestFieldsRequiredByDefaultButExemptOrOptionalStruct(t *testing.T) {
@@ -3901,5 +3901,75 @@ func TestIsYYYYMMDD(t *testing.T) {
 		if actual != test.expected {
 			t.Errorf("Expected IsYYYYMMDD(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
+	}
+}
+
+func TestIsJWT(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name     string
+		param    string
+		expected bool
+	}{
+		{
+			name:     "Valid JWT",
+			param:    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk",
+			expected: true,
+		},
+		{
+			name:     "Empty string",
+			param:    "",
+			expected: false,
+		},
+		{
+			name:     "No dots",
+			param:    "eyJhbGciOiJIUzI1NiJ9",
+			expected: false,
+		},
+		{
+			name:     "Too few parts",
+			param:    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjMifQ",
+			expected: false,
+		},
+		{
+			name:     "Too many parts",
+			param:    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjMifQ.dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk.extra",
+			expected: false,
+		},
+		{
+			name:     "Invalid base64url in header",
+			param:    "invalid!.eyJzdWIiOiIxMjMifQ.dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk",
+			expected: false,
+		},
+		{
+			name:     "Invalid base64url in payload",
+			param:    "eyJhbGciOiJIUzI1NiJ9.invalid!.dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk",
+			expected: false,
+		},
+		{
+			name:     "Invalid base64url in signature",
+			param:    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjMifQ.invalid!",
+			expected: false,
+		},
+		{
+			name:     "Non-JSON header",
+			param:    "aGVsbG8=.eyJzdWIiOiIxMjMifQ.dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk",
+			expected: false,
+		},
+		{
+			name:     "Non-JSON payload",
+			param:    "eyJhbGciOiJIUzI1NiJ9.aGVsbG8=.dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk",
+			expected: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual := IsJWT(tt.param)
+			if actual != tt.expected {
+				t.Errorf("IsJWT(%q) = %v, want %v", tt.param, actual, tt.expected)
+			}
+		})
 	}
 }
