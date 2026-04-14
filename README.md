@@ -10,11 +10,11 @@ A package of validators and sanitizers for strings, structs and collections. Bas
 Make sure that Go is installed on your computer.
 Type the following command in your terminal:
 
-	go get github.com/asaskevich/govalidator/v11
+	go get github.com/asaskevich/govalidator/v12
 
 or you can get specified release of the package with `gopkg.in`:
 
-	go get gopkg.in/asaskevich/govalidator.v10
+	go get gopkg.in/asaskevich/govalidator.v12
 
 After it the package is ready to use.
 
@@ -22,12 +22,12 @@ After it the package is ready to use.
 #### Import package in your project
 Add following line in your `*.go` file:
 ```go
-import "github.com/asaskevich/govalidator/v11"
+import "github.com/asaskevich/govalidator/v12"
 ```
 If you are unhappy to use long `govalidator`, you can do something like this:
 ```go
 import (
-  valid "github.com/asaskevich/govalidator/v11"
+  valid "github.com/asaskevich/govalidator/v12"
 )
 ```
 

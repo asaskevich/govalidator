@@ -73,7 +73,12 @@ func SetNilPtrAllowedByRequired(value bool) {
 
 // IsEmail checks if the string is an email.
 func IsEmail(str string) bool {
-	// TODO uppercase letters are not supported
+	// RFC 2047 encoded-word injection fix
+	// Type: CWE-20 (Improper Input Validation)
+	//	CWE-706 (Use of Incorrectly-Resolved Name)
+	if strings.Contains(str, "=?") && strings.Contains(str, "?=") {
+		return false
+	}
 	return rxEmail.MatchString(str)
 }
 
