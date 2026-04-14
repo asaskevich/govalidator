@@ -1779,3 +1779,38 @@ func IsYYYYMMDD(str string) bool {
 	_, err := time.Parse(layout, str)
 	return err == nil
 }
+
+// IsJWT validates if a string is a valid JSON Web Token (JWT) per RFC 7519.
+// It checks that the string has three parts (header, payload, signature) separated by dots,
+// and that each part is a valid base64url-encoded value. It also ensures the header and payload
+// decode to valid JSON objects.
+func IsJWT(str string) bool {
+    if str == "" || strings.Count(str, ".") != 2 {
+        return false
+    }
+    parts := strings.Split(str, ".")
+    if len(parts) != 3 {
+        return false
+    }
+    for i, part := range parts[:2] {
+        if part == "" {
+            return false
+        }
+        decoded, err := base64.RawURLEncoding.DecodeString(part)
+        if err != nil {
+            return false
+        }
+        if !json.Valid(decoded) {
+            return false
+        }
+        if i > 1 {
+            return false
+        }
+    }
+
+    if parts[2] == "" {
+        return false
+    }
+    _, err := base64.RawURLEncoding.DecodeString(parts[2])
+    return err == nil
+}
