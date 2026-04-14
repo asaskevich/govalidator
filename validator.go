@@ -65,7 +65,7 @@ func SetNilPtrAllowedByRequired(value bool) {
 
 // IsEmail checks if the string is an email.
 func IsEmail(str string) bool {
-	// TODO uppercase letters are not supported
+	
 	return rxEmail.MatchString(str)
 }
 
