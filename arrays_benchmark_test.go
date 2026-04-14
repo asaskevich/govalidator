@@ -21,6 +21,39 @@ func randomArray(n int) (res []interface{}) {
 	return
 }
 
+func BenchmarkSome(b *testing.B) {
+	data := randomArray(1000000)
+	var fn ConditionIterator = func(value interface{}, index int) bool {
+		return value.(int)%2 == 0
+	}
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		_ = Some(data, fn)
+	}
+}
+
+func BenchmarkEvery(b *testing.B) {
+	data := randomArray(1000000)
+	var fn ConditionIterator = func(value interface{}, index int) bool {
+		return value.(int)%2 == 0 || value.(int)%2 == 1
+	}
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		_ = Every(data, fn)
+	}
+}
+
+func BenchmarkReduce(b *testing.B) {
+	data := randomArray(100000)
+	var fn ReduceIterator = func(result interface{}, current interface{}) interface{} {
+		return result.(int) + current.(int)
+	}
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		_ = Reduce(data, fn, 0)
+	}
+}
+
 func BenchmarkEach(b *testing.B) {
 	data := randomArray(1000000)
 	b.ResetTimer()

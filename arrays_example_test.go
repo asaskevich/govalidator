@@ -1,5 +1,29 @@
 package govalidator
 
+func ExampleSome() {
+	data := []interface{}{1, 3, 5, 8}
+	var fn ConditionIterator = func(value interface{}, index int) bool {
+		return value.(int)%2 == 0
+	}
+	_ = Some(data, fn) // result = true
+}
+
+func ExampleEvery() {
+	data := []interface{}{2, 4, 6, 8}
+	var fn ConditionIterator = func(value interface{}, index int) bool {
+		return value.(int)%2 == 0
+	}
+	_ = Every(data, fn) // result = true
+}
+
+func ExampleReduce() {
+	data := []interface{}{1, 2, 3, 4}
+	var fn ReduceIterator = func(result interface{}, current interface{}) interface{} {
+		return result.(int) + current.(int)
+	}
+	_ = Reduce(data, fn, 0) // result = 10
+}
+
 func ExampleFilter() {
 	data := []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 	var fn ConditionIterator = func(value interface{}, index int) bool {
