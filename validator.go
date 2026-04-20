@@ -653,20 +653,14 @@ func IsWinFilePath(str string) bool {
 	if rxARWinPath.MatchString(str) {
 		//check windows path limit see:
 		//  http://msdn.microsoft.com/en-us/library/aa365247(VS.85).aspx#maxpath
-		if len(str[3:]) > 32767 {
-			return false
-		}
-		return true
+		return len(str[3:]) <= 32767
 	}
 	return false
 }
 
 // IsUnixFilePath checks both relative & absolute paths in Unix
 func IsUnixFilePath(str string) bool {
-	if rxARUnixPath.MatchString(str) {
-		return true
-	}
-	return false
+	return rxARUnixPath.MatchString(str)
 }
 
 // IsDataURI checks if a string is base64 encoded data URI such as an image
