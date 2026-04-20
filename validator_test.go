@@ -2484,7 +2484,6 @@ type UserValid struct {
 	Home     *Address
 	Work     []Address `valid:"required"`
 }
-
 type PrivateStruct struct {
 	privateField string `valid:"required,alpha,d_k"`
 	NonZero      int
@@ -2493,6 +2492,10 @@ type PrivateStruct struct {
 	Work         [2]Address
 	Home         Address
 	Map          map[string]Address
+}
+
+type SlicePtrAddress struct {
+	Addresses []*Address
 }
 
 type NegationStruct struct {
@@ -3109,7 +3112,6 @@ func TestFunkyIsInStruct(t *testing.T) {
 // }
 
 func TestValidateStruct(t *testing.T) {
-
 	var tests = []struct {
 		param    interface{}
 		expected bool
@@ -3125,6 +3127,11 @@ func TestValidateStruct(t *testing.T) {
 		{nil, true},
 		{User{"John", "john@yahoo.com", "123G#678", 0, &Address{"Street", "123456"}, []Address{}}, false},
 		{"im not a struct", false},
+		{Address{"Street", "123456"}, true},
+		{Address{"Street", "ABC456D89"}, false},
+		{SlicePtrAddress{[]*Address{{"Street", "123456"}}}, true},
+		{SlicePtrAddress{[]*Address{{"Street", "ABC456D89"}}}, false},
+		{SlicePtrAddress{[]*Address{{"Street", "123456"}, {"Street", "ABC456D89"}}}, false},
 	}
 	for _, test := range tests {
 		actual, err := ValidateStruct(test.param)
