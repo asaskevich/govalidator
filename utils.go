@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"html"
 	"math"
-	"path"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"unicode"
@@ -151,7 +151,7 @@ func RemoveTags(s string) string {
 // SafeFileName returns safe string that can be used in file names
 func SafeFileName(str string) string {
 	name := strings.ToLower(str)
-	name = path.Clean(path.Base(name))
+	name = filepath.Base(name)
 	name = strings.Trim(name, " ")
 	separators, err := regexp.Compile(`[ &_=+:]`)
 	if err == nil {
