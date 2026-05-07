@@ -596,7 +596,7 @@ func IsVariableWidth(str string) bool {
 
 // IsBase64 checks if a string is base64 encoded.
 func IsBase64(str string) bool {
-	return rxBase64.MatchString(str)
+	return str == "" || rxBase64.MatchString(str)
 }
 
 // IsJWT validates if a string is a valid JSON Web Token (JWT) per RFC 7519.
