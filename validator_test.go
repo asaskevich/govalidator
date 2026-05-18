@@ -820,7 +820,9 @@ func TestIsURL(t *testing.T) {
 		{"http://foobar.com/t$-_.+!*\\'(),", true},
 		{"http://www.foobar.com/~foobar", true},
 		{"http://www.-foobar.com/", false},
-		{"http://www.foo---bar.com/", false},
+		// Domain labels may contain runs of hyphens (RFC 1035 §2.3.1);
+		// only a leading or trailing hyphen is invalid. See #386.
+		{"http://www.foo---bar.com/", true},
 		{"http://r6---snnvoxuioq6.googlevideo.com", true},
 		{"mailto:someone@example.com", true},
 		{"irc://irc.server.org/channel", false},
