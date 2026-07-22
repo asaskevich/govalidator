@@ -68,8 +68,8 @@ func InRangeFloat64(value, left, right float64) bool {
 }
 
 // InRange returns true if value lies between left and right border, generic type to handle int, float32, float64 and string.
-// All types must the same type.
-// False if value doesn't lie in range or if it incompatible or not comparable
+// All types must be the same type.
+// False if value doesn't lie in range or if it is incompatible or not comparable.
 func InRange(value interface{}, left interface{}, right interface{}) bool {
 	switch value.(type) {
 	case int:
