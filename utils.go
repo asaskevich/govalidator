@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"html"
-	"math"
 	"path"
 	"regexp"
 	"strings"
@@ -210,54 +209,62 @@ func Truncate(str string, length int, ending string) string {
 	return str
 }
 
-// PadLeft pads left side of a string if size of string is less then indicated pad length
+// PadLeft pads left side of a string if size of string is less than indicated pad length
 func PadLeft(str string, padStr string, padLen int) string {
 	return buildPadStr(str, padStr, padLen, true, false)
 }
 
-// PadRight pads right side of a string if size of string is less then indicated pad length
+// PadRight pads right side of a string if size of string is less than indicated pad length
 func PadRight(str string, padStr string, padLen int) string {
 	return buildPadStr(str, padStr, padLen, false, true)
 }
 
-// PadBoth pads both sides of a string if size of string is less then indicated pad length
+// PadBoth pads both sides of a string if size of string is less than indicated pad length
 func PadBoth(str string, padStr string, padLen int) string {
 	return buildPadStr(str, padStr, padLen, true, true)
 }
 
 // PadString either left, right or both sides.
-// Note that padding string can be unicode and more then one character
+// Note that padding string can be unicode and more than one character
 func buildPadStr(str string, padStr string, padLen int, padLeft bool, padRight bool) string {
-
-	// When padded length is less then the current string size
+	// When padded length is less than the current string size
 	if padLen < utf8.RuneCountInString(str) {
+		return str
+	}
+	// Empty pad string cannot grow the result; avoid division by zero / Repeat panic.
+	if padStr == "" {
 		return str
 	}
 
 	padLen -= utf8.RuneCountInString(str)
 
-	targetLen := padLen
-
-	targetLenLeft := targetLen
-	targetLenRight := targetLen
+	targetLenLeft := padLen
+	targetLenRight := padLen
 	if padLeft && padRight {
 		targetLenLeft = padLen / 2
 		targetLenRight = padLen - targetLenLeft
 	}
 
-	strToRepeatLen := utf8.RuneCountInString(padStr)
-
-	repeatTimes := int(math.Ceil(float64(targetLen) / float64(strToRepeatLen)))
-	repeatedString := strings.Repeat(padStr, repeatTimes)
+	// Build pad sides by rune so multi-byte pad strings are not sliced mid-codepoint.
+	repeatRunes := func(n int) string {
+		if n <= 0 {
+			return ""
+		}
+		var b strings.Builder
+		padRunes := []rune(padStr)
+		for i := 0; i < n; i++ {
+			b.WriteRune(padRunes[i%len(padRunes)])
+		}
+		return b.String()
+	}
 
 	leftSide := ""
 	if padLeft {
-		leftSide = repeatedString[0:targetLenLeft]
+		leftSide = repeatRunes(targetLenLeft)
 	}
-
 	rightSide := ""
 	if padRight {
-		rightSide = repeatedString[0:targetLenRight]
+		rightSide = repeatRunes(targetLenRight)
 	}
 
 	return leftSide + str + rightSide

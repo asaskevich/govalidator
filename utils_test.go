@@ -475,3 +475,22 @@ func TestPadBoth(t *testing.T) {
 		}
 	}
 }
+
+
+func TestPadLeftUnicodeAndEmpty(t *testing.T) {
+	// Multi-byte pad unit must count as one rune of width, not slice mid-UTF-8.
+	got := PadLeft("x", "你", 3)
+	want := "你你x"
+	if got != want {
+		t.Errorf("PadLeft multi-byte pad: got %q want %q", got, want)
+	}
+	// Empty pad must not panic; cannot grow the string.
+	got = PadLeft("go", "", 8)
+	if got != "go" {
+		t.Errorf("PadLeft empty pad: got %q want %q", got, "go")
+	}
+	got = PadRight("go", "", 8)
+	if got != "go" {
+		t.Errorf("PadRight empty pad: got %q want %q", got, "go")
+	}
+}
