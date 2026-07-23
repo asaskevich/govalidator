@@ -39,7 +39,7 @@ func ToFloat(value interface{}) (res float64, err error) {
 			res = 0
 		}
 	default:
-		err = fmt.Errorf("ToInt: unknown interface type %T", value)
+		err = fmt.Errorf("ToFloat: unknown interface type %T", value)
 		res = 0
 	}
 
