@@ -546,4 +546,80 @@ func TestInRange(t *testing.T) {
 			t.Errorf("Expected InRange(%v, %v, %v) to be %v, got %v", test.param, test.left, test.right, test.expected, actual)
 		}
 	}
+
+	var testsString = []struct {
+		param    string
+		left     string
+		right    string
+		expected bool
+	}{
+		{"b", "a", "c", true},
+		{"a", "a", "a", true},
+		{"d", "a", "c", false},
+		{"", "a", "c", false},
+		{"b", "a", "b", true},
+		{"a", "a", "b", true},
+		// reversed bounds must be normalised, matching the numeric branches
+		{"b", "c", "a", true},
+		{"d", "c", "a", false},
+	}
+	for _, test := range testsString {
+		actual := InRange(test.param, test.left, test.right)
+		if actual != test.expected {
+			t.Errorf("Expected InRange(%q, %q, %q) to be %v, got %v", test.param, test.left, test.right, test.expected, actual)
+		}
+	}
+
+	// A string value with non-string bounds is "incompatible": the documented
+	// contract is to return false, never to panic (the numeric branches never do).
+	var testsIncompatible = []struct {
+		value interface{}
+		left  interface{}
+		right interface{}
+	}{
+		{"b", 1, 2},
+		{"b", 1.0, 2.0},
+		{"b", "a", 2},
+		{"b", 1, "c"},
+		{"b", nil, nil},
+	}
+	for _, test := range testsIncompatible {
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					t.Errorf("InRange(%v, %v, %v) panicked, expected false: %v", test.value, test.left, test.right, r)
+				}
+			}()
+			if InRange(test.value, test.left, test.right) {
+				t.Errorf("Expected InRange(%v, %v, %v) to be false for incompatible bounds", test.value, test.left, test.right)
+			}
+		}()
+	}
+}
+
+func TestInRangeString(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		param    string
+		left     string
+		right    string
+		expected bool
+	}{
+		{"b", "a", "c", true},
+		{"a", "a", "a", true},
+		{"c", "a", "b", false},
+		{"", "a", "c", false},
+		{"a", "a", "b", true},
+		{"b", "a", "b", true},
+		// reversed bounds are normalised, just like InRangeInt/InRangeFloat64
+		{"b", "c", "a", true},
+		{"d", "c", "a", false},
+	}
+	for _, test := range tests {
+		actual := InRangeString(test.param, test.left, test.right)
+		if actual != test.expected {
+			t.Errorf("Expected InRangeString(%q, %q, %q) to be %v, got %v", test.param, test.left, test.right, test.expected, actual)
+		}
+	}
 }
