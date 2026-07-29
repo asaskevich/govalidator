@@ -67,6 +67,14 @@ func InRangeFloat64(value, left, right float64) bool {
 	return value >= left && value <= right
 }
 
+// InRangeString returns true if value lies between left and right border (lexicographically)
+func InRangeString(value, left, right string) bool {
+	if left > right {
+		left, right = right, left
+	}
+	return value >= left && value <= right
+}
+
 // InRange returns true if value lies between left and right border, generic type to handle int, float32, float64 and string.
 // All types must the same type.
 // False if value doesn't lie in range or if it incompatible or not comparable
@@ -83,7 +91,12 @@ func InRange(value interface{}, left interface{}, right interface{}) bool {
 		intRight, _ := ToFloat(right)
 		return InRangeFloat64(intValue, intLeft, intRight)
 	case string:
-		return value.(string) >= left.(string) && value.(string) <= right.(string)
+		strLeft, okLeft := left.(string)
+		strRight, okRight := right.(string)
+		if !okLeft || !okRight {
+			return false
+		}
+		return InRangeString(value.(string), strLeft, strRight)
 	default:
 		return false
 	}
