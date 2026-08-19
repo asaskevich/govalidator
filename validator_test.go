@@ -1979,6 +1979,12 @@ func TestIsDNSName(t *testing.T) {
 		{"50.50.50.50", false},
 		{"localhost.localdomain.intern:65535", false},
 		{"漢字汉字", false},
+		{"foo-.com", false},
+		{"localhost-", false},
+		{"example-.org", false},
+		{"foo.bar-.com", false},
+		{"foo-bar.com", true},
+		{"a--b.com", true},
 		{"www.jubfvq1v3p38i51622y0dvmdk1mymowjyeu26gbtw9andgynj1gg8z3msb1kl5z6906k846pj3sulm4kiyk82ln5teqj9nsht59opr0cs5ssltx78lfyvml19lfq1wp4usbl0o36cmiykch1vywbttcus1p9yu0669h8fj4ll7a6bmop505908s1m83q2ec2qr9nbvql2589adma3xsq2o38os2z3dmfh2tth4is4ixyfasasasefqwe4t2ub2fz1rme.de", false},
 	}
 
