@@ -735,30 +735,38 @@ func IsDNSName(str string) bool {
 // IsHash checks if a string is a hash of type algorithm.
 // Algorithm is one of ['md4', 'md5', 'sha1', 'sha256', 'sha384', 'sha512', 'ripemd128', 'ripemd160', 'tiger128', 'tiger160', 'tiger192', 'crc32', 'crc32b']
 func IsHash(str string, algorithm string) bool {
-	var len string
 	algo := strings.ToLower(algorithm)
-
-	if algo == "crc32" || algo == "crc32b" {
-		len = "8"
-	} else if algo == "md5" || algo == "md4" || algo == "ripemd128" || algo == "tiger128" {
-		len = "32"
-	} else if algo == "sha1" || algo == "ripemd160" || algo == "tiger160" {
-		len = "40"
-	} else if algo == "tiger192" {
-		len = "48"
-	} else if algo == "sha3-224" {
-		len = "56"
-	} else if algo == "sha256" || algo == "sha3-256" {
-		len = "64"
-	} else if algo == "sha384" || algo == "sha3-384" {
-		len = "96"
-	} else if algo == "sha512" || algo == "sha3-512" {
-		len = "128"
-	} else {
+	var n int
+	switch algo {
+	case "crc32", "crc32b":
+		n = 8
+	case "md5", "md4", "ripemd128", "tiger128":
+		n = 32
+	case "sha1", "ripemd160", "tiger160":
+		n = 40
+	case "tiger192":
+		n = 48
+	case "sha3-224":
+		n = 56
+	case "sha256", "sha3-256":
+		n = 64
+	case "sha384", "sha3-384":
+		n = 96
+	case "sha512", "sha3-512":
+		n = 128
+	default:
 		return false
 	}
-
-	return Matches(str, "^[a-f0-9]{"+len+"}$")
+	if len(str) != n {
+		return false
+	}
+	for i := 0; i < n; i++ {
+		c := str[i]
+		if (c < '0' || c > '9') && (c < 'a' || c > 'f') {
+			return false
+		}
+	}
+	return true
 }
 
 // IsSHA3224 checks is a string is a SHA3-224 hash. Alias for `IsHash(str, "sha3-224")`

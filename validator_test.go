@@ -633,6 +633,8 @@ func TestIsHash(t *testing.T) {
 		{"720aea11019ef06440fbf05d87aa24680a2153df3907b23631e7177ce620fa1330ff07c0fddee54699a4c3ee0ee9d88", "sha3-384", false},
 		{"75d527c368f2efe848ecf6b073a36767800805e9eef2b1857d5f984f036eb6df891d75f72d9b154518c1cd58835286d1da9a38deba3de98b5a53e5ed78a84976", "sha3-512", true},
 		{"75d527c368f2efe848ecf6b073a36767800805e9eef2b1857d5f984f036eb6df891d75f72d9b154518c1cd58835286d1da9a38deba3de98b5a53e5ed78a8497", "sha3-512", false},
+		{"579282CFB65CA1F109B78536EFFAF621B853C9F7079664A3FBE2B519F435898C", "sha256", false},
+		{"", "md5", false},
 	}
 	for _, test := range tests {
 		actual := IsHash(test.param, test.algo)
