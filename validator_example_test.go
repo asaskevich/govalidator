@@ -48,9 +48,9 @@ func ExampleValidateStructAsync_basic() {
 }
 
 func ExampleValidateStruct_customTagMap() {
-	TagMap["duck"] = Validator(func(str string) bool {
+	TagMap.Set("duck", Validator(func(str string) bool {
 		return str == "duck"
-	})
+	}))
 
 	type Post struct {
 		Message string `valid:"duck"`
@@ -60,10 +60,10 @@ func ExampleValidateStruct_customTagMap() {
 }
 
 func ExampleValidateStruct_customParamTagMap() {
-	ParamTagMap["animal"] = ParamValidator(func(str string, params ...string) bool {
+	ParamTagMap.Set("animal", ParamValidator(func(str string, params ...string) bool {
 		return len(params) > 0 && str == params[0]
-	})
-	ParamTagRegexMap["animal"] = regexp.MustCompile("^animal\\((\\w+)\\)$")
+	}))
+	ParamTagRegexMap.Set("animal", regexp.MustCompile("^animal\\((\\w+)\\)$"))
 
 	type Post struct {
 		Message string `valid:"animal(dog)"`
