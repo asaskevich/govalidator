@@ -2,7 +2,9 @@ package govalidator
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 )
@@ -3136,9 +3138,9 @@ func TestValidateStruct(t *testing.T) {
 		}
 	}
 
-	TagMap["d_k"] = Validator(func(str string) bool {
+	TagMap.Set("d_k", Validator(func(str string) bool {
 		return str == "d_k"
-	})
+	}))
 	result, err := ValidateStruct(PrivateStruct{"d_k", 0, []int{1, 2}, []string{"hi", "super"}, [2]Address{{"Street", "123456"},
 		{"Street", "123456"}}, Address{"Street", "123456"}, map[string]Address{"address": {"Street", "123456"}}})
 	if !result {
@@ -3435,9 +3437,9 @@ func ExampleValidateStruct() {
 	post := &Post{"My Example Post", "duck", "123.234.54.3"}
 
 	//Add your own struct validation tags
-	TagMap["duck"] = Validator(func(str string) bool {
+	TagMap.Set("duck", Validator(func(str string) bool {
 		return str == "duck"
-	})
+	}))
 
 	result, err := ValidateStruct(post)
 	if err != nil {
@@ -3960,4 +3962,27 @@ func TestIsJWT(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestTagMapsConcurrentRegisterAndValidate(t *testing.T) {
+	type sample struct {
+		Name string `valid:"email"`
+	}
+
+	var wg sync.WaitGroup
+	for i := 0; i < 32; i++ {
+		wg.Add(1)
+		go func(n int) {
+			defer wg.Done()
+			name := fmt.Sprintf("conc%d", n)
+			TagMap.Set(name, Validator(func(str string) bool { return str != "" }))
+			ParamTagMap.Set(name, ParamValidator(func(str string, params ...string) bool { return true }))
+			ParamTagRegexMap.Set(name, regexp.MustCompile("^"+name+"\\((\\w+)\\)$"))
+			_, err := ValidateStruct(sample{Name: "user@example.com"})
+			if err != nil {
+				t.Errorf("ValidateStruct: %v", err)
+			}
+		}(i)
+	}
+	wg.Wait()
 }

@@ -49,18 +49,124 @@ type UnsupportedTypeError struct {
 // It implements the methods to sort by string.
 type stringValues []reflect.Value
 
-// InterfaceParamTagMap is a map of functions accept variants parameters for an interface value
-var InterfaceParamTagMap = map[string]InterfaceParamValidator{
-	"type": IsType,
+type interfaceParamTagMap struct {
+	sync.RWMutex
+	validators map[string]InterfaceParamValidator
 }
+
+func (tm *interfaceParamTagMap) Get(name string) (InterfaceParamValidator, bool) {
+	tm.RLock()
+	defer tm.RUnlock()
+	v, ok := tm.validators[name]
+	return v, ok
+}
+
+func (tm *interfaceParamTagMap) Set(name string, v InterfaceParamValidator) {
+	tm.Lock()
+	defer tm.Unlock()
+	tm.validators[name] = v
+}
+
+type interfaceParamTagRegexMap struct {
+	sync.RWMutex
+	regexes map[string]*regexp.Regexp
+}
+
+func (tm *interfaceParamTagRegexMap) Get(name string) (*regexp.Regexp, bool) {
+	tm.RLock()
+	defer tm.RUnlock()
+	v, ok := tm.regexes[name]
+	return v, ok
+}
+
+func (tm *interfaceParamTagRegexMap) Set(name string, re *regexp.Regexp) {
+	tm.Lock()
+	defer tm.Unlock()
+	tm.regexes[name] = re
+}
+
+func (tm *interfaceParamTagRegexMap) Iterate(fn func(name string, re *regexp.Regexp)) {
+	tm.RLock()
+	defer tm.RUnlock()
+	for name, re := range tm.regexes {
+		fn(name, re)
+	}
+}
+
+type paramTagMap struct {
+	sync.RWMutex
+	validators map[string]ParamValidator
+}
+
+func (tm *paramTagMap) Get(name string) (ParamValidator, bool) {
+	tm.RLock()
+	defer tm.RUnlock()
+	v, ok := tm.validators[name]
+	return v, ok
+}
+
+func (tm *paramTagMap) Set(name string, v ParamValidator) {
+	tm.Lock()
+	defer tm.Unlock()
+	tm.validators[name] = v
+}
+
+type paramTagRegexMap struct {
+	sync.RWMutex
+	regexes map[string]*regexp.Regexp
+}
+
+func (tm *paramTagRegexMap) Get(name string) (*regexp.Regexp, bool) {
+	tm.RLock()
+	defer tm.RUnlock()
+	v, ok := tm.regexes[name]
+	return v, ok
+}
+
+func (tm *paramTagRegexMap) Set(name string, re *regexp.Regexp) {
+	tm.Lock()
+	defer tm.Unlock()
+	tm.regexes[name] = re
+}
+
+func (tm *paramTagRegexMap) Iterate(fn func(name string, re *regexp.Regexp)) {
+	tm.RLock()
+	defer tm.RUnlock()
+	for name, re := range tm.regexes {
+		fn(name, re)
+	}
+}
+
+type tagMap struct {
+	sync.RWMutex
+	validators map[string]Validator
+}
+
+func (tm *tagMap) Get(name string) (Validator, bool) {
+	tm.RLock()
+	defer tm.RUnlock()
+	v, ok := tm.validators[name]
+	return v, ok
+}
+
+func (tm *tagMap) Set(name string, v Validator) {
+	tm.Lock()
+	defer tm.Unlock()
+	tm.validators[name] = v
+}
+
+// InterfaceParamTagMap is a map of functions accept variants parameters for an interface value
+var InterfaceParamTagMap = &interfaceParamTagMap{validators: map[string]InterfaceParamValidator{
+	"type": IsType,
+}}
 
 // InterfaceParamTagRegexMap maps interface param tags to their respective regexes.
-var InterfaceParamTagRegexMap = map[string]*regexp.Regexp{
+var InterfaceParamTagRegexMap = &interfaceParamTagRegexMap{regexes: map[string]*regexp.Regexp{
 	"type": regexp.MustCompile(`^type\((.*)\)$`),
-}
+}}
 
 // ParamTagMap is a map of functions accept variants parameters
-var ParamTagMap = map[string]ParamValidator{
+var ParamTagMap = &paramTagMap{validators: map[string]ParamValidator{
 	"length":          ByteLength,
 	"range":           Range,
 	"runelength":      RuneLength,
@@ -70,10 +176,10 @@ var ParamTagMap = map[string]ParamValidator{
 	"rsapub":          IsRsaPub,
 	"minstringlength": MinStringLength,
 	"maxstringlength": MaxStringLength,
-}
+}}
 
 // ParamTagRegexMap maps param tags to their respective regexes.
-var ParamTagRegexMap = map[string]*regexp.Regexp{
+var ParamTagRegexMap = &paramTagRegexMap{regexes: map[string]*regexp.Regexp{
 	"range":           regexp.MustCompile("^range\\((\\d+)\\|(\\d+)\\)$"),
 	"length":          regexp.MustCompile("^length\\((\\d+)\\|(\\d+)\\)$"),
 	"runelength":      regexp.MustCompile("^runelength\\((\\d+)\\|(\\d+)\\)$"),
@@ -83,7 +189,7 @@ var ParamTagRegexMap = map[string]*regexp.Regexp{
 	"rsapub":          regexp.MustCompile("^rsapub\\((\\d+)\\)$"),
 	"minstringlength": regexp.MustCompile("^minstringlength\\((\\d+)\\)$"),
 	"maxstringlength": regexp.MustCompile("^maxstringlength\\((\\d+)\\)$"),
-}
+}}
 
 type customTypeTagMap struct {
 	validators map[string]CustomTypeValidator
@@ -110,7 +216,7 @@ func (tm *customTypeTagMap) Set(name string, ctv CustomTypeValidator) {
 var CustomTypeTagMap = &customTypeTagMap{validators: make(map[string]CustomTypeValidator)}
 
 // TagMap is a map of functions, that can be used as tags for ValidateStruct function.
-var TagMap = map[string]Validator{
+var TagMap = &tagMap{validators: map[string]Validator{
 	"email":              IsEmail,
 	"url":                IsURL,
 	"dialstring":         IsDialString,
@@ -168,7 +274,7 @@ var TagMap = map[string]Validator{
 	"ulid":               IsULID,
 	"yyyymmdd":           IsYYYYMMDD,
 	"jwt":                IsJWT,
-}
+}}
 
 // ISO3166Entry stores country codes
 type ISO3166Entry struct {

@@ -328,9 +328,9 @@ _ = govalidator.Count(data, fn) // result = 5
 ###### ValidateStruct [#2](https://github.com/asaskevich/govalidator/pull/2)
 If you want to validate structs, you can use tag `valid` for any field in your structure. All validators used with this field in one tag are separated by comma. If you want to skip validation, place `-` in your tag. If you need a validator that is not on the list below, you can add it like this:
 ```go
-govalidator.TagMap["duck"] = govalidator.Validator(func(str string) bool {
+govalidator.TagMap.Set("duck", govalidator.Validator(func(str string) bool {
 	return str == "duck"
-})
+}))
 ```
 For completely custom validators (interface-based), see below.
 
@@ -427,16 +427,16 @@ post := &Post{
 }
 
 // Add your own struct validation tags
-govalidator.TagMap["duck"] = govalidator.Validator(func(str string) bool {
+govalidator.TagMap.Set("duck", govalidator.Validator(func(str string) bool {
 	return str == "duck"
-})
+}))
 
 // Add your own struct validation tags with parameter
-govalidator.ParamTagMap["animal"] = govalidator.ParamValidator(func(str string, params ...string) bool {
+govalidator.ParamTagMap.Set("animal", govalidator.ParamValidator(func(str string, params ...string) bool {
     species := params[0]
     return str == species
-})
-govalidator.ParamTagRegexMap["animal"] = regexp.MustCompile("^animal\\((\\w+)\\)$")
+}))
+govalidator.ParamTagRegexMap.Set("animal", regexp.MustCompile("^animal\\((\\w+)\\)$"))
 
 result, err := govalidator.ValidateStruct(post)
 if err != nil {

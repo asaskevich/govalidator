@@ -1575,15 +1575,19 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		}
 
 		// checks for interface param validators
-		for key, value := range InterfaceParamTagRegexMap {
+		var ifaceParamErr error
+		InterfaceParamTagRegexMap.Iterate(func(key string, value *regexp.Regexp) {
+			if ifaceParamErr != nil {
+				return
+			}
 			ps := value.FindStringSubmatch(validator)
 			if len(ps) == 0 {
-				continue
+				return
 			}
 
-			validatefunc, ok := InterfaceParamTagMap[key]
+			validatefunc, ok := InterfaceParamTagMap.Get(key)
 			if !ok {
-				continue
+				return
 			}
 
 			delete(options, validatorSpec)
@@ -1591,13 +1595,18 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 			field := fmt.Sprint(v)
 			if result := validatefunc(v.Interface(), ps[1:]...); (!result && !negate) || (result && negate) {
 				if customMsgExists {
-					return false, Error{t.Name, TruncatingErrorf(validatorStruct.customErrorMessage, field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+					ifaceParamErr = Error{t.Name, TruncatingErrorf(validatorStruct.customErrorMessage, field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+					return
 				}
 				if negate {
-					return false, Error{t.Name, fmt.Errorf("%s does validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+					ifaceParamErr = Error{t.Name, fmt.Errorf("%s does validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+					return
 				}
-				return false, Error{t.Name, fmt.Errorf("%s does not validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+				ifaceParamErr = Error{t.Name, fmt.Errorf("%s does not validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
 			}
+		})
+		if ifaceParamErr != nil {
+			return false, ifaceParamErr
 		}
 	}
 
@@ -1621,15 +1630,19 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 			}
 
 			// checks for param validators
-			for key, value := range ParamTagRegexMap {
+			var paramErr error
+			ParamTagRegexMap.Iterate(func(key string, value *regexp.Regexp) {
+				if paramErr != nil {
+					return
+				}
 				ps := value.FindStringSubmatch(validator)
 				if len(ps) == 0 {
-					continue
+					return
 				}
 
-				validatefunc, ok := ParamTagMap[key]
+				validatefunc, ok := ParamTagMap.Get(key)
 				if !ok {
-					continue
+					return
 				}
 
 				delete(options, validatorSpec)
@@ -1643,20 +1656,25 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 					field := fmt.Sprint(v) // make value into string, then validate with regex
 					if result := validatefunc(field, ps[1:]...); (!result && !negate) || (result && negate) {
 						if customMsgExists {
-							return false, Error{t.Name, TruncatingErrorf(validatorStruct.customErrorMessage, field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+							paramErr = Error{t.Name, TruncatingErrorf(validatorStruct.customErrorMessage, field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+							return
 						}
 						if negate {
-							return false, Error{t.Name, fmt.Errorf("%s does validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+							paramErr = Error{t.Name, fmt.Errorf("%s does validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+							return
 						}
-						return false, Error{t.Name, fmt.Errorf("%s does not validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
+						paramErr = Error{t.Name, fmt.Errorf("%s does not validate as %s", field, validator), customMsgExists, stripParams(validatorSpec), []string{}}
 					}
 				default:
 					// type not yet supported, fail
-					return false, Error{t.Name, fmt.Errorf("Validator %s doesn't support kind %s", validator, v.Kind()), false, stripParams(validatorSpec), []string{}}
+					paramErr = Error{t.Name, fmt.Errorf("Validator %s doesn't support kind %s", validator, v.Kind()), false, stripParams(validatorSpec), []string{}}
 				}
+			})
+			if paramErr != nil {
+				return false, paramErr
 			}
 
-			if validatefunc, ok := TagMap[validator]; ok {
+			if validatefunc, ok := TagMap.Get(validator); ok {
 				delete(options, validatorSpec)
 
 				switch v.Kind() {
