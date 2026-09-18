@@ -3186,6 +3186,28 @@ func TestRequired(t *testing.T) {
 		},
 		{
 			struct {
+				Flag *bool `valid:"required"`
+			}{},
+			false,
+		},
+		{
+			struct {
+				Flag *bool `valid:"required"`
+			}{
+				Flag: func() *bool { f := false; return &f }(),
+			},
+			true,
+		},
+		{
+			struct {
+				Flag *bool `valid:"required"`
+			}{
+				Flag: func() *bool { f := true; return &f }(),
+			},
+			true,
+		},
+		{
+			struct {
 				Addr Address `valid:"required"`
 			}{},
 			false,

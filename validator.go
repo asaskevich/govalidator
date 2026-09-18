@@ -1739,6 +1739,12 @@ func typeCheck(v reflect.Value, t reflect.StructField, o reflect.Value, options 
 		if v.IsNil() {
 			return true, nil
 		}
+		// A non-nil *bool is present even when the pointed-to value is false.
+		// isEmptyValue treats false as empty, so required would fail after
+		// dereference unless we drop it here (Fixes #460).
+		if v.Elem().Kind() == reflect.Bool {
+			delete(options, "required")
+		}
 		return typeCheck(v.Elem(), t, o, options)
 	case reflect.Struct:
 		return true, nil
