@@ -1014,6 +1014,11 @@ func TestIsFloat(t *testing.T) {
 		{"01.123", true},
 		{"-0.22250738585072011e-307", true},
 		{"+0.22250738585072011e-307", true},
+		{"e10", false},
+		{"e+10", false},
+		{"E-2", false},
+		{".", false},
+		{".e10", false},
 	}
 	for _, test := range tests {
 		actual := IsFloat(test.param)
