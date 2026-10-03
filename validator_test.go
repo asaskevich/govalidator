@@ -2957,6 +2957,9 @@ func TestEmptyStringPtr(t *testing.T) {
 		{EmptyIsInStruct{nil}, true, ""},
 		{EmptyIsInStruct{&valid}, true, ""},
 		{EmptyIsInStruct{&invalid}, false, "IsIn: 123456 does not validate as length(3|5)"},
+		{struct {
+			IsIn interface{} `valid:"length(3|5),required"`
+		}{}, true, ""},
 	}
 
 	SetNilPtrAllowedByRequired(true)
@@ -3107,6 +3110,49 @@ func TestFunkyIsInStruct(t *testing.T) {
 // 		}
 // 	}
 // }
+
+func TestValidateStructNilInterface(t *testing.T) {
+	type required struct {
+		Value interface{} `valid:"required"`
+	}
+	tests := []struct {
+		name        string
+		param       interface{}
+		expected    bool
+		expectedErr string
+	}{
+		{"required", required{}, false, "Value: non zero value required"},
+		{"typed nil", required{(*string)(nil)}, false, "Value: non zero value required"},
+		{"non-nil", required{"present"}, true, ""},
+		{"custom error", struct {
+			Value interface{} `valid:"required~value is missing"`
+		}{}, false, "value is missing"},
+		{"optional", struct {
+			Value interface{} `valid:"optional"`
+		}{}, true, ""},
+		{"ignored", struct {
+			Value interface{} `valid:"-"`
+		}{}, true, ""},
+		{"untagged", struct {
+			Value interface{}
+		}{}, true, ""},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			actual, err := ValidateStruct(test.param)
+			if actual != test.expected {
+				t.Errorf("Expected validation %v, got %v", test.expected, actual)
+			}
+			if err == nil {
+				if test.expectedErr != "" {
+					t.Errorf("Expected error %q, got nil", test.expectedErr)
+				}
+			} else if err.Error() != test.expectedErr {
+				t.Errorf("Expected error %q, got %q", test.expectedErr, err)
+			}
+		})
+	}
+}
 
 func TestValidateStruct(t *testing.T) {
 
