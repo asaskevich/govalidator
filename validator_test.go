@@ -1458,7 +1458,8 @@ func TestIsUUID(t *testing.T) {
 		{"412452646", false},
 		{"xxxa987fbc9-4bed-3078-cf07-9141ba07c9f3", false},
 		{"a987fbc9-4bed-4078-8f07-9141ba07c9f3", false},
-		{"a987fbc9-4bed-3078-cf07-9141ba07c9f3", true},
+		{"a987fbc9-4bed-3078-cf07-9141ba07c9f3", false}, // variant nibble 11xx is not RFC 4122
+		{"a987fbc9-4bed-3078-8f07-9141ba07c9f3", true},
 	}
 	for _, test := range tests {
 		actual := IsUUIDv3(test.param)
