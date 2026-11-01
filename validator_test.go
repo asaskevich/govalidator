@@ -1670,6 +1670,7 @@ func TestIsDataURI(t *testing.T) {
 			"QmcL2a6hNOyu0ixX/x2kSFXApEnVrJ+/IxGyfyw8kf4N2IZpW5nEP847lpfj0SZZ" +
 			"Fwrd1mnfnDbYohX2zRptLy2ZUn06Qo9pkG5ntvFEPo9bfZeULtjYzIl6K8gJ2uGZ" + "HQIDAQAB", true},
 		{"data:image/png;base64,12345", false},
+		{"data:image/png;base64", false},
 		{"", false},
 		{"data:text,:;base85,U3VzcGVuZGlzc2UgbGVjdHVzIGxlbw==", false},
 	}
