@@ -1441,6 +1441,7 @@ func TestIsUUID(t *testing.T) {
 		{"987fbc9-4bed-3078-cf07a-9141ba07c9f3", false},
 		{"aaaaaaaa-1111-1111-aaag-111111111111", false},
 		{"a987fbc9-4bed-3078-cf07-9141ba07c9f3", true},
+		{"A987FBC9-4BED-3078-CF07-9141BA07C9F3", true},
 	}
 	for _, test := range tests {
 		actual := IsUUID(test.param)
@@ -1478,6 +1479,7 @@ func TestIsUUID(t *testing.T) {
 		{"934859", false},
 		{"57b73598-8764-4ad0-a76a-679bb6640eb1", true},
 		{"625e63f3-58f5-40b7-83a1-a72ad31acffb", true},
+		{"F47AC10B-58CC-4372-A567-0E02B2C3D479", true},
 	}
 	for _, test := range tests {
 		actual := IsUUIDv4(test.param)
