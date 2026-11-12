@@ -1269,7 +1269,7 @@ func parseTagIntoMap(tag string) tagOptionsMap {
 	for i, option := range options {
 		option = strings.TrimSpace(option)
 
-		validationOptions := strings.Split(option, "~")
+		validationOptions := strings.SplitN(option, "~", 2)
 		if !isValidTag(validationOptions[0]) {
 			continue
 		}
