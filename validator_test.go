@@ -2512,6 +2512,10 @@ type StringMatchesStruct struct {
 	StringMatches string `valid:"matches(^[0-9]{3}$)"`
 }
 
+type StringMatchesRangeStruct struct {
+	StringMatches string `valid:"matches(^[0-9]{3,5}$)"`
+}
+
 // TODO: this testcase should be fixed
 // type StringMatchesComplexStruct struct {
 // 	StringMatches string `valid:"matches(^\\$\\([\"']\\w+[\"']\\)$)"`
@@ -3295,6 +3299,34 @@ func TestErrorByField(t *testing.T) {
 		if actual != test.expected {
 			t.Errorf("Expected ErrorByField(%q) to be %v, got %v", test.param, test.expected, actual)
 		}
+	}
+}
+
+func TestStringMatchesWithRangeQuantifier(t *testing.T) {
+	t.Parallel()
+
+	valid, err := ValidateStruct(StringMatchesRangeStruct{StringMatches: "12345"})
+	if err != nil || !valid {
+		t.Errorf("expected a five digit value to validate, got valid=%v err=%v", valid, err)
+	}
+
+	valid, err = ValidateStruct(StringMatchesRangeStruct{StringMatches: "123456"})
+	if err == nil || valid {
+		t.Errorf("expected a six digit value not to validate, got valid=%v err=%v", valid, err)
+	}
+}
+
+func TestParseTagIntoMapKeepsCommasInParams(t *testing.T) {
+	t.Parallel()
+
+	options := parseTagIntoMap("required,matches(^[0-9]{3,5}$),length(2|3)")
+	for _, validator := range []string{"required", "matches(^[0-9]{3,5}$)", "length(2|3)"} {
+		if _, ok := options[validator]; !ok {
+			t.Errorf("expected validator %q to be parsed", validator)
+		}
+	}
+	if len(options) != 3 {
+		t.Errorf("expected 3 validators, got %d", len(options))
 	}
 }
 
