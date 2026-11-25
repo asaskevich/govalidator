@@ -1264,7 +1264,7 @@ func ValidateMapAsync(s map[string]interface{}, m map[string]interface{}) (<-cha
 // parseTagIntoMap parses a struct tag `valid:required~Some error message,length(2|3)` into map[string]string{"required": "Some error message", "length(2|3)": ""}
 func parseTagIntoMap(tag string) tagOptionsMap {
 	optionsMap := make(tagOptionsMap)
-	options := strings.Split(tag, ",")
+	options := splitTagOptions(tag)
 
 	for i, option := range options {
 		option = strings.TrimSpace(option)
@@ -1282,12 +1282,68 @@ func parseTagIntoMap(tag string) tagOptionsMap {
 	return optionsMap
 }
 
+// splitTagOptions splits validators on commas, ignoring commas inside
+// parenthesized validator parameters such as matches(^[0-9]{3,5}$).
+func splitTagOptions(tag string) []string {
+	var options []string
+	start := 0
+	depth := 0
+	escaped := false
+
+	for i, r := range tag {
+		if escaped {
+			escaped = false
+			continue
+		}
+		if r == '\\' {
+			escaped = true
+			continue
+		}
+
+		switch r {
+		case '(':
+			depth++
+		case ')':
+			if depth > 0 {
+				depth--
+			}
+		case ',':
+			if depth == 0 {
+				options = append(options, tag[start:i])
+				start = i + len(string(r))
+			}
+		}
+	}
+
+	return append(options, tag[start:])
+}
+
 func isValidTag(s string) bool {
 	if s == "" {
 		return false
 	}
+	depth := 0
+	escaped := false
 	for _, c := range s {
+		if escaped {
+			escaped = false
+			continue
+		}
+		if c == '\\' {
+			escaped = true
+			continue
+		}
+		switch c {
+		case '(':
+			depth++
+		case ')':
+			if depth > 0 {
+				depth--
+			}
+		}
 		switch {
+		case c == ',' && depth > 0:
+			// Commas are valid inside parenthesized validator parameters.
 		case strings.ContainsRune("\\'\"!#$%&()*+-./:<=>?@[]^_{|}~ ", c):
 			// Backslash and quote chars are reserved, but
 			// otherwise any punctuation chars are allowed
